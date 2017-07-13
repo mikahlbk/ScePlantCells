@@ -8,8 +8,8 @@ Node::Node(double x, double y) {
     this->y_coord = y;
 }
 void Node::get_location(double& x, double& y) {
-    x = x_coord;
-    y = y_coord;
+    x = this->x_coord;
+    y = this->y_coord;
     return;
 }
 /** class Wall Node Functions **/
@@ -19,30 +19,43 @@ Wall_Node::Wall_Node(double x, double y, Node* left, Node* right) : Node(x,y) {
     this->left_neighbor = left;
     this->right_neighbor = right;
 }
-void Wall_Node::set_Location() {
-    //do some crazy math in here so that you can set
-    x_coord = ;
-    y_coord = ;
-    return;
+
+
+
+Force Wall_Node::get_angle() {
+
 }
-double Wall_Node::calc_Forces() {
+
+Force Wall_Node::calc_Forces() {
     double number;
 
     return number;
 }
+
+Force Wall_Node::calc_Morse() {
+
+}
+
+Force Wall_Node::calc_Linear() {
+
+}
+
+Force Wall_Node::calc_Bending() {
+
+}
+
 /** class Cyt Node Functions **/
-Cyt_Node::Cyt_Node(double x, double y) : Node(x,y) {};
+Cyt_Node::Cyt_Node(Location loc) : Node(loc) {};
 
-void Cyt_Node::set_Location() {
-    //some other crazy math
-    x_coord = ;
-    y_coord = ;
-    return;
-}
-double Cyt_Node::calc_Forces() {
+Force Cyt_Node::calc_Forces() {
     double number;
 
     return number;
+}
+
+Force Cyt_node::calc_Morse() {
+
+
 }
 
 /** class Corner Node Functions **/

@@ -1,25 +1,36 @@
 //node.h
-
+//=====================
+// Include Guards
 #ifndef NODE_H  //if node.h hasn't been included yet
 #define NODE_H  //    define it so the compiler knows 
+//=====================
+// Forward Declarations 
+
+//=====================
+// Include Declarations
+#include "loc.h"
+//=====================
 
 class Node {
     private:
     //variables that will be shared by all nodes
-        double x_coord;
-        double y_coord;
+		Location my_loc;
+		Force new_Force;
     public:
     //functions that you will want performed on all nodes
         //Constructor
-        Node(double x, double y);
+        Node(Location loc);
         //some functions you can define in base class because 
         //    all nodes will use the exact same function
-        virtual void get_location(double& x, double& y);
+        virtual Location get_location();
         //other functions might be executed differently based on
         //    which node you are. Thus define as "pure virtual" and 
         //    properly define them in a derived class
-        virtual void set_Location() = 0;
-        virtual double calc_Forces() = 0;
+        virtual Force calc_Forces() = 0;
+		virtual Force calc_Morse() = 0;
+		virtual Force calc_Linear() = 0;
+		virtual Force calc_Bending() = 0;
+        virtual void set_New_Location() = 0;
 };
 
 class Wall_Node: public Node {
@@ -31,14 +42,17 @@ class Wall_Node: public Node {
 
     public:
     //function that you want performed on all wall nodes
-        Wall_Node(double x, double y);
-        Wall_Node(double x, double y, Node* left, Node* right);
+        Wall_Node(Location loc);
+        Wall_Node(Location loc, Node* left, Node* right, double angle);
         //maybe could define them here if corner and edge both perform
         //    these functions identically
+		virtual double get_Angle();
+        virtual Force calc_Forces();
+		virtual Force calc_Morse();
+		virtual Force calc_Linear();
+		virtual Force calc_Bending();
         virtual void set_Location();
-        virtual double calc_Forces();
         //otherwise set as pure virtual
-        virtual bool is_Corner() = 0;
 
 };
 
@@ -47,9 +61,11 @@ class Cyt_Node: public Node {
     //if don't need to keep any more information then just leave blank
 
     public:
-        Cyt_Node(double x, double y);
+        Cyt_Node(Location loc);
+
+        virtual Force calc_Forces();
+		virtual Force calc_Morse();
         virtual void set_Location();
-        virtual double calc_Forces();
 
 };
 
@@ -57,21 +73,29 @@ class Corner_Node: public Wall_Node {
     private:
 
     public:
-        Corner_Node(double x, double y);
-        Corner_Node(double x, double y, Node* left, Node* right);
-        virtual bool is_Corner();
-
+        Corner_Node(Location loc);
+        Corner_Node(Location loc, Node* left, Node* right, double angle);
+		virtual Force calc_Forces();
+		virtual Force 
 };
 
-class Edge_Node: public Wall_Node {
+class Flank_Node: public Wall_Node {
     private:
 
     public:
-        Edge_Node(double x, double y);
-        Edge_Node(double x, double y, Node* left, Node* right);
-        virtual bool is_Corner();
+        Flank_Node(Location loc);
+        Flank_Node(Location loc, Node* left, Node* right, double angle);
 
 };
 
+class End_Node: public Wall_Node {
+	private:
 
+	public:
+		End_Node(Location loc);
+		End_Node(Location loc, Node* left, Node* right, double angle);
+		
+};
+
+//===========================
 #endif  
