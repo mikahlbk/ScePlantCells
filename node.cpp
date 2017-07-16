@@ -3,27 +3,27 @@
 #include "node.h"
 
 /** class Node Functions **/
-Node::Node(Location loc) {
+Node::Node(Coord loc) {
 	my_loc = loc;
 }
 
-Location Node::get_location() {
+Coord Node::get_location() {
     return my_loc;
 
 }
 
-Force Node::morse_Equation() {
+Coord Node::morse_Equation() {
 
 }
 
 /** class Cyt Node Functions **/
-Cyt_Node::Cyt_Node(Location loc) : Node(loc) {};
+Cyt_Node::Cyt_Node(Coord loc) : Node(loc) {};
 
 Force Cyt_Node::calc_Forces(Cell* my_cell) {
 	//for cyt, just need morse potential for int-int and int-membr
-	Force Fii = calc_Morse_II(my_cell->get_CytNodes());
+	Coord Fii = calc_Morse_II(my_cell->get_CytNodes());
 
-	Force Fmi = calc_Morse_MI(my_cell->get_WallNodes());
+	Coord Fmi = calc_Morse_MI(my_cell->get_WallNodes());
 	
     return Fmi + Fii;
 }
@@ -31,9 +31,9 @@ Force Cyt_Node::calc_Forces(Cell* my_cell) {
 // Needs to have access:
 //		-all the other cyt nodes of cell
 //		-all the membr nodes of cell
-Force Cyt_Node::calc_Morse_II(vector<Cyt_Node*>& cyt_nodes) {
+Coord Cyt_Node::calc_Morse_II(vector<Cyt_Node*>& cyt_nodes) {
 	//calc force for II
-	Force FII; //need to initialize to zero
+	Coord FII; //need to initialize to zero
 
 	for (int j = 0; j < cyt_nodes.size(); j++) {
 		//don't calculate yourself
@@ -46,9 +46,9 @@ Force Cyt_Node::calc_Morse_II(vector<Cyt_Node*>& cyt_nodes) {
 	return FII;
 }
 
-Force Cyt_Node::calc_Morse_MI(Wall_Node* curr)
+Coord Cyt_Node::calc_Morse_MI(Wall_Node* curr)
 	//calc force for IM
-	Force FMI;
+	Coord FMI;
 	Wall_Node* orig = curr;
 	
 	do {
@@ -64,9 +64,9 @@ Force Cyt_Node::calc_Morse_MI(Wall_Node* curr)
 
 
 /** class Wall Node Functions **/
-Wall_Node::Wall_Node(Location loc) : Node(loc) {};
+Wall_Node::Wall_Node(Coord loc) : Node(loc) {};
 
-Wall_Node::Wall_Node(Location loc, Wall_Node* left, Wall_Node* right) : Node(loc) {
+Wall_Node::Wall_Node(Coord loc, Wall_Node* left, Wall_Node* right) : Node(loc) {
     this->left = left;
     this->right = right;
 }
@@ -75,9 +75,9 @@ double Wall_Node::get_Angle() {
 	return my_angle;
 }
 
-Force Wall_Node::calc_Forces(Cell* my_cell) {
+Coord Wall_Node::calc_Forces(Cell* my_cell) {
 	
-	Force sum;
+	Coord sum;
 
 	sum += calc_Morse_SC(my_cell->get_CytNodes);
 	sum += calc_Morse_DC();
@@ -87,8 +87,8 @@ Force Wall_Node::calc_Forces(Cell* my_cell) {
 	return sum;
 }
 //morse potential between wall node i and every cyt node in cell
-Force Wall_Node::calc_Morse_SC(vector<Cyt_Node*> cyt_nodes) {
-	Force Fmi;
+Coord Wall_Node::calc_Morse_SC(vector<Cyt_Node*> cyt_nodes) {
+	Coord Fmi;
 	
 	for (int i = 0; i < cyt_nodes.size(); i++) {
 		Fmi += this->morse_Function(cyt_nodes.at(j), Umi, Wmi, Zmi, Gii);
@@ -97,8 +97,8 @@ Force Wall_Node::calc_Morse_SC(vector<Cyt_Node*> cyt_nodes) {
 	return Fmi;
 }
 //probably need vector of relatively close cells
-Force Wall_Node::calc_Morse_DC(vector<Cell*>& cells) {
-	Force Fdc;
+Coord Wall_Node::calc_Morse_DC(vector<Cell*>& cells) {
+	Coord Fdc;
 	//iterate through each cell
 	for (int i = 0; i < cells.size(); i++) {
 		//iterate through membrane nodes of each cell
@@ -113,19 +113,19 @@ Force Wall_Node::calc_Morse_DC(vector<Cell*>& cells) {
 	return Fdc;
 }
 
-Force Wall_Node::calc_Bending() {
-	Force F_bend;
+Coord Wall_Node::calc_Bending() {
+	Coord F_bend;
 
 	return F_bend;
 }
 /** class Corner Node Functions **/
-Corner_Node::Corner_Node(Location loc) : Wall_Node(loc) {};
+Corner_Node::Corner_Node(Coord loc) : Wall_Node(loc) {};
 
-Corner_Node::Corner_Node(Location loc, Wall_Node* left, Wall_Node* right, double angle) 
+Corner_Node::Corner_Node(Coord loc, Wall_Node* left, Wall_Node* right, double angle) 
     : Wall_Node(loc, left, right, angle) {}
 
-Force Corner_Node::calc_Forces() {
-	Force sum;
+Coord Corner_Node::calc_Forces() {
+	Coord sum;
 
 	//calc Morse_SC
 	sum += calc_Morse_SC();
@@ -136,51 +136,51 @@ Force Corner_Node::calc_Forces() {
 	return sum;
 }
 
-Force Corner_Node::calc_Linear() {
+Coord Corner_Node::calc_Linear() {
 	//as a corner, have to find out which spring is end and 
 	//	which is flank
 
 	//calc left spring force
-	Force F_left = this->linear_Equation(left, left->get_linearSpring());
+	Coord F_left = this->linear_Equation(left, left->get_linearSpring());
 
 	//calc right spring force
-	Force F_rt = this->linear_Equation(right, right->get_linearSpring());
+	Coord F_rt = this->linear_Equation(right, right->get_linearSpring());
 
 	return F_left + F_rt;
 }
 
 /** class Flank Node function **/
-Flank_Node::Flank_Node(Location loc) : Wall_Node(loc) {};
+Flank_Node::Flank_Node(Coord loc) : Wall_Node(loc) {};
 
-Flank_Node::Flank_Node(Location loc, Wall_Node* left, Wall_Node* right, double angle) 
+Flank_Node::Flank_Node(Coord loc, Wall_Node* left, Wall_Node* right, double angle) 
 	: Wall_Node(loc, left, right, angle) {}
 
-Force Flank_Node::calc_Linear() {
+Coord Flank_Node::calc_Linear() {
 	//as a flank node, both springs on either side have flank constants
 
 	//calc left spring force
-	Force F_left = this->linear_Equation(left, );
+	Coord F_left = this->linear_Equation(left, );
 
 	//calc right spring force
-	Force F_rt = this->linear_Equation(right, );
+	Coord F_rt = this->linear_Equation(right, );
 
 	return F_left + F_rt;
 }
 
 /** class Edge Node function **/
-End_Node::End_Node(Location loc) : Wall_Node(loc) {};
+End_Node::End_Node(Coord loc) : Wall_Node(loc) {};
 
-End_Node::End_Node(Location loc, Node* left, Node* right, double angle)
+End_Node::End_Node(Coord loc, Node* left, Node* right, double angle)
     : Wall_Node(loc, left, right, angle) {}
 
-Force End_Node::calc_Linear() {
+Coord End_Node::calc_Linear() {
 	//as end node, both springs on either sied have end constants
 
 	//calc left spring force
-	Force F_left = this->linear_Equation(left, );
+	Coord F_left = this->linear_Equation(left, );
 
 	//calc right spring force
-	Force F_rt = this->linear_Equation(right, );
+	Coord F_rt = this->linear_Equation(right, );
 
 	return F_left + F_rt;
 }
