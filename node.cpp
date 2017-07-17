@@ -5,6 +5,7 @@
 /** class Node Functions **/
 Node::Node(Coord loc) {
 	my_loc = loc;
+	new_Force = Coord();
 }
 
 Coord Node::get_location() {
@@ -12,20 +13,16 @@ Coord Node::get_location() {
 
 }
 
-Coord Node::morse_Equation() {
-
-}
-
 /** class Cyt Node Functions **/
 Cyt_Node::Cyt_Node(Coord loc) : Node(loc) {};
 
-Force Cyt_Node::calc_Forces(Cell* my_cell) {
+void Cyt_Node::calc_Forces(Cell* my_cell) {
 	//for cyt, just need morse potential for int-int and int-membr
 	Coord Fii = calc_Morse_II(my_cell->get_CytNodes());
 
 	Coord Fmi = calc_Morse_MI(my_cell->get_WallNodes());
 	
-    return Fmi + Fii;
+    new_Force = Fmi + Fii;
 }
 
 // Needs to have access:
@@ -33,65 +30,75 @@ Force Cyt_Node::calc_Forces(Cell* my_cell) {
 //		-all the membr nodes of cell
 Coord Cyt_Node::calc_Morse_II(vector<Cyt_Node*>& cyt_nodes) {
 	//calc force for II
-	Coord FII; //need to initialize to zero
+	Coord Fii; //need to initialize to zero
 
 	for (int j = 0; j < cyt_nodes.size(); j++) {
 		//don't calculate yourself
 		if (cyt_nodes.at(j) != this) {
 			//calc morse between this node and node j
-			FII += this->morse_Function(cyt_nodes.at(j), Uii, Wii, Zii, Gii);
+			Fii += this->morse_Function(cyt_nodes.at(j), Uii, Wii, Zii, Gii);
 		}
 	}
 
-	return FII;
+	return Fii;
 }
 
-Coord Cyt_Node::calc_Morse_MI(Wall_Node* curr)
+Coord Cyt_Node::calc_Morse_MI(Wall_Node* orig)
 	//calc force for IM
-	Coord FMI;
-	Wall_Node* orig = curr;
+	Coord Fmi;
+	Wall_Node* curr = orig;
 	
 	do {
-		FMI = this->morse_Function(curr, Umi, Wmi, Zmi, Gii);
+		Fmi = this->morse_Function(curr, Umi, Wmi, Zmi, Gii);
 		//update curr_wall
 		curr = curr->get_Left_Neighbor();
 
 	} while (curr != orig); 
 
-	return FMI;
+	return Fmi;
 }
 
+Coord Cyt_Node::morse_Equation(Cyt_Node* cyt) {
+	//use Int-Int variables
+
+}
+
+Coord Cyt_Node::morse_Equation(Wall_Node* wall) {
+	//use Mem-Int variables
+
+}
 
 
 /** class Wall Node Functions **/
 Wall_Node::Wall_Node(Coord loc) : Node(loc) {};
 
-Wall_Node::Wall_Node(Coord loc, Wall_Node* left, Wall_Node* right) : Node(loc) {
+Wall_Node::Wall_Node(Coord loc, Wall_Node* left, Wall_Node* right, double angle) : Node(loc) {
     this->left = left;
     this->right = right;
+	my_angle = angle;
 }
 
 double Wall_Node::get_Angle() {
 	return my_angle;
 }
 
-Coord Wall_Node::calc_Forces(Cell* my_cell) {
+void Wall_Node::calc_Forces(Cell* my_cell) {
 	
 	Coord sum;
 
 	sum += calc_Morse_SC(my_cell->get_CytNodes);
-	sum += calc_Morse_DC();
+	sum += calc_Morse_DC(my_cell->get_Neigh_Cells());
 	sum += calc_Linear();
 	sum += calc_Bending();
 
-	return sum;
+	new_Force = sum;;
 }
 //morse potential between wall node i and every cyt node in cell
 Coord Wall_Node::calc_Morse_SC(vector<Cyt_Node*> cyt_nodes) {
 	Coord Fmi;
 	
 	for (int i = 0; i < cyt_nodes.size(); i++) {
-		Fmi += this->morse_Function(cyt_nodes.at(j), Umi, Wmi, Zmi, Gii);
+		Fmi += this->morse_Equation(cyt_nodes.at(j));
 	}
 	
 	return Fmi;
@@ -101,10 +108,12 @@ Coord Wall_Node::calc_Morse_DC(vector<Cell*>& cells) {
 	Coord Fdc;
 	//iterate through each cell
 	for (int i = 0; i < cells.size(); i++) {
+		//find which nodes from cell.at(i) you will need
+
 		//iterate through membrane nodes of each cell
 		for () {
 			
-			Fdc += this->morse_Function(   , Ummd, Wmmd, Zmmd, Gmmd);
+			Fdc += this->morse_Function();
 
 		}
 
@@ -118,6 +127,8 @@ Coord Wall_Node::calc_Bending() {
 
 	return F_bend;
 }
+
+
 /** class Corner Node Functions **/
 Corner_Node::Corner_Node(Coord loc) : Wall_Node(loc) {};
 

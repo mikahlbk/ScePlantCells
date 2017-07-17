@@ -77,7 +77,7 @@ double Coord::dot(const Coord& c) const {
 }
 
 Coord Coord::cross(const Coord& c) const {
-	Coord q;
+	Coord q(1,2);
 	return q;
 }
 

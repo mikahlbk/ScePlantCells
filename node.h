@@ -23,12 +23,11 @@ class Node {
         //some functions you can define in base class because 
         //    all nodes will use the exact same function
         virtual Coord get_location();
-		virtual morse_Equation(Node* node, double U, double W,
-							double Z, double G);
+		virtual void update_Location();
         //other functions might be executed differently based on
         //    which node you are. Thus define as "pure virtual" and 
         //    properly define them in a derived class
-        virtual Coord calc_Forces() = 0;
+        virtual void calc_Forces(Cell* my_cell);
 };
 
 class Cyt_Node: public Node {
@@ -37,9 +36,11 @@ class Cyt_Node: public Node {
 
     public:
         Cyt_Node(Coord loc);
-        virtual Coord calc_Forces(Cell* my_cell);
-		virtual Coord calc_Morse_II(vector<Cyt_Node*>& cyt_nodes);
-		virtual Coord calc_Morse_MI(Wall_Node* curr);
+        virtual void calc_Forces(Cell* my_cell);
+		Coord calc_Morse_II(vector<Cyt_Node*>& cyt_nodes);
+		Coord calc_Morse_MI(Wall_Node* curr);
+		Coord morse_Equation(Cyt_Node* cyt);
+		Coord morse_Equation(Wall_Node* wall);
 };
 
 class Wall_Node: public Node {
@@ -56,10 +57,12 @@ class Wall_Node: public Node {
         //maybe could define them here if corner and edge both perform
         //    these functions identically
 		virtual double get_Angle();
-        virtual Coord calc_Forces();
-		virtual Coord calc_Morse_SC();
-		virtual Coord calc_Morse_DC();
-		virtual Coord linear_Equation();
+        virtual Coord calc_Forces(Cell* my_cell);
+		virtual Coord calc_Morse_SC(vector<Cyt_Node*>& cyt_nodes);
+		virtual Coord calc_Morse_DC(vector<Cell*>& cells);
+		virtual Coord morse_Equation(Cyt_Node* cyt);
+		virtual Coord morse_Equation(Wall_Node* wall);
+		virtual Coord linear_Equation(Wall_Node* wall, k_Linear);
 		virtual Coord bending_Equation();
 
         //otherwise set as pure virtual
