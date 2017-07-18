@@ -15,6 +15,9 @@
 
 ///// Cell wall mechanical parameters
 
+//equilibrium angle for end node
+const double thetaEnd;
+
 //equilibrium angle for corner node
 const double thetaCorner;
 
