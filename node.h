@@ -52,7 +52,7 @@ class Wall_Node: public Node {
 
     public:
     //function that you want performed on all wall nodes
-        Wall_Node(Coord loc);
+        Wall_Node(Coord loc, double angle);
         Wall_Node(Coord loc, Wall_Node* left, Wall_Node* right, double angle);
         //maybe could define them here if corner and edge both perform
         //    these functions identically

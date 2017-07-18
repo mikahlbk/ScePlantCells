@@ -4,17 +4,113 @@
 
 //===================
 // Include Dependencies
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <vector>
 
+#include "coord.h"
+#include "node.h"
+#include "cell.h"
 //===================
 
 // Cell Class Member functions
 
 // Constructors
 
-Cell::Cell() {}
-
 Cell::Cell(string filename) {
+	
+	ifstream ifs(filename.c_str());
 
+	if(!ifs) {
+		cout << filename << " is not available" << endl;
+		return 1;
+	}
+
+	stringstream ss;
+	string line;
+	string temp;
+	char comma;
+	double x, y;
+	Wall_Node* prev_wall = NULL;
+	Wall_Node* curr_wall = NULL;
+	Cyt_Node* cyt = NULL;
+
+	while (getline(ifs,line)) {
+		ss.str(line);
+
+		getline(ss,temp,':');
+		
+		if (temp == "Wall_Nodes") {
+			cout << "Started taking in Wall Node Locations" << endl;
+		}
+		else if (temp == "Cyt_Nodes") {
+			//wrap back around to first wall node
+			first_corner->set_Right_Neighbor(prev_wall);
+			prev_wall->set_Left_Neighbor(first_corner);
+
+			//stuff for cyt_nodes
+
+		}
+		else if (temp == "Corner") {
+			ss >> x;
+			ss >> comma;
+			ss >> y;
+			Coord temp(x,y);
+			double angle = pi / 2;
+			
+			curr_wall = new Corner_Node(temp,angle);
+
+			if (prev_wall == NULL) {
+				first_corner = curr_wall;
+			}
+			else {
+				prev_wall->set_Left_Neighbor(curr_wall);
+				curr_wall->set_Right_Neighbor(prev_wall);
+			}
+
+			prev_wall = curr_wall;
+		}
+		else if (temp == "End") {
+			ss >> x;
+			ss >> comma;
+			ss >> y;
+			Coord temp(x,y);
+			double angle = pi;
+			
+			curr_wall = new End_Node(temp,angle);
+
+			prev_wall->set_Left_Neighbor(curr_wall);
+			curr_wall->set_Right_Neighbor(prev_wall);
+
+			prev_wall = curr_wall;
+		}
+		else if (temp == "Flank") {
+			ss >> x;
+			ss >> comma;
+			ss >> y;
+			Coord temp(x,y);
+			double angle = pi;
+
+			curr_wall = new Flank_Node(temp,angle);
+
+			prev_wall->set_Left_Neighbor(curr_wall);
+			curr_wall->set_Right_Neighbor(prev_wall);
+
+			prev_wall = curr_wall;
+		}
+		else if (temp == "Cyt") {
+			ss >> x;
+			ss >> comma;
+			ss >> y;
+			Coord temp(x,y);
+			
+			cyt = new Cyt_Node(temp);
+			cyt_nodes.push_back(cyt);
+		}
+		
+		ss.clr();
+	}
 
 }
 
