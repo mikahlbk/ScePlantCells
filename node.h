@@ -22,12 +22,12 @@ class Node {
         Node(Coord loc);
         //some functions you can define in base class because 
         //    all nodes will use the exact same function
-        virtual Coord get_location();
+        virtual Coord get_Location();
 		virtual void update_Location();
         //other functions might be executed differently based on
         //    which node you are. Thus define as "pure virtual" and 
         //    properly define them in a derived class
-        virtual void calc_Forces(Cell* my_cell);
+        virtual void calc_Forces(Cell* my_cell) = 0;
 };
 
 class Cyt_Node: public Node {
@@ -57,19 +57,24 @@ class Wall_Node: public Node {
         //maybe could define them here if corner and edge both perform
         //    these functions identically
 		virtual double get_Angle();
-        virtual Coord calc_Forces(Cell* my_cell);
+        virtual Wall_Node* get_Left_Neighbor();
+		virtual Wall_Node* get_Right_Neighbor();
+		virtual Coord calc_Forces(Cell* my_cell);
 		virtual Coord calc_Morse_SC(vector<Cyt_Node*>& cyt_nodes);
 		virtual Coord calc_Morse_DC(vector<Cell*>& cells);
 		virtual Coord morse_Equation(Cyt_Node* cyt);
 		virtual Coord morse_Equation(Wall_Node* wall);
 		virtual Coord linear_Equation(Wall_Node* wall, k_Linear);
-		virtual Coord bending_Equation();
+		virtual Coord bending_Equation_Center();
+		virtual Coord bending_Equation_Left();
+		virtual Coord bending_Equation_Right();
+		virtual Coord calc_Bending();
 
         //otherwise set as pure virtual
 		virtual Coord calc_Linear() = 0;
-		virtual Coord calc_Bending() = 0;
 		virtual double get_Equi_Angle() = 0;
 		virtual double get_linearSpring() = 0;
+		virtual double get_bendingSpring() = 0;
 };
 
 class Corner_Node: public Wall_Node {
@@ -78,7 +83,6 @@ class Corner_Node: public Wall_Node {
         Corner_Node(Coord loc, Node* left, Node* right, double angle);
 		virtual double get_Equi_Angle();
 		virtual Coord calc_Linear();
-		virtual Coord calc_Bending();
 };
 
 class Flank_Node: public Wall_Node {
@@ -86,7 +90,6 @@ class Flank_Node: public Wall_Node {
         Flank_Node(Coord loc);
         Flank_Node(Coord loc, Node* left, Node* right, double angle);
 		virtual Coord calc_Linear();
-		virtual Coord calc_Bending();
 		virtual double get_Equi_Angle();
 		virtual double get_linearSpring();
 };
