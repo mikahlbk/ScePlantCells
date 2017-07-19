@@ -59,6 +59,8 @@ class Wall_Node: public Node {
 		virtual double get_Angle();
         virtual Wall_Node* get_Left_Neighbor();
 		virtual Wall_Node* get_Right_Neighbor();
+		virtual void set_Left_Neighbor();
+		virtual void set_Right_Neighbor();
 		virtual Coord calc_Forces(Cell* my_cell);
 		virtual Coord calc_Morse_SC(vector<Cyt_Node*>& cyt_nodes);
 		virtual Coord calc_Morse_DC(vector<Cell*>& cells);

@@ -40,7 +40,11 @@ class Cell {
 		// Talking to other Cells
 
 		// Growth of cell
-
+		// returns the coordinte of the wall node whose 
+		// left length is the largest
+		Wall_Node* find_Largest_Length();
+		void add_Cell_Wall_Node();
+		void add_Cyt_Node();
 
 };
 

@@ -111,6 +111,15 @@ Wall_Node* Wall_Node::get_Right_Neighbor() {
 	return right;
 }
 
+void Wall_Node::set_Left_Neighbor(Wall_Node* new_Left){
+	//change the pointer
+	this->left = new_Left; 
+}
+
+void Wall_Node::set_Right_Neighbor(Wall_Node* new_Right) {
+	//change the pointer
+	this->right = new_Right;
+}
 void Wall_Node::calc_Forces(Cell* my_cell) {
 	
 	Coord sum;

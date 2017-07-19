@@ -165,4 +165,89 @@ void Cell::update_Node_Positions() {
 	return;
 }
 
+Wall_Node* Cell:: find_Largest_Length() {
+	Wall_Node* curr = first_corner;
+	Wall_Node* biggest = first_corner;
+	Coord left_Neighb_loc;
+	Coord curr_Loc;
+	Coord diff_vect;
+	double curr_len = 0;
+	double len;
+	//loop through all possible Cell Wall 'links' to find biggest
+	for (i = first_corner;i = first_corner->get_Right_Neighbor();i = curr->get_Left_Neighbor()) {
+		//finding current lengths and comparing
+		curr = i;
+		left_Neighb_loc = curr->get_Left_Neighbor()->get_Location();
+		curr_Loc = curr->get_Location();
+		diff_vect = left_Neighb_loc - curr_Loc;
+		len = diff_vect.length();
+		if(len > curr_len) {
+			curr_len = len;
+			biggest = curr;
+		}
+	}
+	return biggest;
+}
+
+void Cell::add_Cell_Wall_Node() {
+	//we will add the node based on what the function find_Largest_Length() returns
+	//find_Largest_Length() returns a pointer to the node where the largest
+	//Cell Wall link is to the left of that node
+	//first we apply find_Largest_Length() to the cell to get a pointer to the right
+	//of where the new node is added
+	Wall_Node*  right_Node = find_Largest_Length();
+	//to the left of this node will be the node to the left of the new node
+	Wall_Node*  left_Node = right_Node->get_Left_neighbor();
+	//now we find the coords of each of these nodes to use to find the new coords
+	Coord right_Coords = right_Node->get_Location();  
+	Coord left_Coords = left_Node->get_Location();
+	//add it halfway between these two coords
+	Coord new_Coords = (right_Coords + left_Coords)*(1/2);
+	//make the new wall node
+	Node new_Node(new_Coords);
+	new_Node.set_Left_Neighbor(left_Node);
+	new_Node.set_Right_Neighbor(right_Node);
+	right_Node->set_Left_Neighbor(new_Node*);
+	left_Node->set_Right_Neighbor(new_Node*);
+}
+
+void Cell::add_Cyt_Node() {
+	double len;
+	double width;
+	Coord len_vect;
+	Coord width_vect;
+	Coord new_Coords;
+	Wall_Node* second_corner;
+	Wall_Node* fourth_corner;
+	Wall_Node* curr = first_corner;
+	double i = 1;
+	do {
+		curr = curr->get_Left_Neighbor();
+		//if(curr is a corner node) {
+			i++;
+		}
+	} while(i<2);
+	second_corner = curr;
+	curr = first_corner;
+	double i = 1;
+	do {
+		curr = curr->get_Left_Neighbor();
+		//if(curr is a corner node) {
+			i++;
+		}
+	} while(i<3);
+	fourth_corner = curr;
+	len_vect = first_corner->get_Location()-fourth_corner->get_Location();
+	width_vect = first_corner->get_Location() - second_corner->get_Location();
+	//new_Coords_x = random number between zero and one multiplied by the length	
+	//new_Coords_y = same	
+	//new_Coords = (x,y)
+	Cyt_Node new_Cyt_Node(new_Coords);
+}
+	
+
+
+
+
+
 
