@@ -52,25 +52,30 @@ class Wall_Node: public Node {
 
     public:
     //function that you want performed on all wall nodes
-        Wall_Node(Coord loc, double angle);
-        Wall_Node(Coord loc, Wall_Node* left, Wall_Node* right, double angle);
+		// Constructors
+        Wall_Node(Coord loc);
+        Wall_Node(Coord loc, Wall_Node* left, Wall_Node* right);
         //maybe could define them here if corner and edge both perform
         //    these functions identically
+
+		// Getters and Setters
 		virtual double get_Angle();
         virtual Wall_Node* get_Left_Neighbor();
 		virtual Wall_Node* get_Right_Neighbor();
 		virtual void set_Left_Neighbor();
 		virtual void set_Right_Neighbor();
-		virtual Coord calc_Forces(Cell* my_cell);
+		// Force Calculations
+		virtual void calc_Forces(Cell* my_cell);
+		virtual void update_Angle();
 		virtual Coord calc_Morse_SC(vector<Cyt_Node*>& cyt_nodes);
 		virtual Coord calc_Morse_DC(vector<Cell*>& cells);
+		virtual Coord calc_Bending();
 		virtual Coord morse_Equation(Cyt_Node* cyt);
 		virtual Coord morse_Equation(Wall_Node* wall);
 		virtual Coord linear_Equation(Wall_Node* wall, k_Linear);
 		virtual Coord bending_Equation_Center();
 		virtual Coord bending_Equation_Left();
 		virtual Coord bending_Equation_Right();
-		virtual Coord calc_Bending();
 
         //otherwise set as pure virtual
 		virtual Coord calc_Linear() = 0;
@@ -101,7 +106,6 @@ class End_Node: public Wall_Node {
 		End_Node(Coord loc);
 		End_Node(Coord loc, Node* left, Node* right, double angle);
 		virtual Coord calc_Linear();
-		virtual Coord calc_Bending();
 		virtual double get_Equi_Angle();
 		virtual double get_linearSpring()
 };

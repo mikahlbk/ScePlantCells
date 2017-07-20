@@ -57,18 +57,14 @@ Cell::Cell(string filename) {
 			ss >> comma;
 			ss >> y;
 			Coord temp(x,y);
-			double angle = pi / 2;
 			
-			curr_wall = new Corner_Node(temp,angle);
+			curr_wall = new Corner_Node(temp);
 
-			if (prev_wall == NULL) {
-				first_corner = curr_wall;
-			}
-			else {
+			if (prev_wall != NULL) {
 				prev_wall->set_Left_Neighbor(curr_wall);
 				curr_wall->set_Right_Neighbor(prev_wall);
 			}
-
+			corners.push_back(curr_wall);
 			prev_wall = curr_wall;
 		}
 		else if (temp == "End") {
@@ -76,9 +72,8 @@ Cell::Cell(string filename) {
 			ss >> comma;
 			ss >> y;
 			Coord temp(x,y);
-			double angle = pi;
 			
-			curr_wall = new End_Node(temp,angle);
+			curr_wall = new End_Node(temp);
 
 			prev_wall->set_Left_Neighbor(curr_wall);
 			curr_wall->set_Right_Neighbor(prev_wall);
@@ -90,9 +85,8 @@ Cell::Cell(string filename) {
 			ss >> comma;
 			ss >> y;
 			Coord temp(x,y);
-			double angle = pi;
 
-			curr_wall = new Flank_Node(temp,angle);
+			curr_wall = new Flank_Node(temp);
 
 			prev_wall->set_Left_Neighbor(curr_wall);
 			curr_wall->set_Right_Neighbor(prev_wall);
@@ -112,16 +106,26 @@ Cell::Cell(string filename) {
 		ss.clr();
 	}
 
+	ifs.close();
+
+	// update angles of wall nodes
+	update_Wall_Angles();
 }
 
 // Getters and Setters
 
 void Cell::get_CytNodes(vector<Cyt_Node*>& cyts) {
 	cyts = cyt_nodes;
+	return;
 }
 
 Wall_Node* Cell::get_WallNodes() {
 	return first_corner;
+}
+
+void get_Neigh_Cells(vector<Cell*>& cells) {
+	cells = neigh_cells;
+	return;
 }
 
 // Calc Force
@@ -161,31 +165,52 @@ void Cell::update_Node_Positions() {
 		curr = curr->get_Left_Neighbor();
 	
 	} while(curr != first corner);
+
+	//
 	
 	return;
 }
 
-Wall_Node* Cell:: find_Largest_Length() {
+void Cell::update_Wall_Angles() {
+
+	Wall_Node* curr = corners.at(0);
+	
+	do {
+		curr->update_Angle();
+		curr = curr->get_Left_Neighbor();
+	} while (curr != corners.at(0));	
+
+	return;
+}
+
+Wall_Node* Cell::find_Largest_Length(int& side) {
+	side = 0; //know that we start on bottom flank
+	/* We know we start at first entry of corner vector. 
+		Each time we pass another corner, increment side by 1  */
+	// side = 0 or 2 => end
+	// side = 1 or 3 => flank
 	Wall_Node* curr = first_corner;
-	Wall_Node* biggest = first_corner;
+	Wall_Node* biggest = NULL;
 	Coord left_Neighb_loc;
 	Coord curr_Loc;
 	Coord diff_vect;
-	double curr_len = 0;
+	double max_len = 0;
 	double len;
 	//loop through all possible Cell Wall 'links' to find biggest
-	for (i = first_corner;i = first_corner->get_Right_Neighbor();i = curr->get_Left_Neighbor()) {
+	do {
 		//finding current lengths and comparing
-		curr = i;
 		left_Neighb_loc = curr->get_Left_Neighbor()->get_Location();
 		curr_Loc = curr->get_Location();
 		diff_vect = left_Neighb_loc - curr_Loc;
 		len = diff_vect.length();
-		if(len > curr_len) {
-			curr_len = len;
+		if(len > max_len) {
+			max_len = len;
 			biggest = curr;
 		}
-	}
+		curr = curr->get_Left_Neighbor();
+
+	} while (curr != first_corner);
+
 	return biggest;
 }
 
@@ -195,54 +220,41 @@ void Cell::add_Cell_Wall_Node() {
 	//Cell Wall link is to the left of that node
 	//first we apply find_Largest_Length() to the cell to get a pointer to the right
 	//of where the new node is added
-	Wall_Node*  right_Node = find_Largest_Length();
+	Wall_Node* right_Node = find_Largest_Length();
 	//to the left of this node will be the node to the left of the new node
-	Wall_Node*  left_Node = right_Node->get_Left_neighbor();
+	Wall_Node* left_Node = right_Node->get_Left_neighbor();
 	//now we find the coords of each of these nodes to use to find the new coords
 	Coord right_Coords = right_Node->get_Location();  
 	Coord left_Coords = left_Node->get_Location();
 	//add it halfway between these two coords
+
 	Coord new_Coords = (right_Coords + left_Coords)*(1/2);
-	//make the new wall node
-	Node new_Node(new_Coords);
-	new_Node.set_Left_Neighbor(left_Node);
-	new_Node.set_Right_Neighbor(right_Node);
-	right_Node->set_Left_Neighbor(new_Node*);
-	left_Node->set_Right_Neighbor(new_Node*);
+	
+	if ( ) { //end
+		Wall_Node* new_Node = new End_Node(new_Coords, left_Node, right_Node);
+	}
+	else { //flank
+		Wall_Node* new_Node = new Flank_Node(new_Coords, left_Node, right_Node);
+	}
+	
+	right_Node->set_Left_Neighbor(new_Node);
+	left_Node->set_Right_Neighbor(new_Node);
 }
 
 void Cell::add_Cyt_Node() {
-	double len;
-	double width;
-	Coord len_vect;
-	Coord width_vect;
-	Coord new_Coords;
-	Wall_Node* second_corner;
-	Wall_Node* fourth_corner;
-	Wall_Node* curr = first_corner;
-	double i = 1;
-	do {
-		curr = curr->get_Left_Neighbor();
-		//if(curr is a corner node) {
-			i++;
-		}
-	} while(i<2);
-	second_corner = curr;
-	curr = first_corner;
-	double i = 1;
-	do {
-		curr = curr->get_Left_Neighbor();
-		//if(curr is a corner node) {
-			i++;
-		}
-	} while(i<3);
-	fourth_corner = curr;
-	len_vect = first_corner->get_Location()-fourth_corner->get_Location();
-	width_vect = first_corner->get_Location() - second_corner->get_Location();
-	//new_Coords_x = random number between zero and one multiplied by the length	
-	//new_Coords_y = same	
-	//new_Coords = (x,y)
-	Cyt_Node new_Cyt_Node(new_Coords);
+
+	Coord len_vect = corners.at(0)->get_Location() - corners.at(3)->get_Location();
+	Coord width_vect = corners.at(0)->get_Location() - corners.at(1)->get_Location();
+	double new_x = (rand() / RAND_MAX) * width_vect.length();  
+	double new_y = (rand() / RAND_MAX) * len_vect.length();
+
+	Coord new_Coord(new_x, new_y);
+	new_Coord += corners.at(0);
+
+	Cyt_Node* cyt = new Cyt_Node(new_Coord);
+	cyt_nodes.push_back(cyt);
+
+	return;
 }
 	
 

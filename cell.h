@@ -18,18 +18,18 @@ class Cell {
 	private:
 		// Keep info about its cyt and wall nodes
 		vector<Cyt_Node*> cyt_nodes;
-		Wall_Node* first_corner;
+		vector<Wall_Node*> corners;
 		// Keep info about other cells
-		
+		vector<Cell*> neigh_cells;
 
 	public:
 		// Constructors
-		Cell();
 		Cell(string filename);
 
 		// Getters and Setters
 		void get_CytNodes(vector<Cyt_Node*>& cyts);
 		Wall_Node* get_WallNodes();
+		void get_Neigh_Cells(vector<Cell*>& cells);
 
 		// Keep track of neighbor cells
 
