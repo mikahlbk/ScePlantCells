@@ -19,6 +19,12 @@
 // Constructors
 
 Cell::Cell(string filename) {
+
+	//Initialize node counters to 0
+	num_wall_nodes = 0;
+	num_cyt_nodes = 0;
+	vector<Coord> init_walls;
+	vector<Coord> init_cyts;
 	
 	ifstream ifs(filename.c_str());
 
@@ -66,6 +72,9 @@ Cell::Cell(string filename) {
 			}
 			corners.push_back(curr_wall);
 			prev_wall = curr_wall;
+			
+			init_walls.push_back(temp);
+			num_wall_nodes++;
 		}
 		else if (temp == "End") {
 			ss >> x;
@@ -77,8 +86,10 @@ Cell::Cell(string filename) {
 
 			prev_wall->set_Left_Neighbor(curr_wall);
 			curr_wall->set_Right_Neighbor(prev_wall);
-
 			prev_wall = curr_wall;
+
+			init_walls.push_back(temp);
+			num_wall_nodes++;
 		}
 		else if (temp == "Flank") {
 			ss >> x;
@@ -90,8 +101,10 @@ Cell::Cell(string filename) {
 
 			prev_wall->set_Left_Neighbor(curr_wall);
 			curr_wall->set_Right_Neighbor(prev_wall);
-
 			prev_wall = curr_wall;
+
+			init_walls.push_back(temp);
+			num_wall_nodes++;
 		}
 		else if (temp == "Cyt") {
 			ss >> x;
@@ -101,6 +114,9 @@ Cell::Cell(string filename) {
 			
 			cyt = new Cyt_Node(temp);
 			cyt_nodes.push_back(cyt);
+
+			init_cyts.push_back(temp);
+			num_cyt_nodes++;
 		}
 		
 		ss.clr();
@@ -108,6 +124,11 @@ Cell::Cell(string filename) {
 
 	ifs.close();
 
+	// keep track of initial locations
+	wall_node_locs.push_back(init_walls);
+	cyt_node_locs.push_back(init_cyts);
+	wall_nodes_per_frame.push_back(num_wall_nodes);
+	cyt_nodes_per_frame.push_back(num_cyt_nodes);
 	// update angles of wall nodes
 	update_Wall_Angles();
 }
@@ -187,8 +208,8 @@ Wall_Node* Cell::find_Largest_Length(int& side) {
 	side = 0; //know that we start on bottom flank
 	/* We know we start at first entry of corner vector. 
 		Each time we pass another corner, increment side by 1  */
-	// side = 0 or 2 => end
-	// side = 1 or 3 => flank
+	// side = 1 or 3 => end
+	// side = 2 or 4 => flank
 	Wall_Node* curr = first_corner;
 	Wall_Node* biggest = NULL;
 	Coord left_Neighb_loc;
@@ -198,6 +219,11 @@ Wall_Node* Cell::find_Largest_Length(int& side) {
 	double len;
 	//loop through all possible Cell Wall 'links' to find biggest
 	do {
+		//if encounter a corner, increment side to know if end or flank
+		if (curr->is_Corner()) {
+			side++;
+		}
+
 		//finding current lengths and comparing
 		left_Neighb_loc = curr->get_Left_Neighbor()->get_Location();
 		curr_Loc = curr->get_Location();
@@ -209,7 +235,7 @@ Wall_Node* Cell::find_Largest_Length(int& side) {
 		}
 		curr = curr->get_Left_Neighbor();
 
-	} while (curr != first_corner);
+	} while (curr != corners.at(0));
 
 	return biggest;
 }

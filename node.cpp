@@ -324,6 +324,10 @@ Coord Corner_Node::calc_Linear() {
 	return F_left + F_rt;
 }
 
+bool Corner_Node::is_Corner() {
+	return true;
+}
+
 
 //===========================================================
 /** class Flank Node function **/
@@ -352,6 +356,11 @@ double Flank_Node::get_linearSpring() {
 	return kLinearFlank;
 }
 
+bool Flank_Node::is_Corner() {
+	return false;
+}
+
+
 //==============================================================
 /** class End Node function **/
 End_Node::End_Node(Coord loc) : Wall_Node(loc) {};
@@ -379,6 +388,9 @@ double End_Node::get_linearSpring() {
 	return kLinearEnd;
 }
 
+bool End_Node::is_Corner() {
+	return false;
+}
 
 //==========================================================
 // End of node.cpp

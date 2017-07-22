@@ -82,6 +82,7 @@ class Wall_Node: public Node {
 		virtual double get_Equi_Angle() = 0;
 		virtual double get_linearSpring() = 0;
 		virtual double get_bendingSpring() = 0;
+		virtual bool is_Corner() = 0;
 };
 
 class Corner_Node: public Wall_Node {
@@ -90,6 +91,7 @@ class Corner_Node: public Wall_Node {
         Corner_Node(Coord loc, Node* left, Node* right, double angle);
 		virtual double get_Equi_Angle();
 		virtual Coord calc_Linear();
+		virtual bool is_Corner();
 };
 
 class Flank_Node: public Wall_Node {
@@ -99,6 +101,7 @@ class Flank_Node: public Wall_Node {
 		virtual Coord calc_Linear();
 		virtual double get_Equi_Angle();
 		virtual double get_linearSpring();
+		virtual bool is_Corner();
 };
 
 class End_Node: public Wall_Node {
@@ -108,6 +111,7 @@ class End_Node: public Wall_Node {
 		virtual Coord calc_Linear();
 		virtual double get_Equi_Angle();
 		virtual double get_linearSpring()
+		virtual bool is_Corner();
 };
 
 //===========================

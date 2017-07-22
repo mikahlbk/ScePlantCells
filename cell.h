@@ -16,6 +16,14 @@
 class Cell {
 
 	private:
+		//keep track of how many nodes the cell has created
+		int num_wall_nodes;
+		int num_cyt_nodes;
+		vector<int> wall_nodes_per_frame;
+		vector<int> cyt_nodes_per_frame;
+		//2D vector for node locations
+		vector< vector<Coord> > wall_locs;
+		vector< vector<Coord> > cyt_locs;
 		// Keep info about its cyt and wall nodes
 		vector<Cyt_Node*> cyt_nodes;
 		vector<Wall_Node*> corners;
