@@ -45,8 +45,10 @@ class Cell {
 		void calc_New_Forces();
 		// Update Node Locations
 		void update_Node_Locations();
+		//Update Angles
+		void update_Wall_Angles();
 		// Talking to other Cells
-
+		
 		// Growth of cell
 		// returns the coordinte of the wall node whose 
 		// left length is the largest
