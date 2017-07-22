@@ -260,7 +260,17 @@ Coord Wall_Node::bending_Equation_Center() {
 	Coord F_center;
 	double k_bend = get_bendingSpring();
 	double equ_angle = get_Equi_Angle();
-	double self_Constant = k_bend*(my_angle - equ_angle)/sqrt(1-pow(cos(my_angle),2));
+	double self_Constant; 
+	
+	double eps = 0.00001;
+
+	if (my_angle - pi < eps) {
+		return F_center;
+	}
+	else {
+		self_Constant = k_bend*(my_angle - equ_angle)/sqrt(1-pow(cos(my_angle),2));
+	}
+
 	Coord left_vect = left->get_Location() - my_loc;
 	Coord right_vect = right->get_Location() - my_loc;
 	double left_len = left_vect.length();
@@ -280,7 +290,17 @@ Coord Wall_Node::bending_Equation_Left() {
 	double left_k_bend = left->get_bendingSpring();
 	double left_equ_angle = left->get_Equi_Angle();
 	double left_angle = left->get_Angle();
-	double left_Constant = left_k_bend*(left_angle - left_equ_angle)/sqrt(1-pow(cos(left_angle),2));
+	double left_Constant;
+	
+	double eps = 0.00001;
+
+	if (left_angle - pi < eps) {
+		return F_left;
+	}
+	else {
+		left_Constant = left_k_bend*(left_angle - left_equ_angle)/sqrt(1-pow(cos(left_angle),2));
+	}
+
 	Coord left_vect = left->get_Location() - my_loc;
 	double left_len = left_vect.length();
 	Coord left_left_vect = left->get_Left_Neighbor()->get_Location()-left->get_Location();
@@ -298,7 +318,17 @@ Coord Wall_Node::bending_Equation_Right() {
 	double right_k_bend = right->get_bendingSpring();
 	double right_equ_angle = right->get_Equi_Angle();
 	double right_angle = right->get_Angle();
-	double right_Constant = right_k_bend*(right_angle-right_equ_angle)/sqrt(1-pow(cos(right_angle),2));
+	double right_Constant;
+	
+	double eps = 0.00001;
+
+	if (right_angle - pi < eps) {
+		return F_right;
+	}
+	else {
+		right_Constant = right_k_bend*(right_angle-right_equ_angle)/sqrt(1-pow(cos(right_angle),2));
+	}
+
 	Coord right_vect = right->get_Location() - my_loc;
 	double right_len = right_vect.length();
 	Coord right_right_vect = right->get_Right_Neighbor()->get_Location()-right->get_Location();
