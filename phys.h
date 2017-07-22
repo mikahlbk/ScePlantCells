@@ -13,7 +13,7 @@
 //=====================
 
 // Simulation Constants
-const double dt = 0.01;
+const double dt = 0.0001;
 
 
 // Global Physics Constants
