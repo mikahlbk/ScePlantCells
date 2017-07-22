@@ -9,35 +9,42 @@
 
 //====================
 // Include dependencies
-#include "loc.h"
+#include <math.h>
 //=====================
+
+// Simulation Constants
+const double dt = 0.01;
+
+
 // Global Physics Constants
+
+const double pi = 3.1415926535897;
 
 ///// Cell wall mechanical parameters
 
 //equilibrium angle for end node
-const double thetaEnd;
+const double thetaEnd = pi;
 
 //equilibrium angle for corner node
-const double thetaCorner;
+const double thetaCorner = pi / 2;
 
 //equilibrium angle for flank node
-const double thetaFlank;
+const double thetaFlank = pi;
 
 //rotational spring constant for end node
-const double kBendEnd;
+const double kBendEnd = 6;
 
 //rotational spring constant for flank node
-const double kBendFlank;
+const double kBendFlank = 0.6;
 
 //linear spring constant for end node
-const double kLinearEnd;
+const double kLinearEnd = 30;
 
 //linear spring constant for flank node
-const double kLinearFlank;
+const double kLinearFlank = 6;
 
 //linear spring equilibrium length
-const double MembrEquLen;
+const double MembrEquLen = 0.0625;
 
 ///// Subcellular element parameters for membrane - membrane interactions
 
@@ -59,14 +66,6 @@ const double U_II = 0.488;
 const double W_II = 0.146484;
 const double xsi_II = 0.3125;
 const double gamma_II = 1.25;
-
-
-//=====================
-// Global Physics Equations
-
-Force morse_Potent_Equ();
-Force linear_Spring_Equ();
-Force 
 
 
 //=====================

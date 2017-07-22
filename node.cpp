@@ -1,17 +1,23 @@
 //node.cpp
 //=========================
+#include <iostream>
+#include <vector>
+#include <math.h>
+//=========================
+#include "phys.h"
 #include "coord.h"
 #include "node.h"
+#include "cell.h"
 //=========================
 
 //========================================
 /** class Node Functions **/
 Node::Node(Coord loc) {
 	my_loc = loc;
-	new_Force = Coord();
+	new_force = Coord();
 }
 
-Coord Node::get_location() {
+Coord Node::get_Location() {
     return my_loc;
 }
 
@@ -26,32 +32,37 @@ Cyt_Node::Cyt_Node(Coord loc) : Node(loc) {};
 
 void Cyt_Node::calc_Forces(Cell* my_cell) {
 	//for cyt, just need morse potential for int-int and int-membr
-	Coord Fii = calc_Morse_II(my_cell->get_CytNodes());
+	vector<Cyt_Node*> cyts;
+	my_cell->get_CytNodes(cyts);
+
+	Coord Fii = calc_Morse_II(cyts);
 
 	Coord Fmi = calc_Morse_MI(my_cell->get_WallNodes());
 	
-    new_Force = Fmi + Fii;
+    new_force = Fmi + Fii;
+
+	return;
 }
 
 // Needs to have access:
 //		-all the other cyt nodes of cell
 //		-all the membr nodes of cell
-Coord Cyt_Node::calc_Morse_II(const vector<Cyt_Node*>& cyt_nodes) {
+Coord Cyt_Node::calc_Morse_II(vector<Cyt_Node*>& cyt_nodes) {
 	//calc force for II
 	Coord Fii; //need to initialize to zero
 
-	for (int j = 0; j < cyt_nodes.size(); j++) {
+	for (unsigned int j = 0; j < cyt_nodes.size(); j++) {
 		//don't calculate yourself
 		if (cyt_nodes.at(j) != this) {
 			//calc morse between this node and node j
-			Fii += morse_Equation(cyt_nodes.at(i));
+			Fii += morse_Equation(cyt_nodes.at(j));
 		}
 	}
 
 	return Fii;
 }
 
-Coord Cyt_Node::calc_Morse_MI(Wall_Node* orig)
+Coord Cyt_Node::calc_Morse_MI(Wall_Node* orig) {
 	//calc force for IM
 	Coord Fmi;
 	Wall_Node* curr = orig;
@@ -82,7 +93,7 @@ Coord Cyt_Node::morse_Equation(Cyt_Node* cyt) {
 Coord Cyt_Node::morse_Equation(Wall_Node* wall) {
 	//use Mem-Int variables
 	Coord Fmi;
-	Coord diff_vect = my_loc - cyt->get_Location();
+	Coord diff_vect = my_loc - wall->get_Location();
 	double diff_len = diff_vect.length();
 	double attract = (U_MI/xsi_MI)*exp(diff_len*(-1)/xsi_MI);
     double repel = (W_MI/gamma_MI)*exp(diff_len*(-1)/gamma_MI);
@@ -98,10 +109,11 @@ Coord Cyt_Node::morse_Equation(Wall_Node* wall) {
 // Constructors-----------------
 Wall_Node::Wall_Node(Coord loc) : Node(loc) {};
 
-Wall_Node::Wall_Node(Coord loc, Wall_Node* left, Wall_Node* right, double angle) : Node(loc) {
+Wall_Node::Wall_Node(Coord loc, Wall_Node* left, Wall_Node* right) : Node(loc) {
     this->left = left;
     this->right = right;
-	my_angle = angle;
+
+	update_Angle();
 }
 
 //  Getters and Setters--------------------
@@ -143,7 +155,7 @@ void Wall_Node::calc_Forces(Cell* my_cell) {
 	sum += calc_Bending();
 	
 	// Update new_force variable for location updating
-	new_Force = sum;;
+	new_force = sum;;
 }
 
 void Wall_Node::update_Angle() {
@@ -153,8 +165,8 @@ void Wall_Node::update_Angle() {
 	double left_len = left_vect.length();
 	double right_len = right_vect.length();
 
-	double costheta = left_len.dot(right_len) / (left_len * right_len);
-	double theta = acos( min( max(costheta,-1), 1) );
+	double costheta = left_vect.dot(right_vect) / (left_len * right_len);
+	double theta = acos( min( max(costheta,-1.0), 1.0) );
 
 	double crossProd = left_vect.cross(right_vect);
 
@@ -163,14 +175,15 @@ void Wall_Node::update_Angle() {
 	}
 
 	my_angle = theta;
+	return;
 }
 
 //morse potential between wall node i and every cyt node in cell
-Coord Wall_Node::calc_Morse_SC(vector<Cyt_Node*> cyt_nodes) {
+Coord Wall_Node::calc_Morse_SC(vector<Cyt_Node*>& cyt_nodes) {
 	Coord Fmi;
 	
-	for (int i = 0; i < cyt_nodes.size(); i++) {
-		Fmi += this->morse_Equation(cyt_nodes.at(j));
+	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
+		Fmi += this->morse_Equation(cyt_nodes.at(i));
 	}
 	
 	return Fmi;
@@ -198,18 +211,17 @@ Coord Wall_Node::calc_Morse_DC(vector<Cell*>& cells) {
 
 Coord Wall_Node::calc_Bending() {
 	Coord F_bend;
-	F_center = bending_Equation_Center();
-	F_left = bending_Equation_Left();
-	F_right = bending_Equation_Right();
 
-	F_bend = F_center + F_left + F_right;
+	F_bend += bending_Equation_Center();
+	F_bend += bending_Equation_Left();
+	F_bend += bending_Equation_Right();
 
 	return F_bend;
 }
 
 Coord Wall_Node::morse_Equation(Cyt_Node* cyt) {
 	//use Membr - int variables
-	Coord Fmi
+	Coord Fmi;
 	Coord diff_vect = my_loc - cyt->get_Location();
 	double diff_len = diff_vect.length();
 	double attract = (U_MI/xsi_MI)*exp(diff_len*(-1)/xsi_MI);
@@ -225,23 +237,23 @@ Coord Wall_Node::morse_Equation(Wall_Node* wall) {
     Coord Fmmd;
     Coord diff_vect = my_loc - wall->get_Location();
     double diff_len = diff_vect.length();
-    double attract = (U_MMD/xsi_MMD)*exp(diff_len*(-1)/xsi_MMD);
-    double repel = (W_MMD/gamma_MMD)*exp(diff_len*(-1)/gamma_MMD);
+    double attract = (U_MM/xsi_MM)*exp(diff_len*(-1)/xsi_MM);
+    double repel = (W_MM/gamma_MM)*exp(diff_len*(-1)/gamma_MM);
     
     Fmmd = diff_vect * ((-attract + repel) / diff_len);
 
 	return Fmmd;
 }
 
-Coord Wall_Node::linear_Equation(Wall_Node* wall, k_linear) {
+Coord Wall_Node::linear_Equation(Wall_Node* wall, double k_linear) {
 	//use spring constant variables
 	Coord Flin;
-	Coord diff_vect = wall->get_location() - my_loc;
+	Coord diff_vect = wall->get_Location() - my_loc;
 	double diff_len = diff_vect.length();
 	
-	Fmi = diff_vect * (k_linear * (diff_len - MembrEquLen) / diff_len);
+	Flin = diff_vect * (k_linear * (diff_len - MembrEquLen) / diff_len);
 
-	return Fmi;	
+	return Flin;	
 }
 
 Coord Wall_Node::bending_Equation_Center() {
@@ -268,7 +280,7 @@ Coord Wall_Node::bending_Equation_Left() {
 	double left_k_bend = left->get_bendingSpring();
 	double left_equ_angle = left->get_Equi_Angle();
 	double left_angle = left->get_Angle();
-	double left_Constant = k_bend*(left_angle - left_equ_angle)/sqrt(1-pow(cos(left_angle),2));
+	double left_Constant = left_k_bend*(left_angle - left_equ_angle)/sqrt(1-pow(cos(left_angle),2));
 	Coord left_vect = left->get_Location() - my_loc;
 	double left_len = left_vect.length();
 	Coord left_left_vect = left->get_Left_Neighbor()->get_Location()-left->get_Location();
@@ -281,12 +293,12 @@ Coord Wall_Node::bending_Equation_Left() {
 	return F_left;
 }
 
-Coord Wall_Node::bending_Equation_right() {
+Coord Wall_Node::bending_Equation_Right() {
 	Coord F_right;
 	double right_k_bend = right->get_bendingSpring();
-	double right_equ_angle = rightt->get_Equi_Angle();
+	double right_equ_angle = right->get_Equi_Angle();
 	double right_angle = right->get_Angle();
-	double right_Constant = k_bend*(right_angle-right_equ_angle)/sqrt(1-pow(cos(right_angle),2));
+	double right_Constant = right_k_bend*(right_angle-right_equ_angle)/sqrt(1-pow(cos(right_angle),2));
 	Coord right_vect = right->get_Location() - my_loc;
 	double right_len = right_vect.length();
 	Coord right_right_vect = right->get_Right_Neighbor()->get_Location()-right->get_Location();
@@ -302,13 +314,22 @@ Coord Wall_Node::bending_Equation_right() {
 
 //========================================================
 /** class Corner Node Functions **/
-Corner_Node::Corner_Node(Coord loc) : Wall_Node(loc) {};
+Corner_Node::Corner_Node(Coord loc) : Wall_Node(loc) {}
 
-Corner_Node::Corner_Node(Coord loc, Wall_Node* left, Wall_Node* right, double angle) 
-    : Wall_Node(loc, left, right, angle) {}
+Corner_Node::Corner_Node(Coord loc, Wall_Node* left, Wall_Node* right) 
+    : Wall_Node(loc, left, right) {}
 
 double Corner_Node::get_Equi_Angle() {
 	return thetaCorner;
+}
+
+//should never call this function
+double Corner_Node::get_linearSpring() {
+	return 100000;
+}
+
+double Corner_Node::get_bendingSpring() {
+	return kBendEnd;
 }
 
 Coord Corner_Node::calc_Linear() {
@@ -333,8 +354,8 @@ bool Corner_Node::is_Corner() {
 /** class Flank Node function **/
 Flank_Node::Flank_Node(Coord loc) : Wall_Node(loc) {};
 
-Flank_Node::Flank_Node(Coord loc, Wall_Node* left, Wall_Node* right, double angle) 
-	: Wall_Node(loc, left, right, angle) {}
+Flank_Node::Flank_Node(Coord loc, Wall_Node* left, Wall_Node* right) 
+	: Wall_Node(loc, left, right) {}
 
 double Flank_Node::get_Equi_Angle() {
 	return thetaFlank;
@@ -344,16 +365,20 @@ Coord Flank_Node::calc_Linear() {
 	//as a flank node, both springs on either side have flank constants
 
 	//calc left spring force
-	Coord F_left = this->linear_Equation(left, );
+	Coord F_left = this->linear_Equation(left, kLinearFlank);
 
 	//calc right spring force
-	Coord F_rt = this->linear_Equation(right, );
+	Coord F_rt = this->linear_Equation(right, kLinearFlank);
 
 	return F_left + F_rt;
 }
 
 double Flank_Node::get_linearSpring() {
 	return kLinearFlank;
+}
+
+double Flank_Node::get_bendingSpring() {
+	return kBendEnd;
 }
 
 bool Flank_Node::is_Corner() {
@@ -365,17 +390,17 @@ bool Flank_Node::is_Corner() {
 /** class End Node function **/
 End_Node::End_Node(Coord loc) : Wall_Node(loc) {};
 
-End_Node::End_Node(Coord loc, Node* left, Node* right, double angle)
-    : Wall_Node(loc, left, right, angle) {}
+End_Node::End_Node(Coord loc, Wall_Node* left, Wall_Node* right)
+    : Wall_Node(loc, left, right) {}
 
 Coord End_Node::calc_Linear() {
 	//as end node, both springs on either sied have end constants
 
 	//calc left spring force
-	Coord F_left = this->linear_Equation(left, );
+	Coord F_left = this->linear_Equation(left, kLinearEnd);
 
 	//calc right spring force
-	Coord F_rt = this->linear_Equation(right, );
+	Coord F_rt = this->linear_Equation(right, kLinearEnd);
 
 	return F_left + F_rt;
 }
@@ -386,6 +411,10 @@ double End_Node::get_Equi_Angle() {
 
 double End_Node::get_linearSpring() {
 	return kLinearEnd;
+}
+
+double End_Node::get_bendingSpring() {
+	return kBendEnd;
 }
 
 bool End_Node::is_Corner() {

@@ -8,6 +8,12 @@
 
 //===================
 // include dependencies
+#include <string>
+#include <vector>
+#include <fstream>
+#include <iostream>
+
+#include "phys.h"
 #include "coord.h"
 #include "node.h"
 //===================
@@ -19,11 +25,6 @@ class Cell {
 		//keep track of how many nodes the cell has created
 		int num_wall_nodes;
 		int num_cyt_nodes;
-		vector<int> wall_nodes_per_frame;
-		vector<int> cyt_nodes_per_frame;
-		//2D vector for node locations
-		vector< vector<Coord> > wall_locs;
-		vector< vector<Coord> > cyt_locs;
 		// Keep info about its cyt and wall nodes
 		vector<Cyt_Node*> cyt_nodes;
 		vector<Wall_Node*> corners;
@@ -45,14 +46,17 @@ class Cell {
 		void calc_New_Forces();
 		// Update Node Locations
 		void update_Node_Locations();
-		//Update Angles
+		// Update Angles
 		void update_Wall_Angles();
+		// Output current frame of simulation after update locations
+		void print_Data_Output(ofstream& ofs);
+		void print_VTK_File(ofstream& ofs);
 		// Talking to other Cells
 		
 		// Growth of cell
 		// returns the coordinte of the wall node whose 
 		// left length is the largest
-		Wall_Node* find_Largest_Length();
+		Wall_Node* find_Largest_Length(int& side);
 		void add_Cell_Wall_Node();
 		void add_Cyt_Node();
 
@@ -63,3 +67,6 @@ class Cell {
 //===================
 
 #endif
+
+
+

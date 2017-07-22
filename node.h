@@ -5,9 +5,13 @@
 #define NODE_H  //    define it so the compiler knows 
 //=====================
 // Forward Declarations 
-
+class Wall_Node;
+class Cell;
 //=====================
 // Include Declarations
+#include <iostream>
+#include <vector>
+#include "phys.h"
 #include "coord.h"
 //=====================
 
@@ -62,8 +66,8 @@ class Wall_Node: public Node {
 		virtual double get_Angle();
         virtual Wall_Node* get_Left_Neighbor();
 		virtual Wall_Node* get_Right_Neighbor();
-		virtual void set_Left_Neighbor();
-		virtual void set_Right_Neighbor();
+		virtual void set_Left_Neighbor(Wall_Node* new_Left);
+		virtual void set_Right_Neighbor(Wall_Node* new_Right);
 		// Force Calculations
 		virtual void calc_Forces(Cell* my_cell);
 		virtual void update_Angle();
@@ -72,7 +76,7 @@ class Wall_Node: public Node {
 		virtual Coord calc_Bending();
 		virtual Coord morse_Equation(Cyt_Node* cyt);
 		virtual Coord morse_Equation(Wall_Node* wall);
-		virtual Coord linear_Equation(Wall_Node* wall, k_Linear);
+		virtual Coord linear_Equation(Wall_Node* wall, double k_Linear);
 		virtual Coord bending_Equation_Center();
 		virtual Coord bending_Equation_Left();
 		virtual Coord bending_Equation_Right();
@@ -88,8 +92,10 @@ class Wall_Node: public Node {
 class Corner_Node: public Wall_Node {
     public:
         Corner_Node(Coord loc);
-        Corner_Node(Coord loc, Node* left, Node* right, double angle);
+        Corner_Node(Coord loc, Wall_Node* left, Wall_Node* right);
 		virtual double get_Equi_Angle();
+		virtual double get_linearSpring();
+		virtual double get_bendingSpring();
 		virtual Coord calc_Linear();
 		virtual bool is_Corner();
 };
@@ -97,20 +103,22 @@ class Corner_Node: public Wall_Node {
 class Flank_Node: public Wall_Node {
     public:
         Flank_Node(Coord loc);
-        Flank_Node(Coord loc, Node* left, Node* right, double angle);
+        Flank_Node(Coord loc, Wall_Node* left, Wall_Node* right);
 		virtual Coord calc_Linear();
 		virtual double get_Equi_Angle();
 		virtual double get_linearSpring();
+		virtual double get_bendingSpring();
 		virtual bool is_Corner();
 };
 
 class End_Node: public Wall_Node {
 	public:
 		End_Node(Coord loc);
-		End_Node(Coord loc, Node* left, Node* right, double angle);
+		End_Node(Coord loc, Wall_Node* left, Wall_Node* right);
 		virtual Coord calc_Linear();
 		virtual double get_Equi_Angle();
-		virtual double get_linearSpring()
+		virtual double get_linearSpring();
+		virtual double get_bendingSpring();
 		virtual bool is_Corner();
 };
 
