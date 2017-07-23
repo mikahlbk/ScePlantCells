@@ -223,6 +223,21 @@ void Cell::print_VTK_File(ofstream& ofs) {
 		Coord loc = cyt_nodes.at(i)->get_Location();
 		ofs << loc.get_X() << ' ' << loc.get_Y() << ' ' << 0 << endl;
 	}
+
+	ofs << endl;
+
+	ofs << "CELLS " << 1 << ' ' << num_wall_nodes + num_cyt_nodes + 1  << endl;
+
+	ofs << num_wall_nodes + num_cyt_nodes;
+
+	for (int i = 0; i < num_wall_nodes + num_cyt_nodes; i++) {
+		ofs << ' ' << i;
+	}
+
+	ofs << endl << endl;
+
+	ofs << "CELL_TYPES " << 1 << endl;
+	ofs << 2 << endl;
 	
 	return;
 }
