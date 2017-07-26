@@ -13,12 +13,12 @@
 //=====================
 
 // Simulation Constants
-const double dt = 0.0001;
+const double dt = 0.003;
 
 
 // Global Physics Constants
 
-const double pi = 3.1415926535897;
+const double pi = acos(-1.0);
 
 ///// Cell wall mechanical parameters
 
@@ -26,25 +26,25 @@ const double pi = 3.1415926535897;
 const double thetaEnd = pi;
 
 //equilibrium angle for corner node
-const double thetaCorner = pi / 2;
+const double thetaCorner = pi/2;
 
 //equilibrium angle for flank node
 const double thetaFlank = pi;
 
 //rotational spring constant for end node
-const double kBendEnd = 6;
+const double kBendEnd =6;
 
 //rotational spring constant for flank node
-const double kBendFlank = 0.6;
+const double kBendFlank =6;
 
 //linear spring constant for end node
-const double kLinearEnd = 30;
+const double kLinearEnd = 10;
 
 //linear spring constant for flank node
-const double kLinearFlank = 6;
+const double kLinearFlank =2;
 
 //linear spring equilibrium length
-const double MembrEquLen = 0.0625;
+const double MembrEquLen = .0625;
 
 ///// Subcellular element parameters for membrane - membrane interactions
 

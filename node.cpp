@@ -80,12 +80,12 @@ Coord Cyt_Node::calc_Morse_MI(Wall_Node* orig) {
 Coord Cyt_Node::morse_Equation(Cyt_Node* cyt) {
 	//use Int-Int variables
     Coord Fii;
-    Coord diff_vect = my_loc - cyt->get_Location();
+    Coord diff_vect = cyt->get_Location() - my_loc;
     double diff_len = diff_vect.length();
     double attract = (U_II/xsi_II)*exp(diff_len*(-1)/xsi_II);
     double repel = (W_II/gamma_II)*exp(diff_len*(-1)/gamma_II);
     
-	Fii = diff_vect*(-attract + repel)/diff_len;
+	Fii = diff_vect*((-attract + repel)/diff_len);
 	return Fii;
 
 }
@@ -93,12 +93,12 @@ Coord Cyt_Node::morse_Equation(Cyt_Node* cyt) {
 Coord Cyt_Node::morse_Equation(Wall_Node* wall) {
 	//use Mem-Int variables
 	Coord Fmi;
-	Coord diff_vect = my_loc - wall->get_Location();
+	Coord diff_vect = wall->get_Location() - my_loc; 
 	double diff_len = diff_vect.length();
 	double attract = (U_MI/xsi_MI)*exp(diff_len*(-1)/xsi_MI);
     double repel = (W_MI/gamma_MI)*exp(diff_len*(-1)/gamma_MI);
     
-    Fmi = diff_vect*(-attract + repel)/diff_len;
+    Fmi = diff_vect*((-attract + repel)/diff_len);
 	return Fmi;
 }
 
@@ -113,7 +113,7 @@ Wall_Node::Wall_Node(Coord loc, Wall_Node* left, Wall_Node* right) : Node(loc) {
     this->left = left;
     this->right = right;
 
-	update_Angle();
+//	update_Angle();
 }
 
 //  Getters and Setters--------------------
@@ -146,14 +146,14 @@ void Wall_Node::calc_Forces(Cell* my_cell) {
 	// gather cyt nodes of your cell for morse calc
 	vector<Cyt_Node*> cyts;
 	my_cell->get_CytNodes(cyts);
-	sum += calc_Morse_SC(cyts);
+//	sum += calc_Morse_SC(cyts);
 
 	//will be implimented later
 	//sum += calc_Morse_DC(my_cell->get_Neigh_Cells());
 	
-	sum += calc_Linear();
+//	sum += calc_Linear();
 	sum += calc_Bending();
-	
+
 	// Update new_force variable for location updating
 	new_force = sum;;
 }
@@ -169,11 +169,11 @@ void Wall_Node::update_Angle() {
 	double theta = acos( min( max(costheta,-1.0), 1.0) );
 
 	double crossProd = left_vect.cross(right_vect);
-
+//	cross_Prod = crossProd;
 	if (crossProd < 0) {
 		theta = 2 * pi - theta;
 	}
-
+	
 	my_angle = theta;
 	return;
 }
@@ -215,14 +215,18 @@ Coord Wall_Node::calc_Bending() {
 	F_bend += bending_Equation_Center();
 	F_bend += bending_Equation_Left();
 	F_bend += bending_Equation_Right();
-
+	
+//	if (cross_Prod  > 0.0) {
+//		F_bend = F_bend*(-1);
+//	}	
+    cout << F_bend << endl;
 	return F_bend;
 }
 
 Coord Wall_Node::morse_Equation(Cyt_Node* cyt) {
 	//use Membr - int variables
 	Coord Fmi;
-	Coord diff_vect = my_loc - cyt->get_Location();
+	Coord diff_vect = cyt->get_Location() - my_loc;
 	double diff_len = diff_vect.length();
 	double attract = (U_MI/xsi_MI)*exp(diff_len*(-1)/xsi_MI);
 	double repel = (W_MI/gamma_MI)*exp(diff_len*(-1)/gamma_MI);
@@ -235,7 +239,7 @@ Coord Wall_Node::morse_Equation(Cyt_Node* cyt) {
 Coord Wall_Node::morse_Equation(Wall_Node* wall) {
 	//use Int-Int variables
     Coord Fmmd;
-    Coord diff_vect = my_loc - wall->get_Location();
+    Coord diff_vect = wall->get_Location() -  my_loc;
     double diff_len = diff_vect.length();
     double attract = (U_MM/xsi_MM)*exp(diff_len*(-1)/xsi_MM);
     double repel = (W_MM/gamma_MM)*exp(diff_len*(-1)/gamma_MM);
@@ -251,7 +255,7 @@ Coord Wall_Node::linear_Equation(Wall_Node* wall, double k_linear) {
 	Coord diff_vect = wall->get_Location() - my_loc;
 	double diff_len = diff_vect.length();
 	
-	Flin = diff_vect * (k_linear * (diff_len - MembrEquLen) / diff_len);
+	Flin = (diff_vect/diff_len)*(k_linear * (diff_len - MembrEquLen));
 
 	return Flin;	
 }
@@ -260,25 +264,27 @@ Coord Wall_Node::bending_Equation_Center() {
 	Coord F_center;
 	double k_bend = get_bendingSpring();
 	double equ_angle = get_Equi_Angle();
+//	cout << my_angle << endl;
+//	cout << equ_angle << endl;
 	double self_Constant; 
 	
-	double eps = 0.001;
+//	double eps = 0.0001;
 
-	if (my_angle - pi < eps) {
-		return F_center;
-	}
-	else {
-		self_Constant = k_bend*(my_angle - equ_angle)/sqrt(1-pow(cos(my_angle),2));
-	}
+//	if (my_angle - pi < eps) {
+//		return F_center;
+//	}
+//	else {
+		self_Constant = k_bend*(my_angle - equ_angle)/(sqrt(1-pow(cos(my_angle),2)) + .001);
+//	}
 
 	Coord left_vect = left->get_Location() - my_loc;
 	Coord right_vect = right->get_Location() - my_loc;
 	double left_len = left_vect.length();
 	double right_len = right_vect.length();
-	Coord term_l1 = left_vect*(-1/(left_len*right_len));
-	Coord term_l2 = left_vect*(cos(my_angle)/pow(left_len,2));
-	Coord term_r1 = right_vect*(-1/(left_len*right_len));
-	Coord term_r2 = right_vect*(cos(my_angle)/pow(right_len,2));
+	Coord term_l1 = left_vect*(-1)/(left_len*right_len);
+	Coord term_l2 = left_vect*(cos(my_angle))/pow(left_len,2);
+	Coord term_r1 = right_vect*(-1)/(left_len*right_len);
+	Coord term_r2 = right_vect*(cos(my_angle))/pow(right_len,2);
 
 	F_center = (term_l1 + term_l2 + term_r1 + term_r2) * self_Constant;
 	
@@ -289,24 +295,26 @@ Coord Wall_Node::bending_Equation_Left() {
 	Coord F_left;
 	double left_k_bend = left->get_bendingSpring();
 	double left_equ_angle = left->get_Equi_Angle();
+//	cout << left_equ_angle << endl;
 	double left_angle = left->get_Angle();
+//	cout << left_angle << endl;
 	double left_Constant;
 	
-	double eps = 0.001;
+//	double eps = 0.001;
 
-	if (left_angle - pi < eps) {
-		return F_left;
-	}
-	else {
-		left_Constant = left_k_bend*(left_angle - left_equ_angle)/sqrt(1-pow(cos(left_angle),2));
-	}
+//	if (left_angle - pi < eps) {
+//		return F_left;
+//	}
+//	else {
+		left_Constant = left_k_bend*(left_angle - left_equ_angle)/(sqrt(1-pow(cos(left_angle),2)) + .001);
+//	}
 
 	Coord left_vect = left->get_Location() - my_loc;
 	double left_len = left_vect.length();
 	Coord left_left_vect = left->get_Left_Neighbor()->get_Location()-left->get_Location();
 	double left_left_len = left_left_vect.length();
 	Coord left_left_term1 = left_left_vect/(left_left_len*left_len);
-	Coord left_term2 = left_vect*((-1)*cos(left_angle)/pow(left_len,2));
+	Coord left_term2 = left_vect*cos(left_angle)/pow(left_len,2);
 
 	F_left = (left_left_term1 + left_term2) * left_Constant;
 	
@@ -317,24 +325,26 @@ Coord Wall_Node::bending_Equation_Right() {
 	Coord F_right;
 	double right_k_bend = right->get_bendingSpring();
 	double right_equ_angle = right->get_Equi_Angle();
+//	cout << right_equ_angle << endl;
 	double right_angle = right->get_Angle();
+//	cout << right_angle << endl;
 	double right_Constant;
 	
-	double eps = 0.001;
+//	double eps = 0.001;
 
-	if (right_angle - pi < eps) {
-		return F_right;
-	}
-	else {
-		right_Constant = right_k_bend*(right_angle-right_equ_angle)/sqrt(1-pow(cos(right_angle),2));
-	}
+//	if (right_angle - pi < eps) {
+//		return F_right;
+//	}
+//	else {
+		right_Constant = right_k_bend*(right_angle-right_equ_angle)/(sqrt(1-pow(cos(right_angle),2)) + .001);
+//	}
 
 	Coord right_vect = right->get_Location() - my_loc;
 	double right_len = right_vect.length();
 	Coord right_right_vect = right->get_Right_Neighbor()->get_Location()-right->get_Location();
 	double right_right_len = right_right_vect.length();
 	Coord right_right_term1 = right_right_vect/(right_right_len*right_len);
-	Coord right_term2 = right_vect*((-1)*cos(right_angle)/pow(right_len,2));
+	Coord right_term2 = right_vect*cos(right_angle)/pow(right_len,2);
 
 	F_right = (right_right_term1 + right_term2)*right_Constant;
 	return F_right;

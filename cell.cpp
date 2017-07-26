@@ -72,7 +72,8 @@ Cell::Cell(string filename) {
 				curr_wall->set_Right_Neighbor(prev_wall);
 			}
 			corners.push_back(curr_wall);
-			prev_wall = curr_wall;
+			cout << curr_wall->get_Location() << endl;
+		    prev_wall = curr_wall;
 			
 			num_wall_nodes++;
 		}
@@ -154,7 +155,9 @@ void Cell::calc_New_Forces() {
 	
 	do {
 		curr->calc_Forces(this);
+		cout << curr->get_Location() << endl;
 		curr = curr->get_Left_Neighbor();
+
 	
 	} while(curr != corners.at(0));
 
@@ -244,10 +247,10 @@ void Cell::print_VTK_File(ofstream& ofs) {
 
 
 
-Wall_Node* Cell::find_Largest_Length(int& side) {
+/*Wall_Node* Cell::find_Largest_Length(int& side) {
 	side = 0; //know that we start on bottom flank
-	/* We know we start at first entry of corner vector. 
-		Each time we pass another corner, increment side by 1  */
+	 We know we start at first entry of corner vector. 
+		Each time we pass another corner, increment side by 1 
 	// side = 1 or 3 => end
 	// side = 2 or 4 => flank
 	Wall_Node* curr = corners.at(0);
@@ -327,9 +330,7 @@ void Cell::add_Cyt_Node() {
 
 	num_cyt_nodes++;
 	return;
-}
-	
-
+}*/
 
 
 

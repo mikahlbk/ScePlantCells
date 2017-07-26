@@ -77,7 +77,7 @@ double Coord::dot(const Coord& c) const {
 }
 
 double Coord::cross(const Coord& c) const {
-	return (x * c.get_Y()) + (y * c.get_X());
+	return (x * c.get_Y()) -  (y * c.get_X());
 }
 
 double Coord::length() const {
