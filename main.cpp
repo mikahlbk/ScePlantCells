@@ -67,15 +67,19 @@ int main() {
 	Coord bend = A->calc_Bending();
 	cout << "	Total Bending Force: " << bend << endl << endl;
 
-	cout << "A's Morse Force" << endl;
-	Coord morse = A->calc_Morse_SC(cyts);
-	cout << "	Total Morse Force: " << morse << endl << endl;
+//	cout << "A's Morse Force" << endl;
+//	Coord morse = A->calc_Morse_SC(cyts);
+//	cout << "	Total Morse Force: " << morse << endl << endl;
 	
 	cout << "A's Linear Force" << endl;
 	Coord lin = A->calc_Linear();
 	cout << "	Total Spring Force: " << lin << endl << endl;
 
-	Coord total = bend + morse + lin;
+	cout << "B's Linear Force" << endl;
+	Coord linB = B->calc_Linear();
+	cout << " Total Spring Force: " << linB << endl << endl;
+
+	Coord total = bend +lin; //morse 
 	cout << "A's Total Force: " << total << endl;
 
 
