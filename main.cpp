@@ -20,82 +20,69 @@ using namespace std;
 //============================
 
 int main() {
+	
+	// Five locations for Wall Nodes
+	Coord locA(0.1, 0.1); //first_corner
+	Coord locB(0.2, 0.1); //end node to left of A
+	Coord locC(0.3, 0.1); //end node to left of B
+	Coord locD(0.1, 0.2); //flank node to right of A
+	Coord locE(0.1, 0.3); //flank node to right of D
 
-	string init_cell = "cell_start.txt";
-	//make a new cell object
+	Wall_Node* A = new Corner_Node(locA);
+	Wall_Node* B = new End_Node(locB);
+	Wall_Node* C = new End_Node(locC);
+	Wall_Node* D = new Flank_Node(locD);
+	Wall_Node* E = new Flank_Node(locE);
 
-	Cell* growing_Cell = new Cell(init_cell);
-	cout << "Finished creating Cell" << endl;
-	//parameters for time step
-	double numSteps = 10;
+	A->set_Left_Neighbor(B);
+	B->set_Right_Neighbor(A);
+	B->set_Left_Neighbor(C);
+	C->set_Right_Neighbor(B);
+	
+	A->set_Right_Neighbor(D);
+	D->set_Left_Neighbor(A);
+	D->set_Right_Neighbor(E);
+	E->set_Left_Neighbor(D);
 
-	// Variable for dataoutput
-	int digits;
-	string format = ".vtk";
-	string Number;
-	string initial = "Animation/Plant_Cell_";
-	string Filename;
-	ofstream ofs;
+	A->update_Angle();
+	B->update_Angle();
+	D->update_Angle();
 
-	//loop for time steps
-	for(int Ti = 1; Ti * dt < numSteps; Ti++) {
-		//loop through all cells
-		//for now only one cell
+	// Two locations for Cyt Nodes
+	Coord locF(0.15, 0.2);
+	Coord locG(0.2, 0.15);
 
-		//Print to dataOutput and VTK files
+	Cyt_Node* F = new Cyt_Node(locF);
+	Cyt_Node* G = new Cyt_Node(locG);
+	
+	vector<Cyt_Node*> cyts;
+	cyts.push_back(F);
+	cyts.push_back(G);
 
-		digits = ceil(log10(Ti + 1));
-		if (digits == 1 || digits == 0) {
-			Number = "0000" + to_string(Ti);
-		}
-		else if (digits == 2) {
-			Number = "000" + to_string(Ti);
-		}
-		else if (digits == 3) {
-			Number = "00" + to_string(Ti);
-		}
-		else if (digits == 4) {
-			Number = "0" + to_string(Ti);
-		}
 
-		Filename = initial + Number + format;
+	// Perform Calculations
 
-		ofs.open(Filename.c_str());
-		growing_Cell->print_VTK_File(ofs);
-		ofs.close();
+	//Bending
+	cout << "A's Bending Force" << endl;
+	Coord bend = A->calc_Bending();
+	cout << "	Total Bending Force: " << bend << endl << endl;
 
-		//growth
+	cout << "A's Morse Force" << endl;
+	Coord morse = A->calc_Morse_SC(cyts);
+	cout << "	Total Morse Force: " << morse << endl << endl;
+	
+	cout << "A's Linear Force" << endl;
+	Coord lin = A->calc_Linear();
+	cout << "	Total Spring Force: " << lin << endl << endl;
 
-		if (Ti % 200 == 0) {
-			cout << "Adding cell wall node" << endl;
-			cout << "Ti : " << Ti << endl;
-			growing_Cell->add_Cell_Wall_Node();
-			cout << "Completed adding cell wal node" << endl;
-		}
-		if (Ti % 500 == 0) {
-			cout << "Adding cyt node" << endl;
-			growing_Cell->add_Cyt_Node();
-			cout << "Completed adding cyt node" << endl;
-		}
+	Coord total = bend + morse + lin;
+	cout << "A's Total Force: " << total << endl;
 
-		growing_Cell->calc_New_Forces();
-		growing_Cell->update_Node_Locations();
-		growing_Cell->update_Wall_Angles();
-		
-		
 
-	}
-		
+
+	
 	return 0;
 }
-
-
-
-
-
-
-
-
 
 
 

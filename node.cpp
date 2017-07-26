@@ -34,6 +34,7 @@ void Cyt_Node::calc_Forces(Cell* my_cell) {
 	//for cyt, just need morse potential for int-int and int-membr
 	vector<Cyt_Node*> cyts;
 	my_cell->get_CytNodes(cyts);
+	cout << "Cyts: " << cyts.size() << endl;
 
 	Coord Fii = calc_Morse_II(cyts);
 
@@ -180,10 +181,13 @@ void Wall_Node::update_Angle() {
 
 //morse potential between wall node i and every cyt node in cell
 Coord Wall_Node::calc_Morse_SC(vector<Cyt_Node*>& cyt_nodes) {
+
 	Coord Fmi;
 	
 	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
-		Fmi += this->morse_Equation(cyt_nodes.at(i));
+		Coord F_cyt = morse_Equation(cyt_nodes.at(i));
+		cout << "	i = " << i << " => Morse Force: " << F_cyt << endl; 
+		Fmi += F_cyt;
 	}
 	
 	return Fmi;
@@ -212,9 +216,14 @@ Coord Wall_Node::calc_Morse_DC(vector<Cell*>& cells) {
 Coord Wall_Node::calc_Bending() {
 	Coord F_bend;
 
-	F_bend += bending_Equation_Center();
-	F_bend += bending_Equation_Left();
-	F_bend += bending_Equation_Right();
+	Coord F_cent = bending_Equation_Center();
+	cout << "	Center Bending Force: " << F_cent << endl;
+	Coord F_left= bending_Equation_Left();
+	cout << "	Left Bending Force: " << F_left << endl;
+	Coord F_rt = bending_Equation_Right();
+	cout << "	Right Bending Force: " << F_rt << endl;
+
+	F_bend = F_cent + F_left + F_rt;
 
 	return F_bend;
 }
@@ -368,9 +377,10 @@ Coord Corner_Node::calc_Linear() {
 
 	//calc left spring force
 	Coord F_left = this->linear_Equation(left, left->get_linearSpring());
-
+	cout << "	Left Spring Force: " << F_left << endl;
 	//calc right spring force
 	Coord F_rt = this->linear_Equation(right, right->get_linearSpring());
+	cout << "	Right Spring Force: " << F_rt << endl;
 
 	return F_left + F_rt;
 }
@@ -396,9 +406,10 @@ Coord Flank_Node::calc_Linear() {
 
 	//calc left spring force
 	Coord F_left = this->linear_Equation(left, kLinearFlank);
-
+	cout << "	Left Spring Force: " << F_left << endl;
 	//calc right spring force
 	Coord F_rt = this->linear_Equation(right, kLinearFlank);
+	cout << "	Right Spring Force: " << F_rt << endl;
 
 	return F_left + F_rt;
 }
@@ -425,12 +436,12 @@ End_Node::End_Node(Coord loc, Wall_Node* left, Wall_Node* right)
 
 Coord End_Node::calc_Linear() {
 	//as end node, both springs on either sied have end constants
-
 	//calc left spring force
 	Coord F_left = this->linear_Equation(left, kLinearEnd);
-
+	cout << "	Left Spring Force: " << F_left << endl;
 	//calc right spring force
 	Coord F_rt = this->linear_Equation(right, kLinearEnd);
+	cout << "	Right Spring Force: " << F_rt << endl;
 
 	return F_left + F_rt;
 }
