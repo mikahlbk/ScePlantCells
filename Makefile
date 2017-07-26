@@ -20,4 +20,4 @@ cell.o: cell.cpp
 		$(CC) $(CFLAGS) cell.cpp
 
 clean:
-		rm -rf *o exec
+		rm -rf *o program
