@@ -113,7 +113,7 @@ Wall_Node::Wall_Node(Coord loc, Wall_Node* left, Wall_Node* right) : Node(loc) {
     this->left = left;
     this->right = right;
 
-//	update_Angle();
+	update_Angle();
 }
 
 //  Getters and Setters--------------------
@@ -169,12 +169,14 @@ void Wall_Node::update_Angle() {
 	double theta = acos( min( max(costheta,-1.0), 1.0) );
 
 	double crossProd = left_vect.cross(right_vect);
-//	cross_Prod = crossProd;
+
 	if (crossProd < 0) {
 		theta = 2 * pi - theta;
 	}
 	
 	my_angle = theta;
+	cross_Prod = crossProd;
+
 	return;
 }
 
@@ -216,10 +218,11 @@ Coord Wall_Node::calc_Bending() {
 	F_bend += bending_Equation_Left();
 	F_bend += bending_Equation_Right();
 	
-//	if (cross_Prod  > 0.0) {
-//		F_bend = F_bend*(-1);
-//	}	
-    cout << F_bend << endl;
+	if (cross_Prod < 0.0) {
+		F_bend = F_bend*(-1);
+	}	
+
+	cout << F_bend << endl;
 	return F_bend;
 }
 
@@ -268,14 +271,14 @@ Coord Wall_Node::bending_Equation_Center() {
 //	cout << equ_angle << endl;
 	double self_Constant; 
 	
-//	double eps = 0.0001;
+	double eps = 0.0001;
 
-//	if (my_angle - pi < eps) {
-//		return F_center;
-//	}
-//	else {
-		self_Constant = k_bend*(my_angle - equ_angle)/(sqrt(1-pow(cos(my_angle),2)) + .001);
-//	}
+	if (my_angle - pi < eps) {
+		return F_center;
+	}
+	else {
+		self_Constant = k_bend*(my_angle - equ_angle)/(sqrt(1-pow(cos(my_angle),2)));
+	}
 
 	Coord left_vect = left->get_Location() - my_loc;
 	Coord right_vect = right->get_Location() - my_loc;
@@ -300,14 +303,14 @@ Coord Wall_Node::bending_Equation_Left() {
 //	cout << left_angle << endl;
 	double left_Constant;
 	
-//	double eps = 0.001;
+	double eps = 0.0001;
 
-//	if (left_angle - pi < eps) {
-//		return F_left;
-//	}
-//	else {
-		left_Constant = left_k_bend*(left_angle - left_equ_angle)/(sqrt(1-pow(cos(left_angle),2)) + .001);
-//	}
+	if (left_angle - pi < eps) {
+		return F_left;
+	}
+	else {
+		left_Constant = left_k_bend*(left_angle - left_equ_angle)/(sqrt(1-pow(cos(left_angle),2)));
+	}
 
 	Coord left_vect = left->get_Location() - my_loc;
 	double left_len = left_vect.length();
@@ -330,14 +333,14 @@ Coord Wall_Node::bending_Equation_Right() {
 //	cout << right_angle << endl;
 	double right_Constant;
 	
-//	double eps = 0.001;
+	double eps = 0.0001;
 
-//	if (right_angle - pi < eps) {
-//		return F_right;
-//	}
-//	else {
-		right_Constant = right_k_bend*(right_angle-right_equ_angle)/(sqrt(1-pow(cos(right_angle),2)) + .001);
-//	}
+	if (right_angle - pi < eps) {
+		return F_right;
+	}
+	else {
+		right_Constant = right_k_bend*(right_angle-right_equ_angle)/(sqrt(1-pow(cos(right_angle),2)));
+	}
 
 	Coord right_vect = right->get_Location() - my_loc;
 	double right_len = right_vect.length();
