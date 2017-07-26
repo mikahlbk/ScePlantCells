@@ -5,6 +5,7 @@ CFLAGS=-c -Wall
 all: program
 
 program: main.o coord.o node.o cell.o
+		mkdir -p ./Animation ./DataOutput
 		$(CC) main.o coord.o node.o cell.o -o program
 
 main.o: main.cpp
@@ -20,4 +21,4 @@ cell.o: cell.cpp
 		$(CC) $(CFLAGS) cell.cpp
 
 clean:
-		rm -rf *o exec
+		rm -rf *o program ./Animation ./DataOutput
