@@ -152,9 +152,9 @@ void Wall_Node::calc_Forces(Cell* my_cell) {
 	/*
 	vector<Cyt_Node*> cyts;
 	my_cell->get_CytNodes(cyts);
-<<<<<<< HEAD
+
 //	sum += calc_Morse_SC(cyts);
-=======
+//
 	sum += calc_Morse_SC(cyts);
 	*/
 
@@ -227,7 +227,7 @@ Coord Wall_Node::calc_Morse_DC(vector<Cell*>& cells) {
 Coord Wall_Node::calc_Bending() {
 	Coord F_bend;
 
-<<<<<<< HEAD
+
 	F_bend += bending_Equation_Center();
 	F_bend += bending_Equation_Left();
 	F_bend += bending_Equation_Right();
@@ -237,7 +237,7 @@ Coord Wall_Node::calc_Bending() {
 	}	
 
 	cout << F_bend << endl;
-=======
+
 	Coord F_cent = bending_Equation_Center();
 	cout << "	Center Bending Force: " << F_cent << endl;
 	Coord F_left= bending_Equation_Left();
@@ -252,7 +252,7 @@ Coord Wall_Node::calc_Bending() {
 		F_bend = F_bend * (-1);
 	}
 
->>>>>>> 3f4d54f40273b64ed83d93d4ca3b5a6e1ff1e98b
+
 	return F_bend;
 }
 
