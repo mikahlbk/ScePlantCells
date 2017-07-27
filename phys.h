@@ -13,7 +13,7 @@
 //=====================
 
 // Simulation Constants
-const double dt = 0.003;
+const double dt = 0.0003;
 
 
 // Global Physics Constants
@@ -32,19 +32,19 @@ const double thetaCorner = pi / 2;
 const double thetaFlank = pi;
 
 //rotational spring constant for end node
-const double kBendEnd = .6;
+const double kBendEnd = 0.6;
 
 //rotational spring constant for flank node
-const double kBendFlank = 0.6;
+const double kBendFlank = 6;
 
 //linear spring constant for end node
-const double kLinearEnd = 6;
+const double kLinearEnd = 30;
 
 //linear spring constant for flank node
 const double kLinearFlank = 6;
 
 //linear spring equilibrium length
-const double MembrEquLen = 0.0625;
+const double MembrEquLen = 1; //0.0625;
 
 ///// Subcellular element parameters for membrane - membrane interactions
 

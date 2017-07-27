@@ -27,7 +27,7 @@ int main() {
 	Cell* growing_Cell = new Cell(init_cell);
 	cout << "Finished creating Cell" << endl;
 	//parameters for time step
-	int numSteps = 4;
+	int numSteps = 1000;
 
 	// Variable for dataoutput
 	int digits;

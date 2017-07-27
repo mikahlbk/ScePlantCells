@@ -1,15 +1,16 @@
 Wall_Nodes
 Corner:0.1,0.1
-End:0.2,0.1
+End:0.2,0.0
 Corner:0.3,0.1
-Flank:0.3,0.2
+Flank:0.2,0.2
 Flank:0.3,0.3
 Corner:0.3,0.4
 End:0.2,0.4
 Corner:0.1,0.4
-Flank:0.1,0.3
+Flank:0.0,0.3
 Flank:0.1,0.2
 Cyt_Nodes
-
+//Cyt: 0.15,0.15
+//Cyt: 0.25,.25
 
 

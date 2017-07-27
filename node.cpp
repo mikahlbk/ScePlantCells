@@ -149,22 +149,17 @@ void Wall_Node::calc_Forces(Cell* my_cell) {
 	Coord sum;
 	// gather cyt nodes of your cell for morse calc
 
-	/*
-	vector<Cyt_Node*> cyts;
-	my_cell->get_CytNodes(cyts);
-
+//	vector<Cyt_Node*> cyts;
+//	my_cell->get_CytNodes(cyts);
 //	sum += calc_Morse_SC(cyts);
-//
-	sum += calc_Morse_SC(cyts);
-	*/
 
 	//will be implimented later
 	//sum += calc_Morse_DC(my_cell->get_Neigh_Cells());
 	
 
-//	sum += calc_Linear();
+	sum += calc_Linear();
 
-	//sum += calc_Linear();
+
 	sum += calc_Bending();
 
 	// Update new_force variable for location updating
@@ -227,15 +222,6 @@ Coord Wall_Node::calc_Morse_DC(vector<Cell*>& cells) {
 Coord Wall_Node::calc_Bending() {
 	Coord F_bend;
 
-
-	F_bend += bending_Equation_Center();
-	F_bend += bending_Equation_Left();
-	F_bend += bending_Equation_Right();
-	
-	if (cross_Prod < 0.0) {
-		F_bend = F_bend*(-1);
-	}	
-
 	cout << F_bend << endl;
 
 	Coord F_cent = bending_Equation_Center();
@@ -247,7 +233,7 @@ Coord Wall_Node::calc_Bending() {
 
 	F_bend = F_cent + F_left + F_rt;
 
-	if (cross_Prod < 0) {
+	if (cross_Prod < 0.0) {
 		cout << "	concave angle so alter bending force" << endl;
 		F_bend = F_bend * (-1);
 	}
@@ -297,8 +283,6 @@ Coord Wall_Node::bending_Equation_Center() {
 	Coord F_center;
 	double k_bend = get_bendingSpring();
 	double equ_angle = get_Equi_Angle();
-//	cout << my_angle << endl;
-//	cout << equ_angle << endl;
 	double self_Constant; 
 	
 	double eps = 0.0001;
@@ -335,9 +319,7 @@ Coord Wall_Node::bending_Equation_Left() {
 	Coord F_left;
 	double left_k_bend = left->get_bendingSpring();
 	double left_equ_angle = left->get_Equi_Angle();
-//	cout << left_equ_angle << endl;
 	double left_angle = left->get_Angle();
-//	cout << left_angle << endl;
 	double left_Constant;
 	
 	double eps = 0.0001;
@@ -370,9 +352,7 @@ Coord Wall_Node::bending_Equation_Right() {
 	Coord F_right;
 	double right_k_bend = right->get_bendingSpring();
 	double right_equ_angle = right->get_Equi_Angle();
-//	cout << right_equ_angle << endl;
 	double right_angle = right->get_Angle();
-//	cout << right_angle << endl;
 	double right_Constant;
 	
 	double eps = 0.0001;
