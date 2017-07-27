@@ -166,12 +166,12 @@ void Wall_Node::update_Angle() {
 	double left_len = left_vect.length();
 	double right_len = right_vect.length();
 
-	double costheta = left_vect.dot(right_vect) / (left_len * right_len);
-	double theta = acos( min( max(costheta,-1.0), 1.0) );
+	double costheta = (left_vect.dot(right_vect)) / (left_len * right_len);
+	double theta = acos(costheta);
 
 	double crossProd = left_vect.cross(right_vect);
 
-	if (crossProd < 0) {
+	if (crossProd > 0) {
 		theta = 2 * pi - theta;
 	}
 
@@ -209,7 +209,7 @@ Coord Wall_Node::calc_Morse_DC(vector<Cell*>& cells) {
 		}
 
 	}
-	*/
+`	*/
 	return Fdc;
 }
 
@@ -222,7 +222,7 @@ Coord Wall_Node::calc_Bending() {
 	cout << "	Left Bending Force: " << F_left << endl;
 	Coord F_rt = bending_Equation_Right();
 	cout << "	Right Bending Force: " << F_rt << endl;
-
+    cout << " Angle: " << my_angle << endl;
 	F_bend = F_cent + F_left + F_rt;
 
 	return F_bend;
@@ -271,7 +271,7 @@ Coord Wall_Node::bending_Equation_Center() {
 	double equ_angle = get_Equi_Angle();
 	double self_Constant; 
 	
-	double eps = 0.001;
+	double eps = 0.0000001;
 
 	if (my_angle - pi < eps) {
 		return F_center;
@@ -301,7 +301,7 @@ Coord Wall_Node::bending_Equation_Left() {
 	double left_angle = left->get_Angle();
 	double left_Constant;
 	
-	double eps = 0.001;
+	double eps = 0.0000001;
 
 	if (left_angle - pi < eps) {
 		return F_left;
@@ -329,7 +329,7 @@ Coord Wall_Node::bending_Equation_Right() {
 	double right_angle = right->get_Angle();
 	double right_Constant;
 	
-	double eps = 0.001;
+	double eps = 0.0000001;
 
 	if (right_angle - pi < eps) {
 		return F_right;

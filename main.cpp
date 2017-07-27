@@ -23,9 +23,9 @@ int main() {
 	
 	// Five locations for Wall Nodes
 	Coord locA(0.1, 0.1); //first_corner
-	Coord locB(0.2, 0.1); //end node to left of A
+	Coord locB(0.2,- 0.1); //end node to left of A
 	Coord locC(0.3, 0.1); //end node to left of B
-	Coord locD(0.1, 0.2); //flank node to right of A
+	Coord locD(-0.1, 0.2); //flank node to right of A
 	Coord locE(0.1, 0.3); //flank node to right of D
 
 	Wall_Node* A = new Corner_Node(locA);
@@ -64,23 +64,34 @@ int main() {
 
 	//Bending
 	cout << "A's Bending Force" << endl;
-	Coord bend = A->calc_Bending();
-	cout << "	Total Bending Force: " << bend << endl << endl;
+	Coord bendA = A->calc_Bending();
+	cout << "	Total Bending Force: " << bendA << endl << endl;
+	
+	//Bending
+	cout << "B's Bending Force" << endl;
+	Coord bendB = B->calc_Bending();
+	cout << "	Total Bending Force: " << bendB << endl << endl;
+
+	//Bending
+	cout << "D's Bending Force" << endl;
+	Coord bendD = D->calc_Bending();
+	cout << "	Total Bending Force: " << bendD << endl << endl;
+
 
 //	cout << "A's Morse Force" << endl;
 //	Coord morse = A->calc_Morse_SC(cyts);
 //	cout << "	Total Morse Force: " << morse << endl << endl;
 	
-	cout << "A's Linear Force" << endl;
-	Coord lin = A->calc_Linear();
-	cout << "	Total Spring Force: " << lin << endl << endl;
+//	cout << "A's Linear Force" << endl;
+//	Coord lin = A->calc_Linear();
+//	cout << "	Total Spring Force: " << lin << endl << endl;
 
-	cout << "B's Linear Force" << endl;
-	Coord linB = B->calc_Linear();
-	cout << " Total Spring Force: " << linB << endl << endl;
+//	cout << "B's Linear Force" << endl;
+//	Coord linB = B->calc_Linear();
+//	cout << " Total Spring Force: " << linB << endl << endl;
 
-	Coord total = bend +lin; //morse 
-	cout << "A's Total Force: " << total << endl;
+//	Coord total = bend +lin; //morse 
+//	cout << "A's Total Force: " << total << endl;
 
 
 
