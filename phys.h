@@ -32,13 +32,13 @@ const double thetaCorner = pi / 2;
 const double thetaFlank = pi;
 
 //rotational spring constant for end node
-const double kBendEnd = 6;
+const double kBendEnd = .6;
 
 //rotational spring constant for flank node
 const double kBendFlank = 0.6;
 
 //linear spring constant for end node
-const double kLinearEnd = 30;
+const double kLinearEnd = 6;
 
 //linear spring constant for flank node
 const double kLinearFlank = 6;

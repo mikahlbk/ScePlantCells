@@ -284,7 +284,7 @@ Coord Wall_Node::bending_Equation_Center() {
 	Coord right_vect = right->get_Location() - my_loc;
 	double left_len = left_vect.length();
 	double right_len = right_vect.length();
-	Coord term_l1 = left_vect*(-1/(left_len*right_len));
+	Coord term_l1 = (left_vect/(left_len*right_len))*(-1);
 	Coord term_l2 = left_vect*(cos(my_angle)/pow(left_len,2));
 	Coord term_r1 = right_vect*(-1/(left_len*right_len));
 	Coord term_r2 = right_vect*(cos(my_angle)/pow(right_len,2));
