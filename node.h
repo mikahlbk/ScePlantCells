@@ -53,6 +53,7 @@ class Wall_Node: public Node {
         Wall_Node* left;
         Wall_Node* right;
         double my_angle;
+		double cross_Prod;
 
     public:
     //function that you want performed on all wall nodes
