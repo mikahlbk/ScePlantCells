@@ -145,10 +145,11 @@ void Cell::get_Neigh_Cells(vector<Cell*>& cells) {
 
 void Cell::calc_New_Forces() {
 	//calc forces on cyt nodes
+	
 	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
 		cyt_nodes.at(i)->calc_Forces(this);
 	}
-
+	
 	//calc forces on wall nodes
 	Wall_Node* curr = corners.at(0);
 	
@@ -166,6 +167,7 @@ void Cell::calc_New_Forces() {
 void Cell::update_Node_Locations() {
 	
 	//update cyt nodes
+
 	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
 		cyt_nodes.at(i)->update_Location();
 	}
@@ -198,7 +200,21 @@ void Cell::update_Wall_Angles() {
 
 void Cell::print_Data_Output(ofstream& ofs) {
 	
-	ofs << "This is where data output goes" << endl;
+	Wall_Node* curr = corners.at(0);
+	int i = 0;
+
+	do {
+		Coord loc = curr->get_Location();
+		Coord f = curr->get_New_Forces();
+
+		ofs << "Node " << i << ':' << endl;
+		ofs << "	Loc: " << loc << endl;
+		ofs << "	Force: " << f << endl;
+
+		curr = curr->get_Left_Neighbor();
+		i++;
+
+	} while(curr != corners.at(0));
 
 	return;
 }

@@ -21,6 +21,10 @@ Coord Node::get_Location() {
     return my_loc;
 }
 
+Coord Node::get_New_Forces() {
+	return new_force;
+}
+
 void Node::update_Location() {
     my_loc += new_force * dt;
     return;
@@ -226,12 +230,12 @@ Coord Wall_Node::calc_Bending() {
 	Coord F_left= bending_Equation_Left();
 	cout << "	Left Bending Force: " << F_left << endl;
 	Coord F_rt = bending_Equation_Right();
-	cout << "	Right Bending Force: " << F_rt << endl;
+	cout << "	Right Bending Force: " << F_rt << endl << endl;
 
 	F_bend = F_cent + F_left + F_rt;
 
 	if (cross_Prod < 0) {
-		cout << "concave angle so alter bending force" << endl;
+		cout << "	concave angle so alter bending force" << endl;
 		F_bend = F_bend * (-1);
 	}
 

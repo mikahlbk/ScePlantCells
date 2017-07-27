@@ -20,7 +20,63 @@ using namespace std;
 //============================
 
 int main() {
-	
+
+	string init_cell = "cell_start.txt";
+	//make a new cell object
+
+	Cell* growing_Cell = new Cell(init_cell);
+	cout << "Finished creating Cell" << endl;
+	//parameters for time step
+	double numSteps = 10;
+
+	// Variable for dataoutput
+	int digits;
+	string format1 = ".vtk";
+	string format2 = ".txt";
+	string Number;
+	string initial_1 = "Animation/Plant_Cell_";
+	string initial_2 = "DataOutput/Plant_Cell_";
+	string Filename;
+	ofstream ofs;
+
+	//loop for time steps
+	for(int Ti = 0; Ti < numSteps; Ti++) {
+		//loop through all cells
+		//for now only one cell
+		cout << "Ti: " << Ti << endl;
+		//Print to dataOutput and VTK files
+
+		digits = ceil(log10(Ti + 1));
+		if (digits == 1 || digits == 0) {
+			Number = "0000" + to_string(Ti);
+		}
+		else if (digits == 2) {
+			Number = "000" + to_string(Ti);
+		}
+		else if (digits == 3) {
+			Number = "00" + to_string(Ti);
+		}
+		else if (digits == 4) {
+			Number = "0" + to_string(Ti);
+		}
+
+		Filename = initial_1 + Number + format1;
+		ofs.open(Filename.c_str());
+		growing_Cell->print_VTK_File(ofs);
+		ofs.close();
+
+		Filename = initial_2 + Number + format2;
+		ofs.open(Filename.c_str());
+		growing_Cell->print_Data_Output(ofs);
+		ofs.close();
+		
+		growing_Cell->calc_New_Forces();
+		growing_Cell->update_Node_Locations();
+		growing_Cell->update_Wall_Angles();
+
+	}
+	//=================
+	/*
 	// Five locations for Wall Nodes
 	Coord locA(0.1, 0.1); //first_corner
 	Coord locB(0.2, 0.1); //end node to left of A
@@ -79,7 +135,7 @@ int main() {
 	cout << "A's Total Force: " << total << endl;
 
 
-
+	*/
 	
 	return 0;
 }
