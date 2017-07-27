@@ -27,6 +27,7 @@ class Node {
         //some functions you can define in base class because 
         //    all nodes will use the exact same function
         virtual Coord get_Location();
+		virtual Coord get_New_Forces();
 		virtual void update_Location();
         //other functions might be executed differently based on
         //    which node you are. Thus define as "pure virtual" and 

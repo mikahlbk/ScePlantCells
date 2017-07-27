@@ -2,7 +2,7 @@
 //=========================
 #include <iostream>
 #include <vector>
-#include <math.h>
+#include <cmath>
 //=========================
 #include "phys.h"
 #include "coord.h"
@@ -21,8 +21,12 @@ Coord Node::get_Location() {
     return my_loc;
 }
 
+Coord Node::get_New_Forces() {
+	return new_force;
+}
+
 void Node::update_Location() {
-    my_loc += new_force * dt;
+    my_loc += (new_force * dt);
     return;
 }
 
@@ -144,18 +148,27 @@ void Wall_Node::calc_Forces(Cell* my_cell) {
 	// Initialize force sum to zero by default constructor
 	Coord sum;
 	// gather cyt nodes of your cell for morse calc
+
+	/*
 	vector<Cyt_Node*> cyts;
 	my_cell->get_CytNodes(cyts);
+<<<<<<< HEAD
 //	sum += calc_Morse_SC(cyts);
+=======
+	sum += calc_Morse_SC(cyts);
+	*/
 
 	//will be implimented later
 	//sum += calc_Morse_DC(my_cell->get_Neigh_Cells());
 	
+
 //	sum += calc_Linear();
+
+	//sum += calc_Linear();
 	sum += calc_Bending();
 
 	// Update new_force variable for location updating
-	new_force = sum;;
+	new_force = sum;
 }
 
 void Wall_Node::update_Angle() {
@@ -214,6 +227,7 @@ Coord Wall_Node::calc_Morse_DC(vector<Cell*>& cells) {
 Coord Wall_Node::calc_Bending() {
 	Coord F_bend;
 
+<<<<<<< HEAD
 	F_bend += bending_Equation_Center();
 	F_bend += bending_Equation_Left();
 	F_bend += bending_Equation_Right();
@@ -223,6 +237,22 @@ Coord Wall_Node::calc_Bending() {
 	}	
 
 	cout << F_bend << endl;
+=======
+	Coord F_cent = bending_Equation_Center();
+	cout << "	Center Bending Force: " << F_cent << endl;
+	Coord F_left= bending_Equation_Left();
+	cout << "	Left Bending Force: " << F_left << endl;
+	Coord F_rt = bending_Equation_Right();
+	cout << "	Right Bending Force: " << F_rt << endl << endl;
+
+	F_bend = F_cent + F_left + F_rt;
+
+	if (cross_Prod < 0) {
+		cout << "	concave angle so alter bending force" << endl;
+		F_bend = F_bend * (-1);
+	}
+
+>>>>>>> 3f4d54f40273b64ed83d93d4ca3b5a6e1ff1e98b
 	return F_bend;
 }
 
@@ -273,7 +303,7 @@ Coord Wall_Node::bending_Equation_Center() {
 	
 	double eps = 0.0001;
 
-	if (my_angle - pi < eps) {
+	if (abs(my_angle - pi) < eps) {
 		return F_center;
 	}
 	else {
@@ -290,6 +320,13 @@ Coord Wall_Node::bending_Equation_Center() {
 	Coord term_r2 = right_vect*cos(my_angle)/pow(right_len,2);
 
 	F_center = (term_l1 + term_l2 + term_r1 + term_r2) * self_Constant;
+
+	cout << "	Bend_Center" << endl;
+	cout << "		center_Const: " << self_Constant << endl;
+	cout << "		left_term1: " << term_l1 << endl;
+	cout << "		left_term2: " << term_l2 << endl;
+	cout << "		right_term1: " << term_r1 << endl;
+	cout << "		right_term2: " << term_r2 << endl;
 	
 	return F_center;
 }
@@ -305,7 +342,7 @@ Coord Wall_Node::bending_Equation_Left() {
 	
 	double eps = 0.0001;
 
-	if (left_angle - pi < eps) {
+	if (abs(left_angle - pi) < eps) {
 		return F_left;
 	}
 	else {
@@ -320,6 +357,11 @@ Coord Wall_Node::bending_Equation_Left() {
 	Coord left_term2 = left_vect*cos(left_angle)/pow(left_len,2);
 
 	F_left = (left_left_term1 + left_term2) * left_Constant;
+
+	cout << "	Bend_Left" << endl;
+	cout << "		Left_Const: " << left_Constant << endl;
+	cout << "		left_left_term: " << left_left_term1 << endl;
+	cout << "		left_term: " << left_term2 << endl;
 	
 	return F_left;
 }
@@ -335,7 +377,7 @@ Coord Wall_Node::bending_Equation_Right() {
 	
 	double eps = 0.0001;
 
-	if (right_angle - pi < eps) {
+	if (abs(right_angle - pi) < eps) {
 		return F_right;
 	}
 	else {
@@ -350,6 +392,12 @@ Coord Wall_Node::bending_Equation_Right() {
 	Coord right_term2 = right_vect*cos(right_angle)/pow(right_len,2);
 
 	F_right = (right_right_term1 + right_term2)*right_Constant;
+	
+	cout << "	Bend_Right" << endl;
+	cout << "		Right_Const: " << right_Constant << endl;
+	cout << "		right_right_term: " << right_right_term1 << endl;
+	cout << "		right_term: " << right_term2 << endl;
+	
 	return F_right;
 }
 
