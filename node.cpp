@@ -145,18 +145,21 @@ void Wall_Node::calc_Forces(Cell* my_cell) {
 	// Initialize force sum to zero by default constructor
 	Coord sum;
 	// gather cyt nodes of your cell for morse calc
+
+	/*
 	vector<Cyt_Node*> cyts;
 	my_cell->get_CytNodes(cyts);
 	sum += calc_Morse_SC(cyts);
+	*/
 
 	//will be implimented later
 	//sum += calc_Morse_DC(my_cell->get_Neigh_Cells());
 	
-	sum += calc_Linear();
+	//sum += calc_Linear();
 	sum += calc_Bending();
 	
 	// Update new_force variable for location updating
-	new_force = sum;;
+	new_force = sum;
 }
 
 void Wall_Node::update_Angle() {
@@ -176,6 +179,8 @@ void Wall_Node::update_Angle() {
 	}
 
 	my_angle = theta;
+	cross_Prod = crossProd;
+
 	return;
 }
 
@@ -225,6 +230,11 @@ Coord Wall_Node::calc_Bending() {
 
 	F_bend = F_cent + F_left + F_rt;
 
+	if (cross_Prod < 0) {
+		cout << "concave angle so alter bending force" << endl;
+		F_bend = F_bend * (-1);
+	}
+
 	return F_bend;
 }
 
@@ -271,7 +281,7 @@ Coord Wall_Node::bending_Equation_Center() {
 	double equ_angle = get_Equi_Angle();
 	double self_Constant; 
 	
-	double eps = 0.001;
+	double eps = 0.0001;
 
 	if (my_angle - pi < eps) {
 		return F_center;
@@ -301,7 +311,7 @@ Coord Wall_Node::bending_Equation_Left() {
 	double left_angle = left->get_Angle();
 	double left_Constant;
 	
-	double eps = 0.001;
+	double eps = 0.0001;
 
 	if (left_angle - pi < eps) {
 		return F_left;
@@ -329,7 +339,7 @@ Coord Wall_Node::bending_Equation_Right() {
 	double right_angle = right->get_Angle();
 	double right_Constant;
 	
-	double eps = 0.001;
+	double eps = 0.0001;
 
 	if (right_angle - pi < eps) {
 		return F_right;

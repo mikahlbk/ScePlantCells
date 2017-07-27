@@ -13,12 +13,12 @@
 //=====================
 
 // Simulation Constants
-const double dt = 0.0001;
+const double dt = 0.003;
 
 
 // Global Physics Constants
 
-const double pi = 3.1415926535897;
+const double pi = acos(-1.0);
 
 ///// Cell wall mechanical parameters
 
