@@ -27,7 +27,7 @@ int main() {
 	Cell* growing_Cell = new Cell(init_cell);
 	cout << "Finished creating Cell" << endl;
 	//parameters for time step
-    double numSteps = 1;
+    double numSteps = 10;
 
 	// Variable for dataoutput
 	int digits;
@@ -38,7 +38,7 @@ int main() {
 	ofstream ofs;
 
 	//loop for time steps
-	for(int Ti = 1; Ti < 10; Ti++) {
+	for(int Ti = 1; Ti < numSteps; Ti++) {
 		//loop through all cells
 		//for now only one cell
 

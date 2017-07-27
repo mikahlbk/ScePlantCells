@@ -151,7 +151,7 @@ void Wall_Node::calc_Forces(Cell* my_cell) {
 	//will be implimented later
 	//sum += calc_Morse_DC(my_cell->get_Neigh_Cells());
 	
-//	sum += calc_Linear();
+	sum += calc_Linear();
 	sum += calc_Bending();
 
 	// Update new_force variable for location updating
@@ -170,7 +170,7 @@ void Wall_Node::update_Angle() {
 
 	double crossProd = left_vect.cross(right_vect);
 
-	if (crossProd < 0) {
+	if (crossProd < 0.0) {
 		theta = 2 * pi - theta;
 	}
 	
@@ -219,7 +219,7 @@ Coord Wall_Node::calc_Bending() {
 	F_bend += bending_Equation_Left();
 	F_bend += bending_Equation_Right();
 	
-	if (cross_Prod < 0) {
+	if (cross_Prod < 0.0) {
 		F_bend = F_bend*(-1);
 	}	
     cout << F_bend << endl;
@@ -274,7 +274,7 @@ Coord Wall_Node::bending_Equation_Center() {
 	
 	double eps = 0.0001;
 
-	if (my_angle - pi < eps) {
+	if (abs(my_angle - pi) < eps) {
 		return F_center;
 	}
 	else {
@@ -285,10 +285,10 @@ Coord Wall_Node::bending_Equation_Center() {
 	Coord right_vect = right->get_Location() - my_loc;
 	double left_len = left_vect.length();
 	double right_len = right_vect.length();
-	Coord term_l1 = left_vect*(-1)/(left_len*right_len);
-	Coord term_l2 = left_vect*(cos(my_angle))/pow(left_len,2);
-	Coord term_r1 = right_vect*(-1)/(left_len*right_len);
-	Coord term_r2 = right_vect*(cos(my_angle))/pow(right_len,2);
+	Coord term_l1 = (left_vect*(-1))/(left_len*right_len);
+	Coord term_l2 = left_vect*cos(my_angle)/pow(left_len,2);
+	Coord term_r1 = (right_vect*(-1))/(left_len*right_len);
+	Coord term_r2 = right_vect*cos(my_angle)/pow(right_len,2);
 
 	F_center = (term_l1 + term_l2 + term_r1 + term_r2) * self_Constant;
 	
@@ -299,14 +299,12 @@ Coord Wall_Node::bending_Equation_Left() {
 	Coord F_left;
 	double left_k_bend = left->get_bendingSpring();
 	double left_equ_angle = left->get_Equi_Angle();
-//	cout << left_equ_angle << endl;
 	double left_angle = left->get_Angle();
-//	cout << left_angle << endl;
 	double left_Constant;
 	
 	double eps = 0.0001;
 
-	if (left_angle - pi < eps) {
+	if (abs(left_angle - pi) < eps) {
 		return F_left;
 	}
 	else {
@@ -329,14 +327,12 @@ Coord Wall_Node::bending_Equation_Right() {
 	Coord F_right;
 	double right_k_bend = right->get_bendingSpring();
 	double right_equ_angle = right->get_Equi_Angle();
-//	cout << right_equ_angle << endl;
 	double right_angle = right->get_Angle();
-//	cout << right_angle << endl;
 	double right_Constant;
 	
 	double eps = 0.0001;
 
-	if (right_angle - pi < eps) {
+	if (abs(right_angle - pi) < eps) {
 		return F_right;
 	}
 	else {
@@ -468,4 +464,3 @@ bool End_Node::is_Corner() {
 //==========================================================
 // End of node.cpp
 
-	
