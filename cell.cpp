@@ -152,10 +152,13 @@ void Cell::calc_New_Forces() {
 	
 	//calc forces on wall nodes
 	Wall_Node* curr = corners.at(0);
+	int i = 0;
 	
 	do {
+		cout << "CellRank: " << i << endl;
 		curr->calc_Forces(this);
 		curr = curr->get_Left_Neighbor();
+		i++;
 	
 	} while(curr != corners.at(0));
 

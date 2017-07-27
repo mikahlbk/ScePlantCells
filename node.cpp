@@ -2,7 +2,7 @@
 //=========================
 #include <iostream>
 #include <vector>
-#include <math.h>
+#include <cmath>
 //=========================
 #include "phys.h"
 #include "coord.h"
@@ -26,7 +26,7 @@ Coord Node::get_New_Forces() {
 }
 
 void Node::update_Location() {
-    my_loc += new_force * dt;
+    my_loc += (new_force * dt);
     return;
 }
 
@@ -287,7 +287,7 @@ Coord Wall_Node::bending_Equation_Center() {
 	
 	double eps = 0.0001;
 
-	if (my_angle - pi < eps) {
+	if (abs(my_angle - pi) < eps) {
 		return F_center;
 	}
 	else {
@@ -304,6 +304,13 @@ Coord Wall_Node::bending_Equation_Center() {
 	Coord term_r2 = right_vect*(cos(my_angle)/pow(right_len,2));
 
 	F_center = (term_l1 + term_l2 + term_r1 + term_r2) * self_Constant;
+
+	cout << "	Bend_Center" << endl;
+	cout << "		center_Const: " << self_Constant << endl;
+	cout << "		left_term1: " << term_l1 << endl;
+	cout << "		left_term2: " << term_l2 << endl;
+	cout << "		right_term1: " << term_r1 << endl;
+	cout << "		right_term2: " << term_r2 << endl;
 	
 	return F_center;
 }
@@ -317,7 +324,7 @@ Coord Wall_Node::bending_Equation_Left() {
 	
 	double eps = 0.0001;
 
-	if (left_angle - pi < eps) {
+	if (abs(left_angle - pi) < eps) {
 		return F_left;
 	}
 	else {
@@ -332,6 +339,11 @@ Coord Wall_Node::bending_Equation_Left() {
 	Coord left_term2 = left_vect*((-1)*cos(left_angle)/pow(left_len,2));
 
 	F_left = (left_left_term1 + left_term2) * left_Constant;
+
+	cout << "	Bend_Left" << endl;
+	cout << "		Left_Const: " << left_Constant << endl;
+	cout << "		left_left_term: " << left_left_term1 << endl;
+	cout << "		left_term: " << left_term2 << endl;
 	
 	return F_left;
 }
@@ -345,7 +357,7 @@ Coord Wall_Node::bending_Equation_Right() {
 	
 	double eps = 0.0001;
 
-	if (right_angle - pi < eps) {
+	if (abs(right_angle - pi) < eps) {
 		return F_right;
 	}
 	else {
@@ -360,6 +372,12 @@ Coord Wall_Node::bending_Equation_Right() {
 	Coord right_term2 = right_vect*((-1)*cos(right_angle)/pow(right_len,2));
 
 	F_right = (right_right_term1 + right_term2)*right_Constant;
+	
+	cout << "	Bend_Right" << endl;
+	cout << "		Right_Const: " << right_Constant << endl;
+	cout << "		right_right_term: " << right_right_term1 << endl;
+	cout << "		right_term: " << right_term2 << endl;
+	
 	return F_right;
 }
 
