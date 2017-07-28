@@ -20,10 +20,11 @@ class Node {
     //variables that will be shared by all nodes
 		Coord my_loc;
 		Coord new_force;
+		Cell* my_cell;
     public:
     //functions that you will want performed on all nodes
         //Constructor
-        Node(Coord loc);
+        Node(Coord loc, Cell* my_cell);
         //some functions you can define in base class because 
         //    all nodes will use the exact same function
         virtual Coord get_Location();
@@ -39,7 +40,7 @@ class Cyt_Node: public Node {
     //if don't need to keep any more information then just leave blank
 
     public:
-        Cyt_Node(Coord loc);
+        Cyt_Node(Coord loc, Cell* my_cell);
         virtual void calc_Forces(Cell* my_cell);
 		Coord calc_Morse_II(vector<Cyt_Node*>& cyt_nodes);
 		Coord calc_Morse_MI(Wall_Node* curr);
@@ -58,8 +59,8 @@ class Wall_Node: public Node {
     public:
     //function that you want performed on all wall nodes
 		// Constructors
-        Wall_Node(Coord loc);
-        Wall_Node(Coord loc, Wall_Node* left, Wall_Node* right);
+        Wall_Node(Coord loc, Cell* my_cell);
+        Wall_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right);
         //maybe could define them here if corner and edge both perform
         //    these functions identically
 
@@ -92,8 +93,8 @@ class Wall_Node: public Node {
 
 class Corner_Node: public Wall_Node {
     public:
-        Corner_Node(Coord loc);
-        Corner_Node(Coord loc, Wall_Node* left, Wall_Node* right);
+        Corner_Node(Coord loc, Cell* my_cell);
+        Corner_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right);
 		virtual double get_Equi_Angle();
 		virtual double get_linearSpring();
 		virtual double get_bendingSpring();
@@ -103,8 +104,8 @@ class Corner_Node: public Wall_Node {
 
 class Flank_Node: public Wall_Node {
     public:
-        Flank_Node(Coord loc);
-        Flank_Node(Coord loc, Wall_Node* left, Wall_Node* right);
+        Flank_Node(Coord loc, Cell* my_cell);
+        Flank_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right);
 		virtual Coord calc_Linear();
 		virtual double get_Equi_Angle();
 		virtual double get_linearSpring();
@@ -114,8 +115,8 @@ class Flank_Node: public Wall_Node {
 
 class End_Node: public Wall_Node {
 	public:
-		End_Node(Coord loc);
-		End_Node(Coord loc, Wall_Node* left, Wall_Node* right);
+		End_Node(Coord loc, Cell* my_cell);
+		End_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right);
 		virtual Coord calc_Linear();
 		virtual double get_Equi_Angle();
 		virtual double get_linearSpring();

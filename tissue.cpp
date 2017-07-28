@@ -47,7 +47,7 @@ Tissue::Tissue(string filename) {
 		}
 		else if (temp == "End_Cell") {
 			//create new cell with collected data and push onto vector 
-			curr = new Cell(rank, corner, height, width);
+			curr = new Cell(rank, corner, height, width, 0, this);
 			cells.push_back(curr);
 		}
 
@@ -55,6 +55,11 @@ Tissue::Tissue(string filename) {
 	}
 
 	ifs.close();
+}
+
+void Tissue::get_Cells(vector<Cell*>& cells) {
+	cells = this->cells;
+	return;
 }
 
 void Tissue::calc_New_Forces() {
@@ -80,7 +85,7 @@ void Tissue::update_Cell_Locations() {
 }
 
 void print_Data_Output(ofstream & ofs) {
-
+	return;
 }
 
 void print_VTK_File(ofstream& ofs) {

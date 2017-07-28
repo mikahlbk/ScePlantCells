@@ -5,7 +5,7 @@
 #define _CELL_H_INCLUDED_
 //===================
 // forward declarations
-
+class Tissue;
 //===================
 // include dependencies
 #include <string>
@@ -22,6 +22,10 @@
 class Cell {
 
 	private:
+		Tissue* my_tissue;
+		int rank;
+		//keep track of when spawned
+		int cell_init_time;
 		//keep track of how many nodes the cell has created
 		int num_wall_nodes;
 		int num_cyt_nodes;
@@ -33,7 +37,8 @@ class Cell {
 
 	public:
 		// Constructors
-		Cell(string filename);
+		Cell(int rank, Coord corner, double height, double width, 
+			 int Ti, Tissue* tiss);
 
 		// Getters and Setters
 		void get_CytNodes(vector<Cyt_Node*>& cyts);

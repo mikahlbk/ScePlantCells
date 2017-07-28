@@ -25,6 +25,8 @@ class Tissue {
 
 	public:
 		Tissue(string filename);
+		
+		void get_Cells(vector<Cell*>& cells);
 
 		void calc_New_Forces();
 		void update_Cell_Locations();

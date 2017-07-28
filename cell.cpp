@@ -19,9 +19,13 @@
 
 // Constructors
 
-Cell::Cell(int rank, Coord corner, double height, double width) {
+Cell::Cell(int rank, Coord corner, double height, 
+			double width, int Ti, Tissue* tiss)    {
 	
+	this->my_tissue = tiss;
 	this->rank = rank;
+
+	cell_init_time = Ti;
 
 	int num_Init_Wall_Nodes = 100;
 	double perim = (height * 2) + (width * 2);
@@ -165,7 +169,7 @@ Wall_Node* Cell::get_WallNodes() {
 }
 
 void Cell::get_Neigh_Cells(vector<Cell*>& cells) {
-	cells = neigh_cells;
+	my_tissue->get_Cells(cells);
 	return;
 }
 
@@ -174,16 +178,15 @@ void Cell::get_Neigh_Cells(vector<Cell*>& cells) {
 void Cell::calc_New_Forces() {
 	//calc forces on cyt nodes
 	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
-		cyt_nodes.at(i)->calc_Forces(this);
+		cyt_nodes.at(i)->calc_Forces();
 	}
 
 	//calc forces on wall nodes
 	Wall_Node* curr = corners.at(0);
 	
 	do {
-		curr->calc_Forces(this);
+		curr->calc_Forces();
 		curr = curr->get_Left_Neighbor();
-
 	
 	} while(curr != corners.at(0));
 
@@ -207,8 +210,6 @@ void Cell::update_Node_Locations() {
 		curr = curr->get_Left_Neighbor();
 	
 	} while(curr != corners.at(0));
-
-	//
 	
 	return;
 }
@@ -311,7 +312,7 @@ Wall_Node* Cell::find_Largest_Length(int& side) {
 
 void Cell::add_Wall_Node(const int Ti) {
 
-	if (Ti % ADD_WALL_TIMER != cell_init_time) {
+	if ((Ti - init_cell_time) % ADD_WALL_TIMER != 0) {
 		return;
 	}
 
@@ -353,7 +354,7 @@ void Cell::add_Wall_Node(const int Ti) {
 
 void Cell::add_Cyt_Node(const int Ti) {
 
-	if (Ti % ADD_CYT_TIMER != cell_init_time) {
+	if ((Ti - init_cell_time) % ADD_CYT_TIMER != 0) {
 		return;
 	}
 

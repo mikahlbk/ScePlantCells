@@ -12,9 +12,10 @@
 
 //========================================
 /** class Node Functions **/
-Node::Node(Coord loc) {
+Node::Node(Coord loc, Cell* my_cell) {
 	my_loc = loc;
 	new_force = Coord();
+	this->my_cell = my_cell;
 }
 
 Coord Node::get_Location() {
@@ -28,9 +29,9 @@ void Node::update_Location() {
 
 //========================================
 /** class Cyt Node Functions **/
-Cyt_Node::Cyt_Node(Coord loc) : Node(loc) {};
+Cyt_Node::Cyt_Node(Coord loc, Cell* my_cell) : Node(loc, my_cell) {};
 
-void Cyt_Node::calc_Forces(Cell* my_cell) {
+void Cyt_Node::calc_Forces() {
 	//for cyt, just need morse potential for int-int and int-membr
 	vector<Cyt_Node*> cyts;
 	my_cell->get_CytNodes(cyts);
@@ -107,9 +108,11 @@ Coord Cyt_Node::morse_Equation(Wall_Node* wall) {
 /** class Wall Node Functions **/
 
 // Constructors-----------------
-Wall_Node::Wall_Node(Coord loc) : Node(loc) {};
+Wall_Node::Wall_Node(Coord loc, Cell* my_cell) : Node(loc, my_cell) {};
 
-Wall_Node::Wall_Node(Coord loc, Wall_Node* left, Wall_Node* right) : Node(loc) {
+Wall_Node::Wall_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right) 
+	: Node(loc, my_cell)   {
+
     this->left = left;
     this->right = right;
 
@@ -140,16 +143,14 @@ void Wall_Node::set_Right_Neighbor(Wall_Node* new_Right) {
 }
 
 // Calc Force Functions -----------------------
-void Wall_Node::calc_Forces(Cell* my_cell) {
+void Wall_Node::calc_Forces() {
 	// Initialize force sum to zero by default constructor
 	Coord sum;
 	// gather cyt nodes of your cell for morse calc
-	vector<Cyt_Node*> cyts;
-	my_cell->get_CytNodes(cyts);
-	sum += calc_Morse_SC(cyts);
+	sum += calc_Morse_SC();
 
 	//will be implimented later
-	//sum += calc_Morse_DC(my_cell->get_Neigh_Cells());
+	sum += calc_Morse_DC();
 	
 	sum += calc_Linear();
 	sum += calc_Bending();
@@ -182,7 +183,10 @@ void Wall_Node::update_Angle() {
 }
 
 //morse potential between wall node i and every cyt node in cell
-Coord Wall_Node::calc_Morse_SC(vector<Cyt_Node*>& cyt_nodes) {
+Coord Wall_Node::calc_Morse_SC() {
+	vector<Cyt_Node*> cyt_nodes;
+	my_cell->get_CytNodes(cyt_nodes);
+
 	Coord Fmi;
 	
 	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
@@ -193,22 +197,32 @@ Coord Wall_Node::calc_Morse_SC(vector<Cyt_Node*>& cyt_nodes) {
 }
 
 //probably need vector of relatively close cells
-Coord Wall_Node::calc_Morse_DC(vector<Cell*>& cells) {
+Coord Wall_Node::calc_Morse_DC() {
+
+	vector<Cell*> cells;
+	my_cell->get_Neighbor_Cells(cells);
+
 	Coord Fdc;
-	/*
+	
 	//iterate through each cell
 	for (int i = 0; i < cells.size(); i++) {
 		//find which nodes from cell.at(i) you will need
+		//at the moment, just the ones that aren't yourself
 
-		//iterate through membrane nodes of each cell
-		for () {
-			
-			Fdc += this->morse_Function();
+		if (cells.at(i) != my_cell) {
+			//iterate through membrane nodes of each cell
+			Wall_Node* curr = cells.at(i)->get_WallNodes();
+			Wall_Node* orig = curr;
+
+			do {
+				Fdc += this->morse_Equation(curr);
+				curr = curr->get_Left_Neighbor();
+			} while(curr != orig);
 
 		}
 
 	}
-	*/
+	
 	return Fdc;
 }
 
@@ -351,10 +365,10 @@ Coord Wall_Node::bending_Equation_Right() {
 
 //========================================================
 /** class Corner Node Functions **/
-Corner_Node::Corner_Node(Coord loc) : Wall_Node(loc) {}
+Corner_Node::Corner_Node(Coord loc, Cell* my_cell) : Wall_Node(loc, my_cell) {}
 
-Corner_Node::Corner_Node(Coord loc, Wall_Node* left, Wall_Node* right) 
-    : Wall_Node(loc, left, right) {}
+Corner_Node::Corner_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right) 
+    : Wall_Node(loc, my_cell, left, right) {}
 
 double Corner_Node::get_Equi_Angle() {
 	return thetaCorner;
@@ -389,10 +403,10 @@ bool Corner_Node::is_Corner() {
 
 //===========================================================
 /** class Flank Node function **/
-Flank_Node::Flank_Node(Coord loc) : Wall_Node(loc) {};
+Flank_Node::Flank_Node(Coord loc, Cell* my_cell) : Wall_Node(loc, my_cell) {};
 
-Flank_Node::Flank_Node(Coord loc, Wall_Node* left, Wall_Node* right) 
-	: Wall_Node(loc, left, right) {}
+Flank_Node::Flank_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right) 
+	: Wall_Node(loc, my_cell, left, right) {}
 
 double Flank_Node::get_Equi_Angle() {
 	return thetaFlank;
@@ -425,9 +439,9 @@ bool Flank_Node::is_Corner() {
 
 //==============================================================
 /** class End Node function **/
-End_Node::End_Node(Coord loc) : Wall_Node(loc) {};
+End_Node::End_Node(Coord loc, Cell* my_cell) : Wall_Node(loc, my_cell) {};
 
-End_Node::End_Node(Coord loc, Wall_Node* left, Wall_Node* right)
+End_Node::End_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right)
     : Wall_Node(loc, left, right) {}
 
 Coord End_Node::calc_Linear() {
