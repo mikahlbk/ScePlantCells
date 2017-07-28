@@ -294,10 +294,15 @@ void Cell::add_Cell_Wall_Node() {
 	Wall_Node* left_Node = right_Node->get_Left_Neighbor();
 	//now we find the coords of each of these nodes to use to find the new coords
 	Coord right_Coords = right_Node->get_Location();  
+//	cout << "Right side coordinates" << endl;
+//	cout << right_Coords << endl;
 	Coord left_Coords = left_Node->get_Location();
+//	cout << "Left side coordinates" << endl;
+//	cout << left_Coords << endl;
 	//add it halfway between these two coords
 
-	Coord new_Coords = (right_Coords + left_Coords)*(1/2);
+	Coord new_Coords = (right_Coords + left_Coords)*(.5);
+//	cout << "New Coords: " << new_Coords << endl;
 	Wall_Node* new_Node;
 	
 	if (side % 2 == 1 ) { //end
@@ -323,6 +328,10 @@ void Cell::add_Cyt_Node() {
 
 	Coord new_Coord(new_x, new_y);
 	new_Coord += corners.at(0)->get_Location();
+	double away_from_edge_x = .5;
+	double away_from_edge_y = .5;
+	Coord away_from_Edge(away_from_edge_x,away_from_edge_y);
+	new_Coord += away_from_Edge;
 
 	Cyt_Node* cyt = new Cyt_Node(new_Coord);
 	cyt_nodes.push_back(cyt);
