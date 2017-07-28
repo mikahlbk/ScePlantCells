@@ -38,13 +38,12 @@ int main() {
 	ofstream ofs;
 
 	//loop for time steps
-	for(int Ti = 1; Ti < numSteps; Ti++) {
+	for(int Ti = 1; Ti*dt < numSteps; Ti++) {
 		//loop through all cells
 		//for now only one cell
 
 		//Print to dataOutput and VTK files
-		cout << Ti << endl;
-
+	
 		digits = ceil(log10(Ti + 1));
 		if (digits == 1 || digits == 0) {
 			Number = "0000" + to_string(Ti);
@@ -67,7 +66,7 @@ int main() {
 
 		//growth
 
-/*		if (Ti % 1000 == 0) {
+		if (Ti % 1000 == 0) {
 			cout << "Adding cell wall node" << endl;
 			cout << "Ti : " << Ti << endl;
 			growing_Cell->add_Cell_Wall_Node();
@@ -78,7 +77,7 @@ int main() {
 			growing_Cell->add_Cyt_Node();
 			cout << "Completed adding cyt node" << endl;
 		}
-*/
+
 		growing_Cell->calc_New_Forces();
 		growing_Cell->update_Node_Locations();
 		growing_Cell->update_Wall_Angles();

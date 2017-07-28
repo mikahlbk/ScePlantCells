@@ -2,7 +2,7 @@
 //=========================
 #include <iostream>
 #include <vector>
-#include <math.h>
+#include <cmath>
 //=========================
 #include "phys.h"
 #include "coord.h"
@@ -146,7 +146,7 @@ void Wall_Node::calc_Forces(Cell* my_cell) {
 	// gather cyt nodes of your cell for morse calc
 	vector<Cyt_Node*> cyts;
 	my_cell->get_CytNodes(cyts);
-//	sum += calc_Morse_SC(cyts);
+	sum += calc_Morse_SC(cyts);
 
 	//will be implimented later
 	//sum += calc_Morse_DC(my_cell->get_Neigh_Cells());
@@ -222,8 +222,7 @@ Coord Wall_Node::calc_Bending() {
 	if (cross_Prod < 0.0) {
 		F_bend = F_bend*(-1);
 	}	
-    cout << F_bend << endl;
-	
+
 	return F_bend;
 }
 
@@ -268,8 +267,6 @@ Coord Wall_Node::bending_Equation_Center() {
 	Coord F_center;
 	double k_bend = get_bendingSpring();
 	double equ_angle = get_Equi_Angle();
-//	cout << my_angle << endl;
-//	cout << equ_angle << endl;
 	double self_Constant; 
 	
 	double eps = 0.0001;
