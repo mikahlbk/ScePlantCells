@@ -36,33 +36,43 @@ int main() {
 	string initial = "Animation/Plant_Cell_";
 	string Filename;
 	ofstream ofs;
+	int out = 0; //counter for creating output/vtk files
 
 	//loop for time steps
-	for(int Ti = 1; Ti * dt < numSteps; Ti++) {
+	for(int Ti = 0; Ti * dt < numSteps; Ti++) {
 		//loop through all cells
 		//for now only one cell
 
 		//Print to dataOutput and VTK files
+
+		if (Ti % 100 == 0) {
 	
-		digits = ceil(log10(Ti + 1));
-		if (digits == 1 || digits == 0) {
-			Number = "0000" + to_string(Ti);
-		}
-		else if (digits == 2) {
-			Number = "000" + to_string(Ti);
-		}
-		else if (digits == 3) {
-			Number = "00" + to_string(Ti);
-		}
-		else if (digits == 4) {
-			Number = "0" + to_string(Ti);
+			digits = ceil(log10(out + 1));
+			if (digits == 1 || digits == 0) {
+				Number = "0000" + to_string(out);
+			}
+			else if (digits == 2) {
+				Number = "000" + to_string(out);
+			}
+			else if (digits == 3) {
+				Number = "00" + to_string(out);
+			}
+			else if (digits == 4) {
+				Number = "0" + to_string(out);
+			}
+
+			Filename = initial + Number + format;
+
+			ofs.open(Filename.c_str());
+			growing_Cell->print_VTK_File(ofs);
+			ofs.close();
+		
+			out++;
 		}
 
-		Filename = initial + Number + format;
-
-		ofs.open(Filename.c_str());
-		growing_Cell->print_VTK_File(ofs);
-		ofs.close();
+		if (Ti % 1000 == 0) {
+			cout << "Simulation still running. Ti: " << Ti << endl;
+		}
 
 		//growth
 
