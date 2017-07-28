@@ -32,7 +32,7 @@ class Node {
         //other functions might be executed differently based on
         //    which node you are. Thus define as "pure virtual" and 
         //    properly define them in a derived class
-        virtual void calc_Forces(Cell* my_cell) = 0;
+        virtual void calc_Forces() = 0;
 };
 
 class Cyt_Node: public Node {
@@ -41,7 +41,7 @@ class Cyt_Node: public Node {
 
     public:
         Cyt_Node(Coord loc, Cell* my_cell);
-        virtual void calc_Forces(Cell* my_cell);
+        virtual void calc_Forces();
 		Coord calc_Morse_II(vector<Cyt_Node*>& cyt_nodes);
 		Coord calc_Morse_MI(Wall_Node* curr);
 		Coord morse_Equation(Cyt_Node* cyt);
@@ -71,10 +71,10 @@ class Wall_Node: public Node {
 		virtual void set_Left_Neighbor(Wall_Node* new_Left);
 		virtual void set_Right_Neighbor(Wall_Node* new_Right);
 		// Force Calculations
-		virtual void calc_Forces(Cell* my_cell);
+		virtual void calc_Forces();
 		virtual void update_Angle();
-		virtual Coord calc_Morse_SC(vector<Cyt_Node*>& cyt_nodes);
-		virtual Coord calc_Morse_DC(vector<Cell*>& cells);
+		virtual Coord calc_Morse_SC();
+		virtual Coord calc_Morse_DC();
 		virtual Coord calc_Bending();
 		virtual Coord morse_Equation(Cyt_Node* cyt);
 		virtual Coord morse_Equation(Wall_Node* wall);

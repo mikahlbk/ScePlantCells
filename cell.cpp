@@ -13,6 +13,7 @@
 #include "coord.h"
 #include "node.h"
 #include "cell.h"
+#include "tissue.h"
 //===================
 
 // Cell Class Member functions
@@ -25,7 +26,7 @@ Cell::Cell(int rank, Coord corner, double height,
 	this->my_tissue = tiss;
 	this->rank = rank;
 
-	cell_init_time = Ti;
+	init_cell_time = Ti;
 
 	int num_Init_Wall_Nodes = 100;
 	double perim = (height * 2) + (width * 2);
@@ -43,7 +44,7 @@ Cell::Cell(int rank, Coord corner, double height,
 	Wall_Node* prevW;
 
 	// Create first corner
-	prevW = new Corner_Node(corner);
+	prevW = new Corner_Node(corner, this);
 	corners.push_back(prevW);
 	num_wall_nodes++;
 
@@ -53,7 +54,7 @@ Cell::Cell(int rank, Coord corner, double height,
 
 	for (int i = 0; i < num_end_nodes; i++) {
 		location = Coord(curr_X, curr_Y);
-		currW = new End_Node(location);
+		currW = new End_Node(location, this);
 
 		// Set neighbor relationships
 		currW->set_Right_Neighbor(prevW);
@@ -67,7 +68,7 @@ Cell::Cell(int rank, Coord corner, double height,
 
 	//create second corner
 	location = Coord(curr_X, curr_Y);
-	currW = new Corner_Node(location);
+	currW = new Corner_Node(location, this);
 	currW->set_Right_Neighbor(prevW);
 	prevW->set_Left_Neighbor(currW);
 	corners.push_back(currW);
@@ -80,7 +81,7 @@ Cell::Cell(int rank, Coord corner, double height,
 	
 	for (int i = 0; i < num_flank_nodes; i++) {
 		location = Coord(curr_X, curr_Y);
-		currW = new Flank_Node(location);
+		currW = new Flank_Node(location, this);
 
 		// Set neighbor relationships
 		currW->set_Right_Neighbor(prevW);
@@ -94,7 +95,7 @@ Cell::Cell(int rank, Coord corner, double height,
 
 	//create third corner
 	location = Coord(curr_X, curr_Y);
-	currW = new Corner_Node(location);
+	currW = new Corner_Node(location, this);
 	currW->set_Right_Neighbor(prevW);
 	prevW->set_Left_Neighbor(currW);
 	corners.push_back(currW);
@@ -107,7 +108,7 @@ Cell::Cell(int rank, Coord corner, double height,
 	
 	for (int i = 0; i < num_end_nodes; i++) {
 		location = Coord(curr_X, curr_Y);
-		currW = new End_Node(location);
+		currW = new End_Node(location, this);
 
 		// Set neighbor relationships
 		currW->set_Right_Neighbor(prevW);
@@ -121,7 +122,7 @@ Cell::Cell(int rank, Coord corner, double height,
 
 	//create fourth corner
 	location = Coord(curr_X, curr_Y);
-	currW = new Corner_Node(location);
+	currW = new Corner_Node(location, this);
 	currW->set_Right_Neighbor(prevW);
 	prevW->set_Left_Neighbor(currW);
 	corners.push_back(currW);
@@ -137,7 +138,7 @@ Cell::Cell(int rank, Coord corner, double height,
 	
 	for (int i = 0; i < num_flank_nodes; i++) {
 		location = Coord(curr_X, curr_Y);
-		currW = new Flank_Node(location);
+		currW = new Flank_Node(location, this);
 
 		// Set neighbor relationships
 		currW->set_Right_Neighbor(prevW);
@@ -168,9 +169,13 @@ Wall_Node* Cell::get_WallNodes() {
 	return corners.at(0);
 }
 
-void Cell::get_Neigh_Cells(vector<Cell*>& cells) {
+void Cell::get_Neighbor_Cells(vector<Cell*>& cells) {
 	my_tissue->get_Cells(cells);
 	return;
+}
+
+int Cell::get_Num_Nodes() {
+	return num_wall_nodes + num_cyt_nodes;
 }
 
 // Calc Force
@@ -233,13 +238,7 @@ void Cell::print_Data_Output(ofstream& ofs) {
 	return;
 }
 
-void Cell::print_VTK_File(ofstream& ofs) {
-
-	ofs << "# vtk DataFile Version 3.0" << endl;
-	ofs << "Point representing Sub_cellular elem model" << endl;
-	ofs << "ASCII" << endl << endl;
-	ofs << "DATASET UNSTRUCTURED_GRID" << endl;
-	ofs << "POINTS " << num_wall_nodes + num_cyt_nodes << " float" << endl;
+void Cell::print_VTK_Points(ofstream& ofs, int& count) {
 
 	Wall_Node* curr_wall = corners.at(0);
 	do {
@@ -247,28 +246,15 @@ void Cell::print_VTK_File(ofstream& ofs) {
 		ofs << loc.get_X() << ' ' << loc.get_Y() << ' ' << 0 << endl;
 
 		curr_wall = curr_wall->get_Left_Neighbor();
+		count++;
 	} while(curr_wall != corners.at(0));
 
 	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
 		Coord loc = cyt_nodes.at(i)->get_Location();
 		ofs << loc.get_X() << ' ' << loc.get_Y() << ' ' << 0 << endl;
+		count++;
 	}
 
-	ofs << endl;
-
-	ofs << "CELLS " << 1 << ' ' << num_wall_nodes + num_cyt_nodes + 1  << endl;
-
-	ofs << num_wall_nodes + num_cyt_nodes;
-
-	for (int i = 0; i < num_wall_nodes + num_cyt_nodes; i++) {
-		ofs << ' ' << i;
-	}
-
-	ofs << endl << endl;
-
-	ofs << "CELL_TYPES " << 1 << endl;
-	ofs << 2 << endl;
-	
 	return;
 }
 
@@ -339,10 +325,10 @@ void Cell::add_Wall_Node(const int Ti) {
 	Wall_Node* new_Node;
 	
 	if (side % 2 == 1 ) { //end
-		new_Node = new End_Node(new_Coords, left_Node, right_Node);
+		new_Node = new End_Node(new_Coords, this, left_Node, right_Node);
 	}
 	else { //flank
-		new_Node = new Flank_Node(new_Coords, left_Node, right_Node);
+		new_Node = new Flank_Node(new_Coords, this, left_Node, right_Node);
 	}
 	
 	right_Node->set_Left_Neighbor(new_Node);
@@ -370,7 +356,7 @@ void Cell::add_Cyt_Node(const int Ti) {
 	Coord away_from_Edge(away_from_edge_x,away_from_edge_y);
 	new_Coord += away_from_Edge;
 
-	Cyt_Node* cyt = new Cyt_Node(new_Coord);
+	Cyt_Node* cyt = new Cyt_Node(new_Coord, this);
 	cyt_nodes.push_back(cyt);
 
 	num_cyt_nodes++;

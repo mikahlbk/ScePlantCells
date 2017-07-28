@@ -9,6 +9,8 @@
 //=======================
 //Include dependencies
 #include <string>
+#include <vector>
+#include <fstream>
 
 #include "phys.h"
 #include "coord.h"

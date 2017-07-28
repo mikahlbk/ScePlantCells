@@ -3,7 +3,15 @@
 
 //=========================
 //Include Dependencies
+#include <vector>
+#include <fstream>
+#include <sstream>
+#include <string>
 
+#include "phys.h"
+#include "coord.h"
+#include "cell.h"
+#include "tissue.h"
 //=========================
 // Public Member Functions for Tissue.cpp
 
@@ -27,7 +35,7 @@ Tissue::Tissue(string filename) {
 	Cell* curr;
 
 	while (getline(ifs,line)) {
-		ss.str(line)
+		ss.str(line);
 
 		getline(ss,temp,':');
 
@@ -84,15 +92,57 @@ void Tissue::update_Cell_Locations() {
 	return;
 }
 
-void print_Data_Output(ofstream & ofs) {
+void Tissue::print_Data_Output(ofstream & ofs) {
 	return;
 }
 
-void print_VTK_File(ofstream& ofs) {
+void Tissue::print_VTK_File(ofstream& ofs) {
+		
+	ofs << "# vtk DataFile Version 3.0" << endl;
+	ofs << "Point representing Sub_cellular elem model" << endl;
+	ofs << "ASCII" << endl << endl;
+	ofs << "DATASET UNSTRUCTURED_GRID" << endl;
+	// Good up to here
 
+	//Need total number of points for all cells
+	int num_Points = 0;
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		num_Points += cells.at(i)->get_Num_Nodes();
+	}
+
+	ofs << "POINTS " << num_Points << " float" << endl;
+	
+	vector<int> start_points;
+	vector<int> end_points;
+	int count = 0;
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		start_points.push_back(count);
+		cells.at(i)->print_VTK_Points(ofs, count);
+		end_points.push_back(count - 1);
+	}
+
+	ofs << "CELLS " << cells.size() << ' ' << num_Points + start_points.size() << endl;
+
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		ofs << cells.at(i)->get_Num_Nodes();
+
+		for (int k = start_points.at(i); k <= end_points.at(i); k++) {
+			ofs << ' ' << k;
+		}
+		ofs << endl;
+	}
+
+	ofs << endl;
+
+	ofs << "CELL_TYPES " << start_points.size() << endl;
+	for (unsigned int i = 0; i < start_points.size(); i++) {
+		ofs << 2 << endl;
+	}
+
+	return;
 }
 
-void grow_Cells(const int Ti) {
+void Tissue::grow_Cells(const int Ti) {
 	
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->add_Wall_Node(Ti);

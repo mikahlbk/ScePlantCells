@@ -13,6 +13,7 @@
 #include "coord.h"
 //#include "node.h"
 #include "cell.h"
+#include "tissue.h"
 //==============================
 
 using namespace std;
@@ -21,10 +22,11 @@ using namespace std;
 
 int main() {
 
-	string init_cell = "cell_start.txt";
+	string init_tissue = "cell_start.txt";
 	//make a new cell object
 
-	Cell* growing_Cell = new Cell(init_cell);
+	Tissue growing_Tissue(init_tissue);
+
 	cout << "Finished creating Cell" << endl;
 	//parameters for time step
     double numSteps = 10;
@@ -64,7 +66,7 @@ int main() {
 			Filename = initial + Number + format;
 
 			ofs.open(Filename.c_str());
-			growing_Cell->print_VTK_File(ofs);
+			growing_Tissue.print_VTK_File(ofs);
 			ofs.close();
 		
 			out++;
@@ -74,8 +76,11 @@ int main() {
 			cout << "Simulation still running. Ti: " << Ti << endl;
 		}
 
-		//growth
+		//New Tissue GRowth
+		growing_Tissue.grow_Cells(Ti);
 
+
+		/* OLD CELL GROWTH
 //		if (Ti % 1000 == 0) {
 //			cout << "Adding cell wall node" << endl;
 //			cout << "Ti : " << Ti << endl;
@@ -88,12 +93,11 @@ int main() {
 //			cout << "Completed adding cyt node" << endl;
 		}
 
-		growing_Cell->calc_New_Forces();
-		growing_Cell->update_Node_Locations();
-		growing_Cell->update_Wall_Angles();
-		
-		
+		*/
 
+		growing_Tissue.calc_New_Forces();
+		growing_Tissue.update_Cell_Locations();
+		
 	}
 		
 	return 0;

@@ -205,7 +205,7 @@ Coord Wall_Node::calc_Morse_DC() {
 	Coord Fdc;
 	
 	//iterate through each cell
-	for (int i = 0; i < cells.size(); i++) {
+	for (unsigned int i = 0; i < cells.size(); i++) {
 		//find which nodes from cell.at(i) you will need
 		//at the moment, just the ones that aren't yourself
 
@@ -442,7 +442,7 @@ bool Flank_Node::is_Corner() {
 End_Node::End_Node(Coord loc, Cell* my_cell) : Wall_Node(loc, my_cell) {};
 
 End_Node::End_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right)
-    : Wall_Node(loc, left, right) {}
+    : Wall_Node(loc, my_cell, left, right) {}
 
 Coord End_Node::calc_Linear() {
 	//as end node, both springs on either sied have end constants

@@ -14,6 +14,8 @@
 
 // Simulation Constants
 const double dt = 0.0003;
+const int ADD_WALL_TIMER = 1000;
+const int ADD_CYT_TIMER = 5000;
 
 
 // Global Physics Constants
