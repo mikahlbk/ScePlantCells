@@ -38,7 +38,7 @@ int main() {
 	ofstream ofs;
 
 	//loop for time steps
-	for(int Ti = 1; Ti*dt < numSteps; Ti++) {
+	for(int Ti = 1; Ti * dt < numSteps; Ti++) {
 		//loop through all cells
 		//for now only one cell
 
