@@ -66,16 +66,16 @@ int main() {
 
 		//growth
 
-		if (Ti % 1000 == 0) {
-			cout << "Adding cell wall node" << endl;
-			cout << "Ti : " << Ti << endl;
-			growing_Cell->add_Cell_Wall_Node();
-			cout << "Completed adding cell wall node" << endl;
-		}
+//		if (Ti % 1000 == 0) {
+//			cout << "Adding cell wall node" << endl;
+//			cout << "Ti : " << Ti << endl;
+//			growing_Cell->add_Cell_Wall_Node();
+//			cout << "Completed adding cell wall node" << endl;
+//		}
 		if (Ti % 5000 == 0) {
-			cout << "Adding cyt node" << endl;
+//			cout << "Adding cyt node" << endl;
 			growing_Cell->add_Cyt_Node();
-			cout << "Completed adding cyt node" << endl;
+//			cout << "Completed adding cyt node" << endl;
 		}
 
 		growing_Cell->calc_New_Forces();
