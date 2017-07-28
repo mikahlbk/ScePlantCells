@@ -19,110 +19,137 @@
 
 // Constructors
 
-Cell::Cell(string filename) {
-
-	//Initialize node counters to 0
-	num_wall_nodes = 0;
-	num_cyt_nodes = 0;
-	vector<Coord> init_walls;
-	vector<Coord> init_cyts;
+Cell::Cell(int rank, Coord corner, double height, double width) {
 	
-	ifstream ifs(filename.c_str());
+	this->rank = rank;
 
-	if(!ifs) {
-		cout << filename << " is not available" << endl;
+	int num_Init_Wall_Nodes = 100;
+	double perim = (height * 2) + (width * 2);
+	//space between wall nodes
+	double space = perim / num_Init_Wall_Nodes;
+
+	int num_end_nodes = (width / space);
+	int num_flank_nodes = (height / space);
+
+	double curr_X;
+	double curr_Y;
+	Coord location;
+
+	Wall_Node* currW;
+	Wall_Node* prevW;
+
+	// Create first corner
+	prevW = new Corner_Node(corner);
+	corners.push_back(prevW);
+	num_wall_nodes++;
+
+	//create lower end
+	curr_X = corner.get_X() + space;
+	curr_Y = corner.get_Y();
+
+	for (int i = 0; i < num_end_nodes; i++) {
+		location = Coord(curr_X, curr_Y);
+		currW = new End_Node(location);
+
+		// Set neighbor relationships
+		currW->set_Right_Neighbor(prevW);
+		prevW->set_Left_Neighbor(currW);
+		
+		//update for next iteration
+		prevW = currW;
+		curr_X += space;
+		num_wall_nodes++;
 	}
 
-	stringstream ss;
-	string line;
-	string temp;
-	char comma;
-	double x, y;
-	Wall_Node* prev_wall = NULL;
-	Wall_Node* curr_wall = NULL;
-	Cyt_Node* cyt = NULL;
+	//create second corner
+	location = Coord(curr_X, curr_Y);
+	currW = new Corner_Node(location);
+	currW->set_Right_Neighbor(prevW);
+	prevW->set_Left_Neighbor(currW);
+	corners.push_back(currW);
+	prevW = currW;
+	num_wall_nodes++;
 
-	while (getline(ifs,line)) {
-		ss.str(line);
+	//create right flank
+	//   curr_X should be good
+	curr_Y += space;
+	
+	for (int i = 0; i < num_flank_nodes; i++) {
+		location = Coord(curr_X, curr_Y);
+		currW = new Flank_Node(location);
 
-		getline(ss,temp,':');
+		// Set neighbor relationships
+		currW->set_Right_Neighbor(prevW);
+		prevW->set_Left_Neighbor(currW);
 		
-		if (temp == "Wall_Nodes") {
-			cout << "Started taking in Wall Node Locations" << endl;
-		}
-		else if (temp == "Cyt_Nodes") {
-			//wrap back around to first wall node
-			corners.at(0)->set_Right_Neighbor(prev_wall);
-			prev_wall->set_Left_Neighbor(corners.at(0));
-
-			//stuff for cyt_nodes
-
-		}
-		else if (temp == "Corner") {
-			ss >> x;
-			cout << "X: " << x << endl;
-			ss >> comma;
-			ss >> y;
-			Coord temp(x,y);
-			
-			curr_wall = new Corner_Node(temp);
-
-			if (prev_wall != NULL) {
-				prev_wall->set_Left_Neighbor(curr_wall);
-				curr_wall->set_Right_Neighbor(prev_wall);
-			}
-			corners.push_back(curr_wall);
-			cout << curr_wall->get_Location() << endl;
-		    prev_wall = curr_wall;
-			
-			num_wall_nodes++;
-		}
-		else if (temp == "End") {
-			ss >> x;
-			ss >> comma;
-			ss >> y;
-			Coord temp(x,y);
-			
-			curr_wall = new End_Node(temp);
-
-			prev_wall->set_Left_Neighbor(curr_wall);
-			curr_wall->set_Right_Neighbor(prev_wall);
-			prev_wall = curr_wall;
-
-			num_wall_nodes++;
-		}
-		else if (temp == "Flank") {
-			ss >> x;
-			ss >> comma;
-			ss >> y;
-			Coord temp(x,y);
-
-			curr_wall = new Flank_Node(temp);
-
-			prev_wall->set_Left_Neighbor(curr_wall);
-			curr_wall->set_Right_Neighbor(prev_wall);
-			prev_wall = curr_wall;
-
-			num_wall_nodes++;
-		}
-		else if (temp == "Cyt") {
-			ss >> x;
-			ss >> comma;
-			ss >> y;
-			Coord temp(x,y);
-			
-			cyt = new Cyt_Node(temp);
-			cyt_nodes.push_back(cyt);
-
-			num_cyt_nodes++;
-		}
-		
-		ss.clear();
+		//update for next iteration
+		prevW = currW;
+		curr_Y += space;
+		num_wall_nodes++;
 	}
 
-	ifs.close();
+	//create third corner
+	location = Coord(curr_X, curr_Y);
+	currW = new Corner_Node(location);
+	currW->set_Right_Neighbor(prevW);
+	prevW->set_Left_Neighbor(currW);
+	corners.push_back(currW);
+	prevW = currW;
+	num_wall_nodes++;
 
-	// update angles of wall nodes
+	//create upper end
+	curr_X -= space;
+		//curr_Y should be good
+	
+	for (int i = 0; i < num_end_nodes; i++) {
+		location = Coord(curr_X, curr_Y);
+		currW = new End_Node(location);
+
+		// Set neighbor relationships
+		currW->set_Right_Neighbor(prevW);
+		prevW->set_Left_Neighbor(currW);
+		
+		//update for next iteration
+		prevW = currW;
+		curr_X -= space;
+		num_wall_nodes++;
+	}
+
+	//create fourth corner
+	location = Coord(curr_X, curr_Y);
+	currW = new Corner_Node(location);
+	currW->set_Right_Neighbor(prevW);
+	prevW->set_Left_Neighbor(currW);
+	corners.push_back(currW);
+	prevW = currW;
+	num_wall_nodes++;
+
+	//create left flank
+	//	remember that we already have first corner. 
+	//	don't make it again.
+	
+	//   curr_X should be good
+	curr_Y -= space;
+	
+	for (int i = 0; i < num_flank_nodes; i++) {
+		location = Coord(curr_X, curr_Y);
+		currW = new Flank_Node(location);
+
+		// Set neighbor relationships
+		currW->set_Right_Neighbor(prevW);
+		prevW->set_Left_Neighbor(currW);
+		
+		//update for next iteration
+		prevW = currW;
+		curr_Y -= space;
+		num_wall_nodes++;
+	}
+
+	//connect first and last nodes
+	prevW->set_Left_Neighbor(corners.at(0));
+	corners.at(0)->set_Right_Neighbor(prevW);
+
+	//initialize angles
 	update_Wall_Angles();
 }
 
@@ -282,7 +309,12 @@ Wall_Node* Cell::find_Largest_Length(int& side) {
 	return biggest;
 }
 
-void Cell::add_Cell_Wall_Node() {
+void Cell::add_Wall_Node(const int Ti) {
+
+	if (Ti % ADD_WALL_TIMER != cell_init_time) {
+		return;
+	}
+
 	//we will add the node based on what the function find_Largest_Length() returns
 	//find_Largest_Length() returns a pointer to the node where the largest
 	//Cell Wall link is to the left of that node
@@ -319,7 +351,11 @@ void Cell::add_Cell_Wall_Node() {
 	return;
 }
 
-void Cell::add_Cyt_Node() {
+void Cell::add_Cyt_Node(const int Ti) {
+
+	if (Ti % ADD_CYT_TIMER != cell_init_time) {
+		return;
+	}
 
 	Coord len_vect = corners.at(0)->get_Location() - corners.at(3)->get_Location();
 	Coord width_vect = corners.at(0)->get_Location() - corners.at(1)->get_Location();

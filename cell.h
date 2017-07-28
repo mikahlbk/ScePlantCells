@@ -57,8 +57,8 @@ class Cell {
 		// returns the coordinte of the wall node whose 
 		// left length is the largest
 		Wall_Node* find_Largest_Length(int& side);
-		void add_Cell_Wall_Node();
-		void add_Cyt_Node();
+		void add_Wall_Node(const int Ti);
+		void add_Cyt_Node(const int Ti);
 
 };
 
