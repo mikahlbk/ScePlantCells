@@ -261,7 +261,7 @@ Coord Wall_Node::morse_Equation(Wall_Node* wall) {
     double repel = (W_MM/gamma_MM)*exp(diff_len*(-1)/gamma_MM);
     
     Fmmd = diff_vect * ((-attract + repel) / diff_len);
-
+	cout << Fmmd << endl;
 	return Fmmd;
 }
 

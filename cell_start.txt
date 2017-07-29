@@ -4,8 +4,8 @@ Height:2.5
 Width:2.5
 End_Cell
 
-CellRank:1
+/*CellRank:1
 Corner:5,0.1
 Height:2.5
 Width:2.5
-End_Cell
+End_Cell*/

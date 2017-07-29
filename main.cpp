@@ -29,7 +29,7 @@ int main() {
 
 	cout << "Finished creating Cell" << endl;
 	//parameters for time step
-    double numSteps = 10;
+    double numSteps = 100;
 
 	// Variable for dataoutput
 	int digits;
@@ -41,7 +41,7 @@ int main() {
 	int out = 0; //counter for creating output/vtk files
 
 	//loop for time steps
-	for(int Ti = 0; Ti < numSteps; Ti++) {
+	for(int Ti = 0; Ti*dt < numSteps; Ti++) {
 		//loop through all cells
 		//for now only one cell
 
@@ -71,11 +71,11 @@ int main() {
 		
 			out++;
 		}
-/*
+
 		if (Ti % 1000 == 0) {
 			cout << "Simulation still running. Ti: " << Ti << endl;
 		}
-*/
+
 		//New Tissue GRowth
 //		growing_Tissue.grow_Cells(Ti);
 
