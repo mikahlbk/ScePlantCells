@@ -52,8 +52,8 @@ const double MembrEquLen = .0625;
 
 const double U_MM = 3.90625;
 const double W_MM = 3.90625;
-const double xsi_MM = 0.125;
-const double gamma_MM = 1.5625;
+const double xsi_MM = .125;
+const double gamma_MM = 1.5625;//1.8625;
 
 ///// Subcellular element parameters for membrane  - internal interactions
 

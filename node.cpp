@@ -201,14 +201,13 @@ Coord Wall_Node::calc_Morse_DC() {
 
 	vector<Cell*> cells;
 	my_cell->get_Neighbor_Cells(cells);
-
 	Coord Fdc;
 	
 	//iterate through each cell
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		//find which nodes from cell.at(i) you will need
 		//at the moment, just the ones that aren't yourself
-
+        
 		if (cells.at(i) != my_cell) {
 			//iterate through membrane nodes of each cell
 			Wall_Node* curr = cells.at(i)->get_WallNodes();

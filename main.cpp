@@ -41,7 +41,7 @@ int main() {
 	int out = 0; //counter for creating output/vtk files
 
 	//loop for time steps
-	for(int Ti = 0; Ti * dt < numSteps; Ti++) {
+	for(int Ti = 0; Ti < numSteps; Ti++) {
 		//loop through all cells
 		//for now only one cell
 
@@ -71,13 +71,13 @@ int main() {
 		
 			out++;
 		}
-
+/*
 		if (Ti % 1000 == 0) {
 			cout << "Simulation still running. Ti: " << Ti << endl;
 		}
-
+*/
 		//New Tissue GRowth
-		growing_Tissue.grow_Cells(Ti);
+//		growing_Tissue.grow_Cells(Ti);
 
 
 		/* OLD CELL GROWTH
