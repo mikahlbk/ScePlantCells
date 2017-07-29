@@ -156,6 +156,26 @@ Cell::Cell(int rank, Coord corner, double height,
 
 	//initialize angles
 	update_Wall_Angles();
+
+	//make cytoplasm node
+	double init_Cell_Radius = .9375;
+	int init_Cyt_Count = 20;
+	double random_angle;
+	double random_radius;
+	double x;
+	double y;
+	for(int i = 0; i < init_Cyt_Count; i++) {
+		random_angle = 2*pi*(rand() / RAND_MAX);
+		random_radius = init_Cell_Radius*(rand() / RAND_MAX);
+		x = random_radius*cos(random_angle);
+		//also need to add the x and y value of corner node
+		//of this cell to put these values in the right place
+		y = random_radius*sin(random_angle);
+		location = Coord(x,y);
+		Cyt_Node* cyt = new Cyt_Node(location,this);
+		cyt_nodes.push_back(cyt);
+		num_cyt_nodes++;
+	}
 }
 
 // Getters and Setters
