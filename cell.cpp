@@ -165,12 +165,12 @@ Cell::Cell(int rank, Coord corner, double height,
 	double x;
 	double y;
 	for(int i = 0; i < init_Cyt_Count; i++) {
-		random_angle = 2*pi*(rand() / RAND_MAX);
-		random_radius = init_Cell_Radius*(rand() / RAND_MAX);
-		x = random_radius*cos(random_angle);
+		random_angle = 2*pi*(static_cast<double>(rand()) / RAND_MAX);
+		random_radius = init_Cell_Radius*(static_cast<double>(rand()) / RAND_MAX);
+		x = (random_radius * cos(random_angle)) + corner.get_X() + (width / 2);
 		//also need to add the x and y value of corner node
 		//of this cell to put these values in the right place
-		y = random_radius*sin(random_angle);
+		y = (random_radius * sin(random_angle)) + corner.get_Y() + (height / 2);
 		location = Coord(x,y);
 		Cyt_Node* cyt = new Cyt_Node(location,this);
 		cyt_nodes.push_back(cyt);
