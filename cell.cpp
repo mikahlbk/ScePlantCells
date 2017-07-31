@@ -22,19 +22,23 @@
 
 Cell::Cell(int rank, Coord corner, double height, 
 			double width, int Ti, Tissue* tiss)    {
-	
+	num_wall_nodes = 0;
+	num_cyt_nodes = 0;	
 	this->my_tissue = tiss;
 	this->rank = rank;
 
 	init_cell_time = Ti;
 
-	int num_Init_Wall_Nodes = 100;
-	double perim = (height * 2) + (width * 2);
+	//int num_Init_Wall_Nodes = 100;
+	//double perim = (height * 2) + (width * 2);
 	//space between wall nodes
-	double space = perim / num_Init_Wall_Nodes;
+	//double space = perim / num_Init_Wall_Nodes;
 
-	int num_end_nodes = (width / space);
-	int num_flank_nodes = (height / space);
+	int num_end_nodes = 19;
+	int num_flank_nodes = 34;
+
+	double f_space = height / num_flank_nodes;
+	double e_space = width / num_end_nodes;
 
 	double curr_X;
 	double curr_Y;
@@ -49,7 +53,7 @@ Cell::Cell(int rank, Coord corner, double height,
 	num_wall_nodes++;
 
 	//create lower end
-	curr_X = corner.get_X() + space;
+	curr_X = corner.get_X() + e_space;
 	curr_Y = corner.get_Y();
 
 	for (int i = 0; i < num_end_nodes; i++) {
@@ -62,7 +66,7 @@ Cell::Cell(int rank, Coord corner, double height,
 		
 		//update for next iteration
 		prevW = currW;
-		curr_X += space;
+		curr_X += e_space;
 		num_wall_nodes++;
 	}
 
@@ -77,7 +81,7 @@ Cell::Cell(int rank, Coord corner, double height,
 
 	//create right flank
 	//   curr_X should be good
-	curr_Y += space;
+	curr_Y += f_space;
 	
 	for (int i = 0; i < num_flank_nodes; i++) {
 		location = Coord(curr_X, curr_Y);
@@ -89,7 +93,7 @@ Cell::Cell(int rank, Coord corner, double height,
 		
 		//update for next iteration
 		prevW = currW;
-		curr_Y += space;
+		curr_Y += f_space;
 		num_wall_nodes++;
 	}
 
@@ -103,7 +107,7 @@ Cell::Cell(int rank, Coord corner, double height,
 	num_wall_nodes++;
 
 	//create upper end
-	curr_X -= space;
+	curr_X -= e_space;
 		//curr_Y should be good
 	
 	for (int i = 0; i < num_end_nodes; i++) {
@@ -116,7 +120,7 @@ Cell::Cell(int rank, Coord corner, double height,
 		
 		//update for next iteration
 		prevW = currW;
-		curr_X -= space;
+		curr_X -= e_space;
 		num_wall_nodes++;
 	}
 
@@ -134,7 +138,7 @@ Cell::Cell(int rank, Coord corner, double height,
 	//	don't make it again.
 	
 	//   curr_X should be good
-	curr_Y -= space;
+	curr_Y -= f_space;
 	
 	for (int i = 0; i < num_flank_nodes; i++) {
 		location = Coord(curr_X, curr_Y);
@@ -146,7 +150,7 @@ Cell::Cell(int rank, Coord corner, double height,
 		
 		//update for next iteration
 		prevW = currW;
-		curr_Y -= space;
+		curr_Y -= f_space;
 		num_wall_nodes++;
 	}
 
@@ -364,17 +368,12 @@ void Cell::add_Cyt_Node(const int Ti) {
 		return;
 	}
 
-	Coord len_vect = corners.at(0)->get_Location() - corners.at(3)->get_Location();
-	Coord width_vect = corners.at(0)->get_Location() - corners.at(1)->get_Location();
-	double new_x = (rand() / RAND_MAX) * width_vect.length();  
-	double new_y = (rand() / RAND_MAX) * len_vect.length();
+	Coord len_mid = (corners.at(0)->get_Location() + corners.at(3)->get_Location()) * 0.5;
+	Coord width_mid = (corners.at(0)->get_Location() + corners.at(1)->get_Location()) * 0.5;
+	double new_x = width_mid.get_X();  
+	double new_y = len_mid.get_Y();
 
 	Coord new_Coord(new_x, new_y);
-	new_Coord += corners.at(0)->get_Location();
-	double away_from_edge_x = .5;
-	double away_from_edge_y = .5;
-	Coord away_from_Edge(away_from_edge_x,away_from_edge_y);
-	new_Coord += away_from_Edge;
 
 	Cyt_Node* cyt = new Cyt_Node(new_Coord, this);
 	cyt_nodes.push_back(cyt);

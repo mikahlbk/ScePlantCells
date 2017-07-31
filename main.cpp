@@ -77,7 +77,7 @@ int main() {
 		}
 
 		//New Tissue GRowth
-//		growing_Tissue.grow_Cells(Ti);
+		growing_Tissue.grow_Cells(Ti);
 
 
 		/* OLD CELL GROWTH
