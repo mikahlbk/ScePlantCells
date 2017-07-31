@@ -37,9 +37,9 @@ void Cyt_Node::calc_Forces(Cell* my_cell) {
 
 	Coord Fii = calc_Morse_II(cyts);
 
-	Coord Fmi = calc_Morse_MI(my_cell->get_WallNodes());
+	//Coord Fmi = calc_Morse_MI(my_cell->get_WallNodes());
 	
-    new_force = Fmi + Fii;
+    new_force = Fii;
 
 	return;
 }

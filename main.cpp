@@ -82,11 +82,13 @@ int main() {
 //			growing_Cell->add_Cell_Wall_Node();
 //			cout << "Completed adding cell wall node" << endl;
 //		}
+		/*
 		if (Ti % 5000 == 0) {
 //			cout << "Adding cyt node" << endl;
 			growing_Cell->add_Cyt_Node();
 //			cout << "Completed adding cyt node" << endl;
 		}
+		*/
 
 		growing_Cell->calc_New_Forces();
 		growing_Cell->update_Node_Locations();

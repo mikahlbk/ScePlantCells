@@ -52,8 +52,8 @@ Cell::Cell(string filename) {
 		}
 		else if (temp == "Cyt_Nodes") {
 			//wrap back around to first wall node
-			corners.at(0)->set_Right_Neighbor(prev_wall);
-			prev_wall->set_Left_Neighbor(corners.at(0));
+			//corners.at(0)->set_Right_Neighbor(prev_wall);
+			//prev_wall->set_Left_Neighbor(corners.at(0));
 
 			//stuff for cyt_nodes
 
@@ -149,7 +149,7 @@ void Cell::calc_New_Forces() {
 	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
 		cyt_nodes.at(i)->calc_Forces(this);
 	}
-
+	/*
 	//calc forces on wall nodes
 	Wall_Node* curr = corners.at(0);
 	
@@ -159,6 +159,7 @@ void Cell::calc_New_Forces() {
 
 	
 	} while(curr != corners.at(0));
+	*/
 
 	return;
 }
@@ -171,7 +172,7 @@ void Cell::update_Node_Locations() {
 	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
 		cyt_nodes.at(i)->update_Location();
 	}
-
+	/*
 	//update wall nodes
 	Wall_Node* curr = corners.at(0);
 	
@@ -181,20 +182,20 @@ void Cell::update_Node_Locations() {
 	
 	} while(curr != corners.at(0));
 
-	//
+	*/
 	
 	return;
 }
 
 void Cell::update_Wall_Angles() {
-
+	/*
 	Wall_Node* curr = corners.at(0);
 	
 	do {
 		curr->update_Angle();
 		curr = curr->get_Left_Neighbor();
 	} while (curr != corners.at(0));	
-
+	*/
 	return;
 }
 
@@ -211,8 +212,9 @@ void Cell::print_VTK_File(ofstream& ofs) {
 	ofs << "Point representing Sub_cellular elem model" << endl;
 	ofs << "ASCII" << endl << endl;
 	ofs << "DATASET UNSTRUCTURED_GRID" << endl;
-	ofs << "POINTS " << num_wall_nodes + num_cyt_nodes << " float" << endl;
-
+	ofs << "POINTS " << num_cyt_nodes << " float" << endl;
+	
+	/*
 	Wall_Node* curr_wall = corners.at(0);
 	do {
 		Coord loc = curr_wall->get_Location();
@@ -220,7 +222,7 @@ void Cell::print_VTK_File(ofstream& ofs) {
 
 		curr_wall = curr_wall->get_Left_Neighbor();
 	} while(curr_wall != corners.at(0));
-
+	*/
 	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
 		Coord loc = cyt_nodes.at(i)->get_Location();
 		ofs << loc.get_X() << ' ' << loc.get_Y() << ' ' << 0 << endl;
@@ -228,11 +230,11 @@ void Cell::print_VTK_File(ofstream& ofs) {
 
 	ofs << endl;
 
-	ofs << "CELLS " << 1 << ' ' << num_wall_nodes + num_cyt_nodes + 1  << endl;
+	ofs << "CELLS " << 1 << ' ' << num_cyt_nodes + 1  << endl;
 
-	ofs << num_wall_nodes + num_cyt_nodes;
+	ofs << num_cyt_nodes;
 
-	for (int i = 0; i < num_wall_nodes + num_cyt_nodes; i++) {
+	for (int i = 0; i < num_cyt_nodes; i++) {
 		ofs << ' ' << i;
 	}
 
