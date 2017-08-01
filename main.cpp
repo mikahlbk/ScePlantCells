@@ -27,7 +27,7 @@ int main() {
 	Cell* growing_Cell = new Cell(init_cell);
 	cout << "Finished creating Cell" << endl;
 	//parameters for time step
-    double numSteps = 10;
+    double numSteps = 100;
 
 	// Variable for dataoutput
 	int digits;
@@ -92,21 +92,25 @@ int main() {
 
 		growing_Cell->calc_New_Forces();
 		growing_Cell->update_Node_Locations();
-		growing_Cell->update_Wall_Angles();
-		
-		
+		growing_Cell->update_Wall_Angles();		
 
 	}
+
+	vector<Cyt_Node*> cyts;
+	growing_Cell->get_CytNodes(cyts);
+
+	Coord locA = cyts.at(0)->get_Location();
+	Coord locB = cyts.at(1)->get_Location();
+
+	cout << "A: " << locA << endl;
+	cout << "B: " << locB << endl;
+
+	Coord dist_vec = (locA - locB);
+
+	cout << "Distance: " << dist_vec.length() << endl;
 		
 	return 0;
 }
-
-
-
-
-
-
-
 
 
 
