@@ -29,17 +29,20 @@ Cell::Cell(int rank, Coord corner, double height,
 
 	init_cell_time = Ti;
 
-	//int num_Init_Wall_Nodes = 100;
-	//double perim = (height * 2) + (width * 2);
-	//space between wall nodes
-	//double space = perim / num_Init_Wall_Nodes;
+	int num_Init_Wall_Nodes = 100;
+	double perim = (height * 2) + (width * 2);
+	space between wall nodes
+	double space = perim / num_Init_Wall_Nodes;
+	int num_end_nodes = (width / space);
+	int num_flank_nodes = (height / space);
 
+	/*
 	int num_end_nodes = 19;
 	int num_flank_nodes = 34;
 
 	double f_space = height / num_flank_nodes;
 	double e_space = width / num_end_nodes;
-
+	*/
 	double curr_X;
 	double curr_Y;
 	Coord location;
@@ -53,7 +56,7 @@ Cell::Cell(int rank, Coord corner, double height,
 	num_wall_nodes++;
 
 	//create lower end
-	curr_X = corner.get_X() + e_space;
+	curr_X = corner.get_X() + space;
 	curr_Y = corner.get_Y();
 
 	for (int i = 0; i < num_end_nodes; i++) {
@@ -66,7 +69,7 @@ Cell::Cell(int rank, Coord corner, double height,
 		
 		//update for next iteration
 		prevW = currW;
-		curr_X += e_space;
+		curr_X += space;
 		num_wall_nodes++;
 	}
 
@@ -81,7 +84,7 @@ Cell::Cell(int rank, Coord corner, double height,
 
 	//create right flank
 	//   curr_X should be good
-	curr_Y += f_space;
+	curr_Y += space;
 	
 	for (int i = 0; i < num_flank_nodes; i++) {
 		location = Coord(curr_X, curr_Y);
@@ -93,7 +96,7 @@ Cell::Cell(int rank, Coord corner, double height,
 		
 		//update for next iteration
 		prevW = currW;
-		curr_Y += f_space;
+		curr_Y += space;
 		num_wall_nodes++;
 	}
 
@@ -107,7 +110,7 @@ Cell::Cell(int rank, Coord corner, double height,
 	num_wall_nodes++;
 
 	//create upper end
-	curr_X -= e_space;
+	curr_X -= space;
 		//curr_Y should be good
 	
 	for (int i = 0; i < num_end_nodes; i++) {
@@ -120,7 +123,7 @@ Cell::Cell(int rank, Coord corner, double height,
 		
 		//update for next iteration
 		prevW = currW;
-		curr_X -= e_space;
+		curr_X -= space;
 		num_wall_nodes++;
 	}
 
@@ -138,7 +141,7 @@ Cell::Cell(int rank, Coord corner, double height,
 	//	don't make it again.
 	
 	//   curr_X should be good
-	curr_Y -= f_space;
+	curr_Y -= space;
 	
 	for (int i = 0; i < num_flank_nodes; i++) {
 		location = Coord(curr_X, curr_Y);
@@ -150,7 +153,7 @@ Cell::Cell(int rank, Coord corner, double height,
 		
 		//update for next iteration
 		prevW = currW;
-		curr_Y -= f_space;
+		curr_Y -= space;
 		num_wall_nodes++;
 	}
 
@@ -162,20 +165,43 @@ Cell::Cell(int rank, Coord corner, double height,
 	update_Wall_Angles();
 
 	//make cytoplasm node
-	double init_Cell_Radius = .9375;
+	// For rectangular distribution
+	double corner_offset = 0.1;
+	double scal_x_offset = 0.9;
+	double scal_y_offset = 0.9;
+	Coord corn_off(corner_offset, corner_offset);
+
 	int init_Cyt_Count = 20;
+	/* For circular distribution
+	double init_Cell_Radius = .9375;
 	double random_angle;
 	double random_radius;
+	*/
 	double x;
 	double y;
+
 	for(int i = 0; i < init_Cyt_Count; i++) {
+		
+		// USING POSITIONS OF CORNER NODES FOR CYT NODE ALLOCATION
+		// ---distributes more evenly throughout start cell
+		x = (static_cast<double>(rand()) / RAND_MAX) * scal_x_offset * (width - corner_offset);
+		y = (static_cast<double>(rand()) / RAND_MAX) * scal_y_offset * (height - corner_offset); 
+
+		Coord rand_off(x,y);
+		
+		location = (corner + corn_off + rand_off);
+
+		/* USING ANGLE AND RADIUS FOR CYT NODE ALLOCATION
+
 		random_angle = 2*pi*(static_cast<double>(rand()) / RAND_MAX);
 		random_radius = init_Cell_Radius*(static_cast<double>(rand()) / RAND_MAX);
 		x = (random_radius * cos(random_angle)) + corner.get_X() + (width / 2);
 		//also need to add the x and y value of corner node
 		//of this cell to put these values in the right place
 		y = (random_radius * sin(random_angle)) + corner.get_Y() + (height / 2);
-		location = Coord(x,y);
+		*/
+
+		//create cyt node
 		Cyt_Node* cyt = new Cyt_Node(location,this);
 		cyt_nodes.push_back(cyt);
 		num_cyt_nodes++;
@@ -368,12 +394,30 @@ void Cell::add_Cyt_Node(const int Ti) {
 		return;
 	}
 
+	// Puts cyt node anywhere in cell with a min dist away from walls
+	double min_x = max(corners.at(0)->get_Location().get_X(), corners.at(3)->get_Location().get_X());
+	double max_x = min(corners.at(1)->get_Location().get_X(), corners.at(2)->get_Location().get_X()); 
+	double min_y = max(corners.at(0)->get_Location().get_Y(), corners.at(1)->get_Location().get_Y());
+	double max_y = min(corners.at(2)->get_Location().get_Y(), corners.at(3)->get_Location().get_Y());
+
+	double corn_offset = 0.08;
+	Coord init_off(corn_offset, corn_offset);
+	Coord min_corner(min_x, min_y);
+
+	double scal_x_offset = 0.75;
+	double scal_y_offset = 0.9;
+	double scal_x = (static_cast<double>(rand()) / RAND_MAX) * scal_x_offset * (max_x - (min_x + corn_offset));
+	double scal_y = (static_cast<double>(rand()) / RAND_MAX) * scal_y_offset * (max_y - (min_y + corn_offset));
+	Coord scal_C(scal_x, scal_y);
+
+	/* Puts new cyt node in dead center of cell
 	Coord len_mid = (corners.at(0)->get_Location() + corners.at(3)->get_Location()) * 0.5;
 	Coord width_mid = (corners.at(0)->get_Location() + corners.at(1)->get_Location()) * 0.5;
 	double new_x = width_mid.get_X();  
 	double new_y = len_mid.get_Y();
+	*/
 
-	Coord new_Coord(new_x, new_y);
+	Coord new_Coord = (min_corner + init_off + scal_C);
 
 	Cyt_Node* cyt = new Cyt_Node(new_Coord, this);
 	cyt_nodes.push_back(cyt);
