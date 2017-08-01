@@ -29,7 +29,7 @@ int main() {
 
 	cout << "Finished creating Cell" << endl;
 	//parameters for time step
-    double numSteps = 100;
+    double numSteps = 20;
 
 	// Variable for dataoutput
 	int digits;
@@ -47,7 +47,7 @@ int main() {
 
 		//Print to dataOutput and VTK files
 
-		if (Ti % 100 == 0) {
+		if (Ti % 250 == 0) {
 	
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {
@@ -78,24 +78,9 @@ int main() {
 
 		//New Tissue GRowth
 		growing_Tissue.grow_Cells(Ti);
-
-
-		/* OLD CELL GROWTH
-//		if (Ti % 1000 == 0) {
-//			cout << "Adding cell wall node" << endl;
-//			cout << "Ti : " << Ti << endl;
-//			growing_Cell->add_Cell_Wall_Node();
-//			cout << "Completed adding cell wall node" << endl;
-//		}
-		if (Ti % 5000 == 0) {
-//			cout << "Adding cyt node" << endl;
-			growing_Cell->add_Cyt_Node();
-//			cout << "Completed adding cyt node" << endl;
-		}
-
-		*/
-
+		//Calculate new forces on cells and nodes
 		growing_Tissue.calc_New_Forces();
+		//Update node positions
 		growing_Tissue.update_Cell_Locations();
 		
 	}
