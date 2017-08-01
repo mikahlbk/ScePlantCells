@@ -33,8 +33,8 @@ Cell::Cell(int rank, Coord corner, double height,
 	double perim = (height * 2) + (width * 2);
 	//space between wall nodes
 	double space = perim / num_Init_Wall_Nodes;
-	int num_end_nodes = (width / space);
-	int num_flank_nodes = (height / space);
+	int num_end_nodes = (width / space) - 1;
+	int num_flank_nodes = (height / space) - 1;
 
 	/*
 	int num_end_nodes = 19;
