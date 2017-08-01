@@ -4,9 +4,11 @@ CFLAGS=-c -Wall
 
 all: program
 
-program: main.o coord.o node.o cell.o tissue.o
-		mkdir -p ./Animation ./DataOutput
+program: folder main.o coord.o node.o cell.o tissue.o
 		$(CC) main.o coord.o node.o cell.o tissue.o -o program
+
+folder: 
+		mkdir -p ./Animation ./DataOutput
 
 main.o: main.cpp
 		$(CC) $(CFLAGS) main.cpp
@@ -23,5 +25,8 @@ cell.o: cell.cpp
 tissue.o: tissue.cpp
 		$(CC) $(CFLAGS) tissue.cpp
 
-clean:
-		rm -rf *o program ./Animation ./DataOutput
+clean: wipe
+		rm -rf *o program
+
+wipe:
+		rm -rf ./Animation ./DataOutput
