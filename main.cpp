@@ -77,7 +77,7 @@ int main() {
 		}
 
 		//New Tissue GRowth
-		//growing_Tissue.grow_Cells(Ti);
+		growing_Tissue.grow_Cells(Ti);
 		//Calculate new forces on cells and nodes
 		growing_Tissue.calc_New_Forces();
 		//Update node positions

@@ -40,10 +40,10 @@ const double kBendEnd = 6;
 const double kBendFlank = 6;
 
 //linear spring constant for end node
-const double kLinearEnd = 30;
+const double kLinearEnd = 40;
 
 //linear spring constant for flank node
-const double kLinearFlank = 20;
+const double kLinearFlank = 30;
 
 //linear spring equilibrium length
 const double MembrEquLen = .0625; //0.0625
@@ -57,17 +57,17 @@ const double gamma_MM = 1.5625;//1.8625;
 
 ///// Subcellular element parameters for membrane  - internal interactions
 
-const double U_MI = 0.78125;
-const double W_MI = 0.00;
-const double xsi_MI = 0.125;
-const double gamma_MI = 0.625;
+const double U_MI = 0.69;   //0.78125  
+const double W_MI = 0.0;    //0.00;
+const double xsi_MI = 0.1; //0.125;
+const double gamma_MI = 1.0;  //0.625;
 
 ///// Subcellular element parameters for internal - internal interactions
 
-const double U_II = 0.488;
-const double W_II = 0.146484;
-const double xsi_II = 0.3125;
-const double gamma_II = 1.25;
+const double U_II = 0.69;      //0.488;
+const double W_II = 0.0;       //0.146484;
+const double xsi_II = 0.1;   //0.3125;
+const double gamma_II = 1.0;  //1.25;
 
 
 //=====================
