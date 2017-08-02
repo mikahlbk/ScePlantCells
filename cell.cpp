@@ -21,7 +21,8 @@
 // Constructors
 
 Cell::Cell(int rank, Coord corner, double height, 
-			double width, int Ti, Tissue* tiss)    {
+	
+	double width, int Ti, Tissue* tiss)    {
 	num_wall_nodes = 0;
 	num_cyt_nodes = 0;	
 	this->my_tissue = tiss;
@@ -166,17 +167,13 @@ Cell::Cell(int rank, Coord corner, double height,
 
 	//make cytoplasm node
 	// For rectangular distribution
-	double corner_offset = 0.1;
+
+	Coord corn_off(0.05 * width, 0.05 * height);
 	double scal_x_offset = 0.9;
 	double scal_y_offset = 0.9;
-	Coord corn_off(corner_offset, corner_offset);
 
 	int init_Cyt_Count = 20;
-	/* For circular distribution
-	double init_Cell_Radius = .9375;
-	double random_angle;
-	double random_radius;
-	*/
+
 	double x;
 	double y;
 
@@ -184,8 +181,8 @@ Cell::Cell(int rank, Coord corner, double height,
 		
 		// USING POSITIONS OF CORNER NODES FOR CYT NODE ALLOCATION
 		// ---distributes more evenly throughout start cell
-		x = (static_cast<double>(rand()) / RAND_MAX) * scal_x_offset * (width - corner_offset);
-		y = (static_cast<double>(rand()) / RAND_MAX) * scal_y_offset * (height - corner_offset); 
+		x = (static_cast<double>(rand()) / RAND_MAX) * scal_x_offset * width;
+		y = (static_cast<double>(rand()) / RAND_MAX) * scal_y_offset * height; 
 
 		Coord rand_off(x,y);
 		
@@ -400,14 +397,13 @@ void Cell::add_Cyt_Node(const int Ti) {
 	double min_y = max(corners.at(0)->get_Location().get_Y(), corners.at(1)->get_Location().get_Y());
 	double max_y = min(corners.at(2)->get_Location().get_Y(), corners.at(3)->get_Location().get_Y());
 
-	double corn_offset = 0.08;
-	Coord init_off(corn_offset, corn_offset);
+	Coord init_off((max_x - min_x) * 0.05, (max_y - min_y) * 0.05);
 	Coord min_corner(min_x, min_y);
 
-	double scal_x_offset = 0.75;
+	double scal_x_offset = 0.9;
 	double scal_y_offset = 0.9;
-	double scal_x = (static_cast<double>(rand()) / RAND_MAX) * scal_x_offset * (max_x - (min_x + corn_offset));
-	double scal_y = (static_cast<double>(rand()) / RAND_MAX) * scal_y_offset * (max_y - (min_y + corn_offset));
+	double scal_x = (static_cast<double>(rand()) / RAND_MAX) * scal_x_offset * (max_x - min_x);
+	double scal_y = (static_cast<double>(rand()) / RAND_MAX) * scal_y_offset * (max_y - min_y);
 	Coord scal_C(scal_x, scal_y);
 
 	/* Puts new cyt node in dead center of cell

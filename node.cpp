@@ -69,7 +69,7 @@ Coord Cyt_Node::calc_Morse_MI(Wall_Node* orig) {
 	Wall_Node* curr = orig;
 	
 	do {
-		Fmi = morse_Equation(curr);
+		Fmi += morse_Equation(curr);
 		//update curr_wall
 		curr = curr->get_Left_Neighbor();
 
