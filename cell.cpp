@@ -105,6 +105,7 @@ Cell::Cell(string filename) {
 
 			num_wall_nodes++;
 		}
+		
 		else if (temp == "Cyt") {
 			ss >> x;
 			ss >> comma;
@@ -116,6 +117,7 @@ Cell::Cell(string filename) {
 
 			num_cyt_nodes++;
 		}
+		
 		
 		ss.clear();
 	}
