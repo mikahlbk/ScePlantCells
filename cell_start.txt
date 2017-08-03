@@ -1,6 +1,11 @@
 CellRank:0
 Corner:0.1,0.1
-Height:2.5
-Width:2.5
+Height:1.8
+Width:1.325
 End_Cell
 
+CellRank:0
+Corner:1.6,0.1
+Height:1.8
+Width:1.325
+End_Cell

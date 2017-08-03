@@ -306,7 +306,7 @@ void Cell::print_VTK_Points(ofstream& ofs, int& count) {
 }
 
 
-
+/*
 Wall_Node* Cell::find_Largest_Length(int& side) {
 	side = 0; //know that we start on bottom flank
 	// We know we start at first entry of corner vector. 
@@ -342,6 +342,47 @@ Wall_Node* Cell::find_Largest_Length(int& side) {
 
 	return biggest;
 }
+*/
+
+void Cell::find_Big_Gaps(vector<Wall_Node*>& walls, vector<int>& sides) {
+	
+	int side = 0;
+	// We know we start at first entry of corner vector. 
+	//Each time we pass another corner, increment side by 1 
+	// side = 1 or 3 => end
+	// side = 2 or 4 => flank
+	Wall_Node* curr = corners.at(0);
+
+	Coord left_loc;
+	Coord curr_loc;
+	Coord diff_vect;
+	double cut_off = 0.15;
+	double len;
+
+	do {
+		//if encounter a corner, increment side to know if end or flank
+		if (curr->is_Corner()) {
+			side++;
+		}
+
+		//finding current lengths and comparing
+		left_loc = curr->get_Left_Neighbor()->get_Location();
+		curr_loc = curr->get_Location();
+		diff_vect = left_loc - curr_loc;
+		len = diff_vect.length();
+		if(len > cut_off) {
+			//Push wall node and it's side ID onto vectors
+			walls.push_back(curr);
+			sides.push_back(side);
+		}
+
+		curr = curr->get_Left_Neighbor();
+
+	} while (curr != corners.at(0));
+
+	return;
+}
+
 
 void Cell::add_Wall_Node(const int Ti) {
 
@@ -354,34 +395,38 @@ void Cell::add_Wall_Node(const int Ti) {
 	//Cell Wall link is to the left of that node
 	//first we apply find_Largest_Length() to the cell to get a pointer to the right
 	//of where the new node is added
-	int side = 0;
-	Wall_Node* right_Node = find_Largest_Length(side);
-	//to the left of this node will be the node to the left of the new node
-	Wall_Node* left_Node = right_Node->get_Left_Neighbor();
-	//now we find the coords of each of these nodes to use to find the new coords
-	Coord right_Coords = right_Node->get_Location();  
-//	cout << "Right side coordinates" << endl;
-//	cout << right_Coords << endl;
-	Coord left_Coords = left_Node->get_Location();
-//	cout << "Left side coordinates" << endl;
-//	cout << left_Coords << endl;
-	//add it halfway between these two coords
+	vector<Wall_Node*> walls;
+	vector<int> sides;
 
-	Coord new_Coords = (right_Coords + left_Coords)*(.5);
-//	cout << "New Coords: " << new_Coords << endl;
-	Wall_Node* new_Node;
-	
-	if (side % 2 == 1 ) { //end
-		new_Node = new End_Node(new_Coords, this, left_Node, right_Node);
-	}
-	else { //flank
-		new_Node = new Flank_Node(new_Coords, this, left_Node, right_Node);
-	}
-	
-	right_Node->set_Left_Neighbor(new_Node);
-	left_Node->set_Right_Neighbor(new_Node);
+	find_Big_Gaps(walls, sides);
 
-	num_wall_nodes++;
+	cout << "Find_Big_Gaps size: " << walls.size() << endl;
+
+	Wall_Node* right = NULL;
+	Wall_Node* left = NULL;
+	Coord newCoord;
+	Wall_Node* newNode = NULL;
+
+	for (unsigned int i = 0; i < walls.size(); i++) {
+		//Get nodes to right and left of new node
+		right = walls.at(i);
+		left = right->get_Left_Neighbor();
+		// New node's location
+		newCoord = ((right->get_Location() + left->get_Location()) * 0.5);
+		
+		if (sides.at(i) % 2 == 1) {
+			newNode = new End_Node(newCoord, this, left, right);
+		}
+		else { //flank
+			newNode = new Flank_Node(newCoord, this, left, right);
+		}
+		//increment wall node counter
+		num_wall_nodes++;
+		//update neighbors of left and right
+		right->set_Left_Neighbor(newNode);
+		left->set_Right_Neighbor(newNode);
+	}
+
 	return;
 }
 

@@ -62,7 +62,7 @@ class Cell {
 		// Growth of cell
 		// returns the coordinte of the wall node whose 
 		// left length is the largest
-		Wall_Node* find_Largest_Length(int& side);
+		void find_Big_Gaps(vector<Wall_Node*>& walls, vector<int>& sides);
 		void add_Wall_Node(const int Ti);
 		void add_Cyt_Node(const int Ti);
 
