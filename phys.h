@@ -15,7 +15,7 @@
 // Simulation Constants
 const double dt = 0.0003;
 const int ADD_WALL_TIMER = 2000;
-const int ADD_CYT_TIMER = 6000;
+const int ADD_CYT_TIMER = 2500;
 
 const int MAX_NUM_WALL = 200;
 const int MAX_NUM_CYT = 60;
@@ -54,10 +54,10 @@ const double MembrCutOFFLen = 0.15;
 
 ///// Subcellular element parameters for membrane - membrane interactions
 
-const double U_MM = 0.5;
-const double W_MM = 0.45;
-const double xsi_MM = 0.155;
-const double gamma_MM = 0.175;	
+const double U_MM = 0.2;
+const double W_MM = 0.1;
+const double xsi_MM = 0.06;
+const double gamma_MM = 0.07;	
 
 ///// Subcellular element parameters for membrane  - internal interactions
 
