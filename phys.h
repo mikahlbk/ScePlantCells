@@ -54,10 +54,10 @@ const double MembrCutOFFLen = 0.15;
 
 ///// Subcellular element parameters for membrane - membrane interactions
 
-const double U_MM = 0.02;
-const double W_MM = 0.01;
-const double xsi_MM = 0.15;
-const double gamma_MM = 0.5;	
+const double U_MM = 0.5;
+const double W_MM = 0.45;
+const double xsi_MM = 0.155;
+const double gamma_MM = 0.175;	
 
 ///// Subcellular element parameters for membrane  - internal interactions
 
