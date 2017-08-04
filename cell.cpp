@@ -188,16 +188,6 @@ Cell::Cell(int rank, Coord corner, double height,
 		
 		location = (corner + corn_off + rand_off);
 
-		/* USING ANGLE AND RADIUS FOR CYT NODE ALLOCATION
-
-		random_angle = 2*pi*(static_cast<double>(rand()) / RAND_MAX);
-		random_radius = init_Cell_Radius*(static_cast<double>(rand()) / RAND_MAX);
-		x = (random_radius * cos(random_angle)) + corner.get_X() + (width / 2);
-		//also need to add the x and y value of corner node
-		//of this cell to put these values in the right place
-		y = (random_radius * sin(random_angle)) + corner.get_Y() + (height / 2);
-		*/
-
 		//create cyt node
 		Cyt_Node* cyt = new Cyt_Node(location,this);
 		cyt_nodes.push_back(cyt);
@@ -305,44 +295,6 @@ void Cell::print_VTK_Points(ofstream& ofs, int& count) {
 	return;
 }
 
-
-/*
-Wall_Node* Cell::find_Largest_Length(int& side) {
-	side = 0; //know that we start on bottom flank
-	// We know we start at first entry of corner vector. 
-	//Each time we pass another corner, increment side by 1 
-	// side = 1 or 3 => end
-	// side = 2 or 4 => flank
-	Wall_Node* curr = corners.at(0);
-	Wall_Node* biggest = NULL;
-	Coord left_Neighb_loc;
-	Coord curr_Loc;
-	Coord diff_vect;
-	double max_len = 0;
-	double len;
-	//loop through all possible Cell Wall 'links' to find biggest
-	do {
-		//if encounter a corner, increment side to know if end or flank
-		if (curr->is_Corner()) {
-			side++;
-		}
-
-		//finding current lengths and comparing
-		left_Neighb_loc = curr->get_Left_Neighbor()->get_Location();
-		curr_Loc = curr->get_Location();
-		diff_vect = left_Neighb_loc - curr_Loc;
-		len = diff_vect.length();
-		if(len > max_len) {
-			max_len = len;
-			biggest = curr;
-		}
-		curr = curr->get_Left_Neighbor();
-
-	} while (curr != corners.at(0));
-
-	return biggest;
-}
-*/
 
 void Cell::find_Big_Gaps(vector<Wall_Node*>& walls, vector<int>& sides) {
 	
@@ -467,7 +419,142 @@ void Cell::add_Cyt_Node(const int Ti) {
 	return;
 }
 
+// Gets called by update_Node_Locations()
+Cell* Cell::divide_length_wise() {
+	// Current cell splits into two daughter cells
+	//    -"this" will keep its entity as the left sister, 
+	//		create a sister cell to the right of it, and return it 
+	//      to the tissue.
+
+	//ask tissue for new id num
+	int new_id = my_tissue->get();
+	Cell* sister = new Cell(new_id, my_tissue);
+
+	// Find midpoint
+	Coord mid_top = ((corners.at(3)->get_Location() + corners.at(2)->get_Location()) * 0.5);
+	Coord mid_bot = ((corners.at(0)->get_Location() + corners.at(1)->get_Location()) * 0.5);
+	Coord divider = (mid_top - mid_bot);
+	double divide_X = divider.get_X();
+
+	vector<Wall_Node*> corners_A;
+	vector<Wall_Node*> corners_B;
+
+	Wall_Node* curr = corners.at(0);
+	Wall_Node* prev = NULL;
+	Wall_Node* next = NULL:
+	
+	int side = 0;
+
+	// distribute wall nodes between sister cells
+	do { 
+		next = curr->get_Left_Neighbor();
+		
+		if (curr->get_Location().get_X() < divide_X) {
+			//Cell A
+			
+			if (side == 0) {
+				//on bottom end
+				
+				if (next->get_Location().get_X() < divide_X) {
+					
+				}
+				else {
+					// delete yourself and prev, then add corner
+					
+
+				}
+
+			}
+			else if (
+			else {
+				//on top end
+
+			}
+
+
+		}
+		else {
+			//Cell B
+
+			if (bottomEnd) {
+
+			}
+			else {
+
+			}
+			
+		}
+
+	
+		curr = 
+
+
+	} while(curr != corners.at(0));
+
+	// create new flank walls for both cells
+
+	// distribute cyt nodes between sister cells
+	
+
+	return sister;
+}
+
+
+// Gets called by update_Node_Locations()
+Cell* Cell::divide_width_wise() {
+	// Current cell splits into two daughter cells
+	//    -"this" will keep its entity, create a sister cell, and return it 
+	//      to the tissue.
+	Cell* sister = NULL;
+
+	// Find midpoint
+
+
+	return sister;
+}
 
 
 
+
+
+
+
+
+/*
+Wall_Node* Cell::find_Largest_Length(int& side) {
+	side = 0; //know that we start on bottom flank
+	// We know we start at first entry of corner vector. 
+	//Each time we pass another corner, increment side by 1 
+	// side = 1 or 3 => end
+	// side = 2 or 4 => flank
+	Wall_Node* curr = corners.at(0);
+	Wall_Node* biggest = NULL;
+	Coord left_Neighb_loc;
+	Coord curr_Loc;
+	Coord diff_vect;
+	double max_len = 0;
+	double len;
+	//loop through all possible Cell Wall 'links' to find biggest
+	do {
+		//if encounter a corner, increment side to know if end or flank
+		if (curr->is_Corner()) {
+			side++;
+		}
+
+		//finding current lengths and comparing
+		left_Neighb_loc = curr->get_Left_Neighbor()->get_Location();
+		curr_Loc = curr->get_Location();
+		diff_vect = left_Neighb_loc - curr_Loc;
+		len = diff_vect.length();
+		if(len > max_len) {
+			max_len = len;
+			biggest = curr;
+		}
+		curr = curr->get_Left_Neighbor();
+
+	} while (curr != corners.at(0));
+
+	return biggest;
+}
+*/
 

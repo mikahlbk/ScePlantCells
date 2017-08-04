@@ -38,7 +38,6 @@ class Tissue {
 
 		void grow_Cells(const int Ti);
 
-
 };
 
 
