@@ -70,11 +70,21 @@ void Tissue::get_Cells(vector<Cell*>& cells) {
 	return;
 }
 
-void Tissue::calc_New_Forces() {
+void Tissue::calc_New_Forces(const int Ti) {
+
+	string init = "DataOutput/wall_forces_";
+	string end = ".txt";
+	string num = to_string(Ti);
+
+	string filename = init + num + end;
+
+	ofstream ofs(filename.c_str());
 
 	for (unsigned int i = 0; i < cells.size(); i++) {
-		cells.at(i)->calc_New_Forces();
+		cells.at(i)->calc_New_Forces(ofs);
 	}
+
+	ofs.close();
 
 	return;
 }

@@ -30,7 +30,7 @@ class Tissue {
 		
 		void get_Cells(vector<Cell*>& cells);
 
-		void calc_New_Forces();
+		void calc_New_Forces(const int Ti);
 		void update_Cell_Locations();
 
 		void print_Data_Output(ofstream& ofs);

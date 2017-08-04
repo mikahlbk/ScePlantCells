@@ -20,9 +20,9 @@
 
 // Constructors
 
-Cell::Cell(int rank, Coord corner, double height, 
-	
+Cell::Cell(int rank, Coord corner, double height, 	
 	double width, int Ti, Tissue* tiss)    {
+	
 	num_wall_nodes = 0;
 	num_cyt_nodes = 0;	
 	this->my_tissue = tiss;
@@ -227,19 +227,38 @@ int Cell::get_Num_Nodes() {
 
 // Calc Force
 
-void Cell::calc_New_Forces() {
+void Cell::calc_New_Forces(ofstream& ofs) {
 	//calc forces on cyt nodes
 	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
 		cyt_nodes.at(i)->calc_Forces();
 	}
 
 	//calc forces on wall nodes
+	// and output them to file based on end vs flank
 	Wall_Node* curr = corners.at(0);
-	
+	Wall_Node* next = NULL;
+	Coord sum;
+	double len;
+	int side = 0;
+
 	do {
-		curr->calc_Forces();
-		curr = curr->get_Left_Neighbor();
-	
+		
+		sum += curr->calc_Forces();
+		next = curr->get_Left_Neighbor();
+		len += (curr->get_Location() - next->get_Location()).length();
+
+		if (next->is_Corner()) {
+			//output previous edge
+			ofs << "Cell: " << rank << endl;
+			ofs << "	Edge: " << side << " -- Vec: " << (sum / len);
+			ofs << " -- F = " << (sum / len).length() << endl;
+			side++;
+		}
+
+		sum = Coord(0.0,0.0);
+		len = 0.0;
+		curr = next;
+
 	} while(curr != corners.at(0));
 
 	return;

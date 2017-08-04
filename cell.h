@@ -49,7 +49,7 @@ class Cell {
 		// Keep track of neighbor cells
 
 		// Calc Forces
-		void calc_New_Forces();
+		void calc_New_Forces(ofstream& ofs);
 		// Update Node Locations
 		void update_Node_Locations();
 		// Update Angles

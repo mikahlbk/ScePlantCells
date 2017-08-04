@@ -31,7 +31,7 @@ void Node::update_Location() {
 /** class Cyt Node Functions **/
 Cyt_Node::Cyt_Node(Coord loc, Cell* my_cell) : Node(loc, my_cell) {};
 
-void Cyt_Node::calc_Forces() {
+Coord Cyt_Node::calc_Forces() {
 	//for cyt, just need morse potential for int-int and int-membr
 	vector<Cyt_Node*> cyts;
 	my_cell->get_CytNodes(cyts);
@@ -42,7 +42,7 @@ void Cyt_Node::calc_Forces() {
 	
     new_force = Fmi + Fii;
 
-	return;
+	return new_force;
 }
 
 // Needs to have access:
@@ -143,7 +143,7 @@ void Wall_Node::set_Right_Neighbor(Wall_Node* new_Right) {
 }
 
 // Calc Force Functions -----------------------
-void Wall_Node::calc_Forces() {
+Coord Wall_Node::calc_Forces() {
 	// Initialize force sum to zero by default constructor
 	Coord sum;
 	// gather cyt nodes of your cell for morse calc
@@ -156,7 +156,9 @@ void Wall_Node::calc_Forces() {
 	sum += calc_Bending();
 
 	// Update new_force variable for location updating
-	new_force = sum;;
+	new_force = sum;
+
+	return new_force;
 }
 
 void Wall_Node::update_Angle() {
