@@ -440,39 +440,72 @@ Cell* Cell::divide_length_wise() {
 	vector<Wall_Node*> corners_B;
 
 	Wall_Node* curr = corners.at(0);
+	Wall_Node* next = NULL;
 	Wall_Node* prev = NULL;
-	Wall_Node* next = NULL:
 	
 	int side = 0;
 
 	// distribute wall nodes between sister cells
 	do { 
+
 		next = curr->get_Left_Neighbor();
 		
 		if (curr->get_Location().get_X() < divide_X) {
 			//Cell A
 			
-			if (side == 0) {
+			if (curr->is_Corner()) {
+				corners_A.push_back(curr);
+				side++;
+			}
+
+			if (side == 1) {
 				//on bottom end
 				
 				if (next->get_Location().get_X() < divide_X) {
-					
+					//do nothing
 				}
 				else {
-					// delete yourself and prev, then add corner
+					// delete curr and prev, then add corner
+					Wall_Node* prev_prev = prev->get_Right_Neighbor();
+					Wall_Node* temp = new Corner_Node(prev->get_Location(), this);
+					temp->set_Right_Neighbor(prev_prev);
+					prev_prev->set_Left_Neighbor(temp);
 					
-
+					//delete curr
+					//delete prev
 				}
 
 			}
-			else if (
-			else {
+			else if (side == 3) {
 				//on top end
+				if (corners_A.size() < 3) {
+					//need to delete curr and next, then insert a corner
+					//WARNING: prev is set to null, do not try to access
+					Wall_Node* next_next = next->get_Left_Neighbor();
+					Wall_Node* temp = new Corner_Node(next->get_Location(), this);
+					temp->set_Left_Neighbor(next_next);
+					next_next->set_Right_Neighbor(temp);
 
+					//delete curr
+					//delete next
+
+					next = temp
+				}
+				else {
+					//do nothing
+				}
+			}
+			else if (side == 2) {
+				cout << "ERROR: DIVISION. CAN'T BE ON THIS FLANK" << endl;
+			}
+			else { //side == 4
+				//on left flank
+				//do nothing
 			}
 
 
 		}
+		
 		else {
 			//Cell B
 
@@ -486,8 +519,7 @@ Cell* Cell::divide_length_wise() {
 		}
 
 	
-		curr = 
-
+		curr = next;
 
 	} while(curr != corners.at(0));
 
