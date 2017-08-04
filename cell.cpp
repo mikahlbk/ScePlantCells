@@ -155,7 +155,7 @@ Cell::Cell(int rank, Coord corner, double height,
 		//update for next iteration
 		prevW = currW;
 		curr_Y -= space;
-		num_wall_nodes++;
+		num_wall_nodes++;	
 	}
 
 	//connect first and last nodes
