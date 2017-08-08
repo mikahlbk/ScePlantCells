@@ -84,16 +84,15 @@ int main() {
 		cout << "Done updating neighbors. " << endl;
 
 		//New Tissue GRowth
-		cout << "Growing cells ... ";
 		growing_Tissue.grow_Cells(Ti);
-		cout << "done. " << endl;
-
-		cout << "Calculating forces ... ";
+		cout << "Calculating forces: ";
+		
 		//Calculate new forces on cells and nodes
+
 		growing_Tissue.calc_New_Forces();
 		cout << "done." << endl;
 		//Update node positions
-		cout << "Updating Positioning ... ";
+		cout << "Updating Positioning: ";
 		growing_Tissue.update_Cell_Locations();
 		cout << "done." << endl;
 		
