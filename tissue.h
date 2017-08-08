@@ -32,6 +32,7 @@ class Tissue {
 
 		void calc_New_Forces();
 		void update_Cell_Locations();
+		void update_Neighbor_Cells();
 
 		void print_Data_Output(ofstream& ofs);
 		void print_VTK_File(ofstream& ofs);

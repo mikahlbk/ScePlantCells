@@ -29,7 +29,7 @@ int main() {
 
 	cout << "Finished creating Cell" << endl;
 	//parameters for time step
-    double numSteps = 40;
+    double numSteps = 1;
 
 	// Variable for dataoutput
 	int digits;
@@ -75,13 +75,27 @@ int main() {
 		if (Ti % 1000 == 0) {
 			cout << "Simulation still running. Ti: " << Ti << endl;
 		}
+		
+		// Update Each cell's neighboring cells
+		if (Ti % 5000 == 0) {
+			growing_Tissue.update_Neighbor_Cells();
+		}
+
+		cout << "Done updating neighbors. " << endl;
 
 		//New Tissue GRowth
+		cout << "Growing cells ... ";
 		growing_Tissue.grow_Cells(Ti);
+		cout << "done. " << endl;
+
+		cout << "Calculating forces ... ";
 		//Calculate new forces on cells and nodes
 		growing_Tissue.calc_New_Forces();
+		cout << "done." << endl;
 		//Update node positions
+		cout << "Updating Positioning ... ";
 		growing_Tissue.update_Cell_Locations();
+		cout << "done." << endl;
 		
 	}
 		

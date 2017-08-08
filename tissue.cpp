@@ -89,6 +89,18 @@ void Tissue::update_Cell_Locations() {
 		cells.at(i)->update_Wall_Angles();
 	}
 
+	
+
+	return;
+}
+
+void Tissue::update_Neighbor_Cells() {
+	//update vectors of neighboring cells
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->update_Neighbor_Cells();
+	}
+	
+
 	return;
 }
 

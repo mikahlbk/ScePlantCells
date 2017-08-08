@@ -146,10 +146,8 @@ void Wall_Node::set_Right_Neighbor(Wall_Node* new_Right) {
 void Wall_Node::calc_Forces() {
 	// Initialize force sum to zero by default constructor
 	Coord sum;
-	// gather cyt nodes of your cell for morse calc
+	
 	sum += calc_Morse_SC();
-
-	//will be implimented later
 	sum += calc_Morse_DC();
 	
 	sum += calc_Linear();
@@ -201,23 +199,75 @@ Coord Wall_Node::calc_Morse_DC() {
 
 	vector<Cell*> cells;
 	my_cell->get_Neighbor_Cells(cells);
+
 	Coord Fdc;
-	
+	bool close_enough = false;
+	double threshold = 0.40;
+
 	//iterate through each cell
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		//find which nodes from cell.at(i) you will need
 		//at the moment, just the ones that aren't yourself
-        
-		if (cells.at(i) != my_cell) {
-			//iterate through membrane nodes of each cell
-			Wall_Node* curr = cells.at(i)->get_WallNodes();
-			Wall_Node* orig = curr;
+		Wall_Node* A = NULL;
+		Wall_Node* B = NULL;
 
-			do {
-				Fdc += morse_Equation(curr);
-				curr = curr->get_Left_Neighbor();
-			} while(curr != orig);
+		close_enough = cells.at(i)->get_Reasonable_Bounds(this, A, B);
+		
+        if (close_enough) {
+			
+			if (A == B) {
+				//expand outward for calculations
+				Fdc += morse_Equation(A);
+				//expand right
+				Wall_Node* curr = A->get_Right_Neighbor();
 
+				while ( (curr->get_Location() - my_loc).length() < threshold) {
+					Fdc += morse_Equation(curr);
+					curr = curr->get_Right_Neighbor();
+				}
+				//expand left
+				curr = A->get_Left_Neighbor();
+
+				while ( (curr->get_Location() - my_loc).length() < threshold) {
+					Fdc += morse_Equation(curr);
+					curr = curr->get_Left_Neighbor();
+				}
+
+			}
+			else {
+				bool A_good = false;  
+				
+				if ( (A->get_Location() - my_loc).length() < threshold) {
+					A_good = true;
+					Fdc += morse_Equation(A);
+				}
+				//expand right side of A
+				Wall_Node* curr = NULL;
+				if (A_good) {
+					curr = A->get_Right_Neighbor();
+					while ( (curr->get_Location() - my_loc).length() < threshold) {
+						Fdc += morse_Equation(curr);
+						curr = curr->get_Right_Neighbor();
+					}
+					curr = A->get_Left_Neighbor();
+				}
+				else {
+					//iterate through left neighbors until find one within range
+					curr = A->get_Left_Neighbor();
+					while( (curr->get_Location() - my_loc).length() > threshold) {
+						curr = curr->get_Left_Neighbor();
+					}
+				}
+				
+				//between A and B, and past B
+				// curr is already set by prev if/else statements 
+				do {
+					Fdc += morse_Equation(curr);
+					curr = curr->get_Left_Neighbor();
+				} while ( (curr->get_Location() - my_loc).length() < threshold);
+
+
+			}
 		}
 
 	}
