@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <ctime>
 
 #include "phys.h"
 #include "coord.h"
@@ -22,6 +23,8 @@ using namespace std;
 
 int main() {
 
+	int start = clock();
+
 	string init_tissue = "cell_start.txt";
 	//make a new cell object
 
@@ -29,7 +32,7 @@ int main() {
 
 	cout << "Finished creating Cell" << endl;
 	//parameters for time step
-    double numSteps = 1;
+    double numSteps = 20;
 
 	// Variable for dataoutput
 	int digits;
@@ -98,6 +101,10 @@ int main() {
 		//cout << "Finished Positioning " << endl;
 		
 	}
+
+	int stop = clock();
+
+	cout << "Clock: " << (stop - start) / double(CLOCKS_PER_SEC) * 1000 << endl;
 		
 	return 0;
 }

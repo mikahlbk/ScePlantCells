@@ -202,7 +202,7 @@ Coord Wall_Node::calc_Morse_DC() {
 
 	Coord Fdc;
 	bool close_enough = false;
-	double threshold = 0.40;
+	double threshold = 0.70;
 
 	//iterate through each cell
 	for (unsigned int i = 0; i < cells.size(); i++) {
