@@ -146,15 +146,15 @@ void Wall_Node::set_Right_Neighbor(Wall_Node* new_Right) {
 void Wall_Node::calc_Forces() {
 	// Initialize force sum to zero by default constructor
 	Coord sum;
-	
 	sum += calc_Morse_SC();
 	sum += calc_Morse_DC();
-	
 	sum += calc_Linear();
 	sum += calc_Bending();
 
 	// Update new_force variable for location updating
-	new_force = sum;;
+	new_force = sum;
+
+	return;
 }
 
 void Wall_Node::update_Angle() {
@@ -212,6 +212,7 @@ Coord Wall_Node::calc_Morse_DC() {
 		Wall_Node* B = NULL;
 
 		close_enough = cells.at(i)->get_Reasonable_Bounds(this, A, B);
+		//cout << "Finished gettin reasonable bounds" << endl;
 		
         if (close_enough) {
 			
@@ -236,7 +237,7 @@ Coord Wall_Node::calc_Morse_DC() {
 			}
 			else {
 				bool A_good = false;  
-				
+				bool B_good = false;
 				if ( (A->get_Location() - my_loc).length() < threshold) {
 					A_good = true;
 					Fdc += morse_Equation(A);
@@ -250,22 +251,28 @@ Coord Wall_Node::calc_Morse_DC() {
 						curr = curr->get_Right_Neighbor();
 					}
 					curr = A->get_Left_Neighbor();
+					B_good = true;
 				}
 				else {
 					//iterate through left neighbors until find one within range
 					curr = A->get_Left_Neighbor();
 					while( (curr->get_Location() - my_loc).length() > threshold) {
+						if (curr == B) {
+							B_good = false;
+							break;
+						}
 						curr = curr->get_Left_Neighbor();
 					}
 				}
 				
 				//between A and B, and past B
 				// curr is already set by prev if/else statements 
-				do {
-					Fdc += morse_Equation(curr);
-					curr = curr->get_Left_Neighbor();
-				} while ( (curr->get_Location() - my_loc).length() < threshold);
-
+				if (B_good) {
+					do {
+						Fdc += morse_Equation(curr);
+						curr = curr->get_Left_Neighbor();
+					} while ( (curr->get_Location() - my_loc).length() < threshold);
+				}
 
 			}
 		}

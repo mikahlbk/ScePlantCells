@@ -475,10 +475,13 @@ void Cell::calc_New_Forces() {
 	Wall_Node* curr = corners.at(0);
 	
 	do {
+		//cout << " calc force for this node" << endl;
 		curr->calc_Forces();
 		curr = curr->get_Left_Neighbor();
 	
 	} while (curr != corners.at(0));
+
+	//cout << "Finished Cell::calc_NewForces" << endl;
 
 	return;
 }

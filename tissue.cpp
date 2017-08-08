@@ -73,6 +73,7 @@ void Tissue::get_Cells(vector<Cell*>& cells) {
 void Tissue::calc_New_Forces() {
 
 	for (unsigned int i = 0; i < cells.size(); i++) {
+		//cout << "calc new forces" << endl;
 		cells.at(i)->calc_New_Forces();
 	}
 
