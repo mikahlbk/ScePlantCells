@@ -134,6 +134,7 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 		end_points.push_back(count - 1);
 	}
 
+	ofs << endl;
 	ofs << "CELLS " << cells.size() << ' ' << num_Points + start_points.size() << endl;
 
 	for (unsigned int i = 0; i < cells.size(); i++) {
@@ -151,6 +152,24 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 	for (unsigned int i = 0; i < start_points.size(); i++) {
 		ofs << 2 << endl;
 	}
+
+	ofs << endl;
+
+	ofs << "POINT_DATA " << num_Points << endl;
+	ofs << "SCALARS magnitude float " << 1 << endl;
+	ofs << "LOOKUP_TABLE default" << endl;
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->print_VTK_Scalars(ofs);
+	}
+
+	ofs << endl;
+
+	ofs << "VECTORS force float" << endl;
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->print_VTK_Vectors(ofs);
+	}
+
+
 
 	return;
 }

@@ -28,6 +28,7 @@ class Node {
         //some functions you can define in base class because 
         //    all nodes will use the exact same function
         virtual Coord get_Location();
+		virtual Coord get_Force();
 		virtual void update_Location();
         //other functions might be executed differently based on
         //    which node you are. Thus define as "pure virtual" and 
@@ -55,6 +56,7 @@ class Wall_Node: public Node {
         Wall_Node* right;
         double my_angle;
 		double cross_Prod;
+		Coord cyt_force;
 
     public:
     //function that you want performed on all wall nodes
@@ -66,6 +68,7 @@ class Wall_Node: public Node {
 
 		// Getters and Setters
 		virtual double get_Angle();
+		virtual Coord get_CytForce();
         virtual Wall_Node* get_Left_Neighbor();
 		virtual Wall_Node* get_Right_Neighbor();
 		virtual void set_Left_Neighbor(Wall_Node* new_Left);

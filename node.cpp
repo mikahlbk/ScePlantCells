@@ -22,6 +22,10 @@ Coord Node::get_Location() {
     return my_loc;
 }
 
+Coord Node::get_Force() {
+	return new_force;
+}
+
 void Node::update_Location() {
     my_loc += new_force * dt;
     return;
@@ -115,6 +119,7 @@ Wall_Node::Wall_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right
 
     this->left = left;
     this->right = right;
+	cyt_force = Coord();
 
 	update_Angle();
 }
@@ -122,6 +127,10 @@ Wall_Node::Wall_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right
 //  Getters and Setters--------------------
 double Wall_Node::get_Angle() {
 	return my_angle;
+}
+
+Coord Wall_Node::get_CytForce() {
+	return cyt_force;
 }
 
 Wall_Node* Wall_Node::get_Left_Neighbor() {
@@ -146,8 +155,12 @@ void Wall_Node::set_Right_Neighbor(Wall_Node* new_Right) {
 void Wall_Node::calc_Forces() {
 	// Initialize force sum to zero by default constructor
 	Coord sum;
+
 	sum += calc_Morse_SC();
 	sum += calc_Morse_DC();
+
+	cyt_force = sum;
+
 	sum += calc_Linear();
 	sum += calc_Bending();
 
@@ -194,7 +207,30 @@ Coord Wall_Node::calc_Morse_SC() {
 	return Fmi;
 }
 
-//probably need vector of relatively close cells
+// Basic -- not efficient
+Coord Wall_Node::calc_Morse_DC() {
+	Coord Fdc;
+
+	vector<Cell*> cells;
+	my_cell->get_Neighbor_Cells(cells);
+	
+	Wall_Node* curr = NULL;
+	Wall_Node* orig = NULL;
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		curr = cells.at(i)->get_WallNodes();
+		orig = curr;
+
+		do {
+			Fdc += morse_Equation(curr);
+			curr = curr->get_Left_Neighbor();
+		} while (curr != orig);
+
+	}
+
+	return Fdc;
+}
+
+/* Efficient but doesn't work
 Coord Wall_Node::calc_Morse_DC() {
 
 	vector<Cell*> cells;
@@ -202,7 +238,7 @@ Coord Wall_Node::calc_Morse_DC() {
 
 	Coord Fdc;
 	bool close_enough = false;
-	double threshold = 0.1;
+	double threshold = 1.0;
 
 	//iterate through each cell
 	for (unsigned int i = 0; i < cells.size(); i++) {
@@ -281,6 +317,7 @@ Coord Wall_Node::calc_Morse_DC() {
 	
 	return Fdc;
 }
+*/
 
 Coord Wall_Node::calc_Bending() {
 	Coord F_bend;

@@ -166,6 +166,12 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	//initialize angles
 	update_Wall_Angles();
 
+	//update cell_Center
+	double x_val = ((corners.at(0)->get_Location().get_X()) + (corners.at(1)->get_Location().get_X())) / 2;
+	double y_val = ((corners.at(0)->get_Location().get_Y()) + (corners.at(3)->get_Location().get_Y())) / 2;
+
+	cell_center = Coord(x_val, y_val);
+
 	//make cytoplasm node
 	// For rectangular distribution
 
@@ -488,6 +494,8 @@ void Cell::calc_New_Forces() {
 
 // Update Node Locations
 
+
+
 void Cell::update_Node_Locations() {
 	
 	//update cyt nodes
@@ -552,6 +560,43 @@ void Cell::print_VTK_Points(ofstream& ofs, int& count) {
 	return;
 }
 
+void Cell::print_VTK_Scalars(ofstream& ofs) {
+
+	Wall_Node* curr_wall = corners.at(0);
+	do {
+		Coord force = curr_wall->get_Force();
+		ofs << force.length() << endl;
+
+		curr_wall = curr_wall->get_Left_Neighbor();
+		
+	} while(curr_wall != corners.at(0));
+
+	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
+		Coord force = cyt_nodes.at(i)->get_Force();
+		ofs << force.length() << endl;
+	}
+
+	return;
+}
+
+void Cell::print_VTK_Vectors(ofstream& ofs) {
+
+	Wall_Node* curr_wall = corners.at(0);
+	do {
+		Coord force = curr_wall->get_CytForce();
+		ofs << force.get_X() << ' ' << force.get_Y() << ' ' << 0 << endl;
+
+		curr_wall = curr_wall->get_Left_Neighbor();
+		
+	} while(curr_wall != corners.at(0));
+
+	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
+		Coord force = cyt_nodes.at(i)->get_Force();
+		ofs << force.get_X() << ' ' << force.get_Y() << ' ' << 0 << endl;
+	}
+
+	return;
+}
 
 /*
 Wall_Node* Cell::find_Largest_Length(int& side) {

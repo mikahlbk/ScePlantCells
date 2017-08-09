@@ -84,21 +84,12 @@ int main() {
 			growing_Tissue.update_Neighbor_Cells();
 		}
 
-		//cout << "Done updating neighbors. " << endl;
-
 		//New Tissue GRowth
 		growing_Tissue.grow_Cells(Ti);
-		//cout << "Done growing cells. " << endl;
 		//Calculate new forces on cells and nodes
-
-		//cout << "Starting calculaltions " << endl;
-		//cout << "but first..." << endl;
 		growing_Tissue.calc_New_Forces();
-		//cout << "Finished calculations " << endl;
 		//Update node positions
-		//cout << "Updating Positioning: " << endl;
 		growing_Tissue.update_Cell_Locations();
-		//cout << "Finished Positioning " << endl;
 		
 	}
 

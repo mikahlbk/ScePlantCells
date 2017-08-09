@@ -63,6 +63,8 @@ class Cell {
 		// Output current frame of simulation after update locations
 		void print_Data_Output(ofstream& ofs);
 		void print_VTK_Points(ofstream& ofs, int& count);
+		void print_VTK_Scalars(ofstream& ofs);
+		void print_VTK_Vectors(ofstream& ofs);
 		// Talking to other Cells
 		
 		// Growth of cell
