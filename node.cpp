@@ -22,11 +22,18 @@ Coord Node::get_Location() {
     return my_loc;
 }
 
+Coord Node::get_Force() {
+	return new_force;
+}
+
 void Node::update_Location() {
     my_loc += new_force * dt;
     return;
 }
 
+Node::~Node() {
+	my_cell = NULL;
+}
 //========================================
 /** class Cyt Node Functions **/
 Cyt_Node::Cyt_Node(Coord loc, Cell* my_cell) : Node(loc, my_cell) {};
@@ -103,6 +110,7 @@ Coord Cyt_Node::morse_Equation(Wall_Node* wall) {
 	return Fmi;
 }
 
+Cyt_Node::~Cyt_Node() {}
 
 //======================================================
 /** class Wall Node Functions **/
@@ -115,13 +123,23 @@ Wall_Node::Wall_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right
 
     this->left = left;
     this->right = right;
+	cyt_force = Coord();
 
 	update_Angle();
+}
+
+Wall_Node::~Wall_Node() {
+	left = NULL;
+	right = NULL;
 }
 
 //  Getters and Setters--------------------
 double Wall_Node::get_Angle() {
 	return my_angle;
+}
+
+Coord Wall_Node::get_CytForce() {
+	return cyt_force;
 }
 
 Wall_Node* Wall_Node::get_Left_Neighbor() {
@@ -146,17 +164,19 @@ void Wall_Node::set_Right_Neighbor(Wall_Node* new_Right) {
 void Wall_Node::calc_Forces() {
 	// Initialize force sum to zero by default constructor
 	Coord sum;
-	// gather cyt nodes of your cell for morse calc
+
 	sum += calc_Morse_SC();
 
-	//will be implimented later
+	cyt_force = sum;
+
 	sum += calc_Morse_DC();
-	
 	sum += calc_Linear();
 	sum += calc_Bending();
 
 	// Update new_force variable for location updating
-	new_force = sum;;
+	new_force = sum;
+
+	return;
 }
 
 void Wall_Node::update_Angle() {
@@ -196,34 +216,117 @@ Coord Wall_Node::calc_Morse_SC() {
 	return Fmi;
 }
 
-//probably need vector of relatively close cells
+// Basic -- not efficient
+Coord Wall_Node::calc_Morse_DC() {
+	Coord Fdc;
+
+	vector<Cell*> cells;
+	my_cell->get_Neighbor_Cells(cells);
+	
+	Wall_Node* curr = NULL;
+	Wall_Node* orig = NULL;
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		curr = cells.at(i)->get_WallNodes();
+		orig = curr;
+
+		do {
+			Fdc += morse_Equation(curr);
+			curr = curr->get_Left_Neighbor();
+		} while (curr != orig);
+
+	}
+
+	return Fdc;
+}
+
+/* Efficient but doesn't work
 Coord Wall_Node::calc_Morse_DC() {
 
 	vector<Cell*> cells;
 	my_cell->get_Neighbor_Cells(cells);
+
 	Coord Fdc;
-	
+	bool close_enough = false;
+	double threshold = 1.0;
+
 	//iterate through each cell
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		//find which nodes from cell.at(i) you will need
 		//at the moment, just the ones that aren't yourself
-        
-		if (cells.at(i) != my_cell) {
-			//iterate through membrane nodes of each cell
-			Wall_Node* curr = cells.at(i)->get_WallNodes();
-			Wall_Node* orig = curr;
+		Wall_Node* A = NULL;
+		Wall_Node* B = NULL;
 
-			do {
-				Fdc += morse_Equation(curr);
-				curr = curr->get_Left_Neighbor();
-			} while(curr != orig);
+		close_enough = cells.at(i)->get_Reasonable_Bounds(this, A, B);
+		//cout << "Finished gettin reasonable bounds" << endl;
+		
+        if (close_enough) {
+			
+			if (A == B) {
+				//expand outward for calculations
+				Fdc += morse_Equation(A);
+				//expand right
+				Wall_Node* curr = A->get_Right_Neighbor();
 
+				while ( (curr->get_Location() - my_loc).length() < threshold) {
+					Fdc += morse_Equation(curr);
+					curr = curr->get_Right_Neighbor();
+				}
+				//expand left
+				curr = A->get_Left_Neighbor();
+
+				while ( (curr->get_Location() - my_loc).length() < threshold) {
+					Fdc += morse_Equation(curr);
+					curr = curr->get_Left_Neighbor();
+				}
+
+			}
+			else {
+				bool A_good = false;  
+				bool B_good = false;
+				if ( (A->get_Location() - my_loc).length() < threshold) {
+					A_good = true;
+					Fdc += morse_Equation(A);
+				}
+				//expand right side of A
+				Wall_Node* curr = NULL;
+				if (A_good) {
+					curr = A->get_Right_Neighbor();
+					while ( (curr->get_Location() - my_loc).length() < threshold) {
+						Fdc += morse_Equation(curr);
+						curr = curr->get_Right_Neighbor();
+					}
+					curr = A->get_Left_Neighbor();
+					B_good = true;
+				}
+				else {
+					//iterate through left neighbors until find one within range
+					curr = A->get_Left_Neighbor();
+					while( (curr->get_Location() - my_loc).length() > threshold) {
+						if (curr == B) {
+							B_good = false;
+							break;
+						}
+						curr = curr->get_Left_Neighbor();
+					}
+				}
+				
+				//between A and B, and past B
+				// curr is already set by prev if/else statements 
+				if (B_good) {
+					do {
+						Fdc += morse_Equation(curr);
+						curr = curr->get_Left_Neighbor();
+					} while ( (curr->get_Location() - my_loc).length() < threshold);
+				}
+
+			}
 		}
 
 	}
 	
 	return Fdc;
 }
+*/
 
 Coord Wall_Node::calc_Bending() {
 	Coord F_bend;
@@ -398,6 +501,7 @@ bool Corner_Node::is_Corner() {
 	return true;
 }
 
+Corner_Node::~Corner_Node() {}
 
 //===========================================================
 /** class Flank Node function **/
@@ -434,7 +538,7 @@ bool Flank_Node::is_Corner() {
 	return false;
 }
 
-
+Flank_Node::~Flank_Node() {}
 //==============================================================
 /** class End Node function **/
 End_Node::End_Node(Coord loc, Cell* my_cell) : Wall_Node(loc, my_cell) {};
@@ -469,6 +573,8 @@ double End_Node::get_bendingSpring() {
 bool End_Node::is_Corner() {
 	return false;
 }
+
+End_Node::~End_Node() {}
 
 //==========================================================
 // End of node.cpp

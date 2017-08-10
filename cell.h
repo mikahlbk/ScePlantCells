@@ -26,6 +26,8 @@ class Cell {
 		int rank;
 		//keep track of when spawned
 		int init_cell_time;
+		//approx location
+		Coord cell_center;
 		//keep track of how many nodes the cell has created
 		int num_wall_nodes;
 		int num_cyt_nodes;
@@ -41,11 +43,13 @@ class Cell {
 			 int Ti, Tissue* tiss);
 
 		// Getters and Setters
+		Coord get_Cell_Center();
 		void get_CytNodes(vector<Cyt_Node*>& cyts);
+		void get_CornerNodes(vector<Wall_Node*>& corns);
 		Wall_Node* get_WallNodes();
 		void get_Neighbor_Cells(vector<Cell*>& cells);
 		int get_Num_Nodes();
-
+		bool get_Reasonable_Bounds(Wall_Node* curr, Wall_Node* & A, Wall_Node* & B);
 		// Keep track of neighbor cells
 
 		// Calc Forces
@@ -54,9 +58,13 @@ class Cell {
 		void update_Node_Locations();
 		// Update Angles
 		void update_Wall_Angles();
+		// Update list of neighbor cells
+		void update_Neighbor_Cells();
 		// Output current frame of simulation after update locations
 		void print_Data_Output(ofstream& ofs);
 		void print_VTK_Points(ofstream& ofs, int& count);
+		void print_VTK_Scalars(ofstream& ofs);
+		void print_VTK_Vectors(ofstream& ofs);
 		// Talking to other Cells
 		
 		// Growth of cell
@@ -66,6 +74,8 @@ class Cell {
 		void add_Wall_Node(const int Ti);
 		void add_Cyt_Node(const int Ti);
 
+		// Destructor
+		~Cell();
 };
 
 

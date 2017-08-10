@@ -65,6 +65,16 @@ Tissue::Tissue(string filename) {
 	ifs.close();
 }
 
+Tissue::~Tissue() {
+	
+	Cell* curr = NULL;
+	while ( !cells.empty() ) {
+		curr = cells.at(cells.size() - 1);
+		delete curr;
+		cells.pop_back();
+	}
+}
+
 void Tissue::get_Cells(vector<Cell*>& cells) {
 	cells = this->cells;
 	return;
@@ -73,6 +83,7 @@ void Tissue::get_Cells(vector<Cell*>& cells) {
 void Tissue::calc_New_Forces() {
 
 	for (unsigned int i = 0; i < cells.size(); i++) {
+		//cout << "calc new forces" << endl;
 		cells.at(i)->calc_New_Forces();
 	}
 
@@ -88,6 +99,18 @@ void Tissue::update_Cell_Locations() {
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->update_Wall_Angles();
 	}
+
+	
+
+	return;
+}
+
+void Tissue::update_Neighbor_Cells() {
+	//update vectors of neighboring cells
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->update_Neighbor_Cells();
+	}
+	
 
 	return;
 }
@@ -121,6 +144,7 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 		end_points.push_back(count - 1);
 	}
 
+	ofs << endl;
 	ofs << "CELLS " << cells.size() << ' ' << num_Points + start_points.size() << endl;
 
 	for (unsigned int i = 0; i < cells.size(); i++) {
@@ -138,6 +162,24 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 	for (unsigned int i = 0; i < start_points.size(); i++) {
 		ofs << 2 << endl;
 	}
+
+	ofs << endl;
+
+	ofs << "POINT_DATA " << num_Points << endl;
+	ofs << "SCALARS magnitude float " << 1 << endl;
+	ofs << "LOOKUP_TABLE default" << endl;
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->print_VTK_Scalars(ofs);
+	}
+
+	ofs << endl;
+
+	ofs << "VECTORS force float" << endl;
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->print_VTK_Vectors(ofs);
+	}
+
+
 
 	return;
 }
