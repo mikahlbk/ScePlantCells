@@ -564,7 +564,7 @@ void Cell::print_VTK_Scalars(ofstream& ofs) {
 
 	Wall_Node* curr_wall = corners.at(0);
 	do {
-		Coord force = curr_wall->get_Force();
+		Coord force = curr_wall->get_CytForce();
 		ofs << force.length() << endl;
 
 		curr_wall = curr_wall->get_Left_Neighbor();

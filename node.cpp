@@ -157,10 +157,10 @@ void Wall_Node::calc_Forces() {
 	Coord sum;
 
 	sum += calc_Morse_SC();
-	sum += calc_Morse_DC();
 
 	cyt_force = sum;
 
+	sum += calc_Morse_DC();
 	sum += calc_Linear();
 	sum += calc_Bending();
 
