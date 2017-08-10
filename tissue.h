@@ -38,8 +38,8 @@ class Tissue {
 		void print_VTK_File(ofstream& ofs);
 
 		void grow_Cells(const int Ti);
-
-
+		//Destructor
+		~Tissue();
 };
 
 

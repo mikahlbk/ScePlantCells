@@ -74,6 +74,8 @@ class Cell {
 		void add_Wall_Node(const int Ti);
 		void add_Cyt_Node(const int Ti);
 
+		// Destructor
+		~Cell();
 };
 
 

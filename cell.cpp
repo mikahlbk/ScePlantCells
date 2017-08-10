@@ -212,6 +212,37 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	}
 }
 
+// Destructor
+Cell::~Cell() {
+
+	// Delete Cyt Nodes
+	Cyt_Node* cyt = NULL;
+	while ( !cyt_nodes.empty()) {
+		cyt = cyt_nodes.at(cyt_nodes.size() - 1);
+		delete cyt;
+		cyt_nodes.pop_back();
+	}
+	// Delete Wall Nodes
+	Wall_Node* curr = corners.at(0);
+	Wall_Node* next = NULL;
+	Wall_Node* last = curr->get_Right_Neighbor();
+	last->set_Left_Neighbor(NULL);
+
+	while (curr != NULL) {
+		next = curr->get_Left_Neighbor();
+		delete curr;
+		curr = next;
+	}
+
+	// Extra clean up of pointers
+	while ( !corners.empty() ) {
+		corners.at(corners.size() - 1) = NULL;
+		corners.pop_back();
+	}
+	
+	my_tissue = NULL;
+}
+
 // Getters and Setters
 Coord Cell::get_Cell_Center() {
 	return cell_center;

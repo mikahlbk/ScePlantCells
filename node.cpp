@@ -31,6 +31,9 @@ void Node::update_Location() {
     return;
 }
 
+Node::~Node() {
+	my_cell = NULL;
+}
 //========================================
 /** class Cyt Node Functions **/
 Cyt_Node::Cyt_Node(Coord loc, Cell* my_cell) : Node(loc, my_cell) {};
@@ -107,6 +110,7 @@ Coord Cyt_Node::morse_Equation(Wall_Node* wall) {
 	return Fmi;
 }
 
+Cyt_Node::~Cyt_Node() {}
 
 //======================================================
 /** class Wall Node Functions **/
@@ -122,6 +126,11 @@ Wall_Node::Wall_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right
 	cyt_force = Coord();
 
 	update_Angle();
+}
+
+Wall_Node::~Wall_Node() {
+	left = NULL;
+	right = NULL;
 }
 
 //  Getters and Setters--------------------
@@ -492,6 +501,7 @@ bool Corner_Node::is_Corner() {
 	return true;
 }
 
+Corner_Node::~Corner_Node() {}
 
 //===========================================================
 /** class Flank Node function **/
@@ -528,7 +538,7 @@ bool Flank_Node::is_Corner() {
 	return false;
 }
 
-
+Flank_Node::~Flank_Node() {}
 //==============================================================
 /** class End Node function **/
 End_Node::End_Node(Coord loc, Cell* my_cell) : Wall_Node(loc, my_cell) {};
@@ -563,6 +573,8 @@ double End_Node::get_bendingSpring() {
 bool End_Node::is_Corner() {
 	return false;
 }
+
+End_Node::~End_Node() {}
 
 //==========================================================
 // End of node.cpp

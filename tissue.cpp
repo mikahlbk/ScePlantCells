@@ -65,6 +65,16 @@ Tissue::Tissue(string filename) {
 	ifs.close();
 }
 
+Tissue::~Tissue() {
+	
+	Cell* curr = NULL;
+	while ( !cells.empty() ) {
+		curr = cells.at(cells.size() - 1);
+		delete curr;
+		cells.pop_back();
+	}
+}
+
 void Tissue::get_Cells(vector<Cell*>& cells) {
 	cells = this->cells;
 	return;

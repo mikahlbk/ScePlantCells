@@ -32,7 +32,7 @@ int main() {
 
 	cout << "Finished creating Cell" << endl;
 	//parameters for time step
-    double numSteps = 20;
+    double numSteps = 1;
 
 	// Variable for dataoutput
 	int digits;
