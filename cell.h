@@ -39,43 +39,48 @@ class Cell {
 
 	public:
 		// Constructors
+		Cell(int Ti, Tissue* tiss);
 		Cell(int rank, Coord corner, double height, double width, 
 			 int Ti, Tissue* tiss);
+		// Destructors
+		~Cell();
 
 		// Getters and Setters
 		Coord get_Cell_Center();
+		void update_Cell_Center();
+		void set_Wall_Cnt(int cnt);
+		void set_Rank(const int id);
 		void get_CytNodes(vector<Cyt_Node*>& cyts);
+		void set_CytNodes(vector<Cyt_Node*>& cyts);
 		void get_CornerNodes(vector<Wall_Node*>& corns);
+		void set_CornerNodes(vector<Wall_Node*>& corns);
 		Wall_Node* get_WallNodes();
 		void get_Neighbor_Cells(vector<Cell*>& cells);
 		int get_Num_Nodes();
 		bool get_Reasonable_Bounds(Wall_Node* curr, Wall_Node* & A, Wall_Node* & B);
-		// Keep track of neighbor cells
 
 		// Calc Forces
 		void calc_New_Forces();
-		// Update Node Locations
 		void update_Node_Locations();
-		// Update Angles
 		void update_Wall_Angles();
-		// Update list of neighbor cells
 		void update_Neighbor_Cells();
+		
 		// Output current frame of simulation after update locations
 		void print_Data_Output(ofstream& ofs);
 		void print_VTK_Points(ofstream& ofs, int& count);
 		void print_VTK_Scalars(ofstream& ofs);
 		void print_VTK_Vectors(ofstream& ofs);
-		// Talking to other Cells
 		
 		// Growth of cell
-		// returns the coordinte of the wall node whose 
-		// left length is the largest
 		void find_Big_Gaps(vector<Wall_Node*>& walls, vector<int>& sides);
 		void add_Wall_Node(const int Ti);
 		void add_Cyt_Node(const int Ti);
 
-		// Destructor
-		~Cell();
+		// Division
+		Cell* divide(const int Ti);
+		Cell* divide_length_wise(const int Ti);
+		Cell* divide_width_wise(const int Ti);
+
 };
 
 
@@ -83,6 +88,8 @@ class Cell {
 //===================
 
 #endif
+
+
 
 
 

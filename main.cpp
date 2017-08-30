@@ -32,7 +32,7 @@ int main() {
 
 	cout << "Finished creating Cell" << endl;
 	//parameters for time step
-    double numSteps = 1;
+    double numSteps = 40;
 
 	// Variable for dataoutput
 	int digits;
@@ -90,6 +90,8 @@ int main() {
 		growing_Tissue.calc_New_Forces();
 		//Update node positions
 		growing_Tissue.update_Cell_Locations();
+		//Allow Cells to divide
+		growing_Tissue.cell_Division(Ti);
 		
 	}
 

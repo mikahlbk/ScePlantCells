@@ -20,7 +20,7 @@ const int ADD_CYT_TIMER = 2500;
 const int MAX_NUM_WALL = 200;
 const int MAX_NUM_CYT = 60;
 
-
+const int CELL_DIV_TIME = 30000;
 // Global Physics Constants
 
 const double pi = acos(-1.0);

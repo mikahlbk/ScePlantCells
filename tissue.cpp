@@ -16,7 +16,8 @@
 // Public Member Functions for Tissue.cpp
 
 Tissue::Tissue(string filename) {
-
+	
+	num_cells = 0;
 	ifstream ifs(filename.c_str());
 
 	if(!ifs) {
@@ -57,6 +58,7 @@ Tissue::Tissue(string filename) {
 			//create new cell with collected data and push onto vector 
 			curr = new Cell(rank, corner, height, width, 0, this);
 			cells.push_back(curr);
+			num_cells++;
 		}
 
 		ss.clear();
@@ -189,6 +191,30 @@ void Tissue::grow_Cells(const int Ti) {
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->add_Wall_Node(Ti);
 		cells.at(i)->add_Cyt_Node(Ti);
+	}
+
+	return;
+}
+
+void Tissue::cell_Division(const int Ti) {
+	
+	bool divided = false;
+	Cell* new_cell = NULL;
+	//cout << "CElls size: " << cells.size() << endl;
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		new_cell = cells.at(i)->divide(Ti);
+
+		if (new_cell != NULL) {
+			divided = true;
+			new_cell->set_Rank(num_cells);
+			num_cells++;
+			cells.push_back(new_cell);
+		}
+
+	}
+
+	if (divided) {
+		this->update_Neighbor_Cells();
 	}
 
 	return;

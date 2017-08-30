@@ -30,6 +30,7 @@ class Node {
         virtual Coord get_Location();
 		virtual Coord get_Force();
 		virtual void update_Location();
+		virtual void set_My_Cell(Cell* cell);
         //other functions might be executed differently based on
         //    which node you are. Thus define as "pure virtual" and 
         //    properly define them in a derived class

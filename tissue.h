@@ -24,6 +24,7 @@ class Tissue {
 	private:
 		// We'll need a better data structure for later
 		vector<Cell*> cells;
+		int num_cells;
 
 	public:
 		Tissue(string filename);
@@ -38,6 +39,7 @@ class Tissue {
 		void print_VTK_File(ofstream& ofs);
 
 		void grow_Cells(const int Ti);
+		void cell_Division(const int Ti);
 		
 		//Destructor
 		~Tissue();

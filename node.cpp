@@ -31,6 +31,11 @@ void Node::update_Location() {
     return;
 }
 
+void Node::set_My_Cell(Cell* cell) {
+	my_cell = cell;
+	return;
+}
+
 Node::~Node() {
 	my_cell = NULL;
 }

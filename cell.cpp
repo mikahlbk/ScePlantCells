@@ -19,6 +19,13 @@
 // Cell Class Member functions
 
 // Constructors
+Cell::Cell(int Ti, Tissue* tiss) {
+	init_cell_time = Ti;
+	my_tissue = tiss;
+	num_wall_nodes = 0;
+	num_cyt_nodes = 0;
+	rank = -1;
+}
 
 Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* tiss)    {
 	
@@ -38,13 +45,6 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	int num_end_nodes = (width / space) - 1;
 	int num_flank_nodes = (height / space) - 1;
 
-	/*
-	int num_end_nodes = 19;
-	int num_flank_nodes = 34;
-
-	double f_space = height / num_flank_nodes;
-	double e_space = width / num_end_nodes;
-	*/
 	double curr_X;
 	double curr_Y;
 	Coord location;
@@ -167,10 +167,7 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	update_Wall_Angles();
 
 	//update cell_Center
-	double x_val = ((corners.at(0)->get_Location().get_X()) + (corners.at(1)->get_Location().get_X())) / 2;
-	double y_val = ((corners.at(0)->get_Location().get_Y()) + (corners.at(3)->get_Location().get_Y())) / 2;
-
-	cell_center = Coord(x_val, y_val);
+	update_Cell_Center();
 
 	//make cytoplasm node
 	// For rectangular distribution
@@ -187,7 +184,6 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	for(int i = 0; i < init_Cyt_Count; i++) {
 		
 		// USING POSITIONS OF CORNER NODES FOR CYT NODE ALLOCATION
-		// ---distributes more evenly throughout start cell
 		x = (static_cast<double>(rand()) / RAND_MAX) * scal_x_offset * width;
 		y = (static_cast<double>(rand()) / RAND_MAX) * scal_y_offset * height; 
 
@@ -238,8 +234,33 @@ Coord Cell::get_Cell_Center() {
 	return cell_center;
 }
 
+void Cell::update_Cell_Center() {
+	
+	double x_val = ((corners.at(0)->get_Location().get_X()) + (corners.at(1)->get_Location().get_X())) / 2;
+	double y_val = ((corners.at(0)->get_Location().get_Y()) + (corners.at(3)->get_Location().get_Y())) / 2;
+
+	cell_center = Coord(x_val, y_val);
+	
+	return;
+}
+
+void Cell::set_Wall_Cnt(int cnt) {
+	num_wall_nodes = cnt;
+	return;
+}
+
+void Cell::set_Rank(const int id) {
+	rank = id;
+	return;
+}
+
 void Cell::get_CytNodes(vector<Cyt_Node*>& cyts) {
 	cyts = cyt_nodes;
+	return;
+}
+
+void Cell::set_CytNodes(vector<Cyt_Node*>& cyts) {
+	cyt_nodes = cyts;
 	return;
 }
 
@@ -252,133 +273,8 @@ void Cell::get_CornerNodes(vector<Wall_Node*>& corns) {
 	return;
 }
 
-void Cell::update_Neighbor_Cells() {
-	//clear prev vector of neigh cells
-	neigh_cells.clear();
-	//grab all cells from tissue
-	vector<Cell*> all_Cells;
-	my_tissue->get_Cells(all_Cells);
-
-	
-	// Empty variables for holding info about other cells
-	Cell* curr = NULL;
-	Coord curr_Cent;
-	double curr_cX, curr_cY;
-	double curr_minX, curr_maxX, curr_minY, curr_maxY;
-	vector<Wall_Node*> curr_corners;
-	
-	// All necessary info about my cell location
-	double my_cX = cell_center.get_X();
-	double my_cY = cell_center.get_Y();
-	double my_minX = corners.at(0)->get_Location().get_X();
-	double my_maxX = corners.at(1)->get_Location().get_X();
-	double my_minY = corners.at(0)->get_Location().get_Y();
-	double my_maxY = corners.at(3)->get_Location().get_Y();
-
-	double prelim_threshold = 5.0;
-	double sec_threshold = 0.5;
-
-	bool checkA = false;
-	bool checkB = false;
-
-	// iterate through all cells
-	for (unsigned int i = 0; i < all_Cells.size(); i++) {
-		curr = all_Cells.at(i);
-		//reset boolean variables
-		checkA = false;
-		checkB = false;
-		//check to make sure not pointing at yourself
-		if (curr != this) {
-			curr_Cent = curr->get_Cell_Center();
-			// Check if cell centers are close enough together
-			if ( (curr_Cent - cell_center).length() < prelim_threshold ) {
-				
-				curr_cX = curr_Cent.get_X();
-				curr_cY = curr_Cent.get_Y();
-
-				curr->get_CornerNodes(curr_corners);
-
-
-				if (curr_cX < my_cX) {
-					if (curr_cY < my_cY) {
-						//check if curr_maxX and curr_maxY are in range
-						// of my_minX and my_minY
-						curr_maxX = curr_corners.at(2)->get_Location().get_X();
-						curr_maxY = curr_corners.at(2)->get_Location().get_Y();
-						
-						if ( (curr_maxX > my_minX) || ( (my_minX - curr_maxX) < sec_threshold) ) {
-							checkA = true;
-						}
-
-						if ( (curr_maxY > my_minY) || ( (my_minY - curr_maxY) < sec_threshold) ) {
-							checkB = true;
-						}
-
-					}
-					else {
-						//check if curr_maxX and curr_minY are in range
-						// of my_minX and my_maxY
-						curr_maxX = curr_corners.at(2)->get_Location().get_X();
-						curr_minY = curr_corners.at(0)->get_Location().get_Y();
-						
-						if ( (curr_maxX > my_minX) || ( (my_minX - curr_maxX) < sec_threshold) ) {
-							checkA = true;
-						}
-
-						if ( (curr_minY < my_maxY) || ( (curr_minY - my_maxY) < sec_threshold) ) {
-							checkB = true;
-						}
-
-					}
-				}
-				else { // curr_cX > my_cX
-					if (curr_cY < my_cY) {
-						//check if curr_minX and curr_maxY are in range
-						// of my_maxX and my_minY
-						curr_minX = curr_corners.at(0)->get_Location().get_X();
-						curr_maxY = curr_corners.at(2)->get_Location().get_Y();
-						
-						if ( (curr_minX < my_maxX) || ( (curr_minX - my_maxX) < sec_threshold) ) {
-							checkA = true;
-						}
-
-						if ( (curr_maxY > my_minY) || ( (my_minY - curr_maxY) < sec_threshold) ) {
-							checkB = true;
-						}
-
-					}
-					else {
-						//check if curr_minX and curr_minY are in range
-						// of my_maxX and my_maxY
-						curr_minX = curr_corners.at(0)->get_Location().get_X();
-						curr_minY = curr_corners.at(0)->get_Location().get_Y();
-						
-						if ( (curr_minX < my_maxX) || ( (curr_minX - my_maxX) < sec_threshold) ) {
-							checkA = true;
-						}
-
-						if ( (curr_minY < my_maxY) || ( (curr_minY - my_maxY) < sec_threshold) ) {
-							checkB = true;
-						}
-
-					}
-				}
-
-			}
-			//else already too far away
-				
-			// if both checks come out true, then add curr to neigh cells
-			if ( checkA && checkB) {
-				neigh_cells.push_back(curr);
-			}
-			
-		}
-		//else you're pointing at yourself and shouldnt do anything
-
-	}
-	
-	cout << "Cell: " << rank << " -- neighbors: " << neigh_cells.size() << endl;
-
+void Cell::set_CornerNodes(vector<Wall_Node*>& corns) {
+	this->corners = corns;
 	return;
 }
 
@@ -545,11 +441,148 @@ void Cell::update_Node_Locations() {
 void Cell::update_Wall_Angles() {
 
 	Wall_Node* curr = corners.at(0);
-	
 	do {
+		
+		if (curr->is_Corner()) {
+			//cout << 'C' << endl;
+		}
+		else {
+			//cout << 'E' << endl;
+		}
+
 		curr->update_Angle();
 		curr = curr->get_Left_Neighbor();
 	} while (curr != corners.at(0));	
+
+	return;
+}
+
+void Cell::update_Neighbor_Cells() {
+	//clear prev vector of neigh cells
+	neigh_cells.clear();
+	//grab all cells from tissue
+	vector<Cell*> all_Cells;
+	my_tissue->get_Cells(all_Cells);
+
+	
+	// Empty variables for holding info about other cells
+	Cell* curr = NULL;
+	Coord curr_Cent;
+	double curr_cX, curr_cY;
+	double curr_minX, curr_maxX, curr_minY, curr_maxY;
+	vector<Wall_Node*> curr_corners;
+	
+	// All necessary info about my cell location
+	double my_cX = cell_center.get_X();
+	double my_cY = cell_center.get_Y();
+	double my_minX = corners.at(0)->get_Location().get_X();
+	double my_maxX = corners.at(1)->get_Location().get_X();
+	double my_minY = corners.at(0)->get_Location().get_Y();
+	double my_maxY = corners.at(3)->get_Location().get_Y();
+
+	double prelim_threshold = 5.0;
+	double sec_threshold = 0.5;
+
+	bool checkA = false;
+	bool checkB = false;
+
+	// iterate through all cells
+	for (unsigned int i = 0; i < all_Cells.size(); i++) {
+		curr = all_Cells.at(i);
+		//reset boolean variables
+		checkA = false;
+		checkB = false;
+		//check to make sure not pointing at yourself
+		if (curr != this) {
+			curr_Cent = curr->get_Cell_Center();
+			// Check if cell centers are close enough together
+			if ( (curr_Cent - cell_center).length() < prelim_threshold ) {
+				
+				curr_cX = curr_Cent.get_X();
+				curr_cY = curr_Cent.get_Y();
+
+				curr->get_CornerNodes(curr_corners);
+
+
+				if (curr_cX < my_cX) {
+					if (curr_cY < my_cY) {
+						//check if curr_maxX and curr_maxY are in range
+						// of my_minX and my_minY
+						curr_maxX = curr_corners.at(2)->get_Location().get_X();
+						curr_maxY = curr_corners.at(2)->get_Location().get_Y();
+						
+						if ( (curr_maxX > my_minX) || ( (my_minX - curr_maxX) < sec_threshold) ) {
+							checkA = true;
+						}
+
+						if ( (curr_maxY > my_minY) || ( (my_minY - curr_maxY) < sec_threshold) ) {
+							checkB = true;
+						}
+
+					}
+					else {
+						//check if curr_maxX and curr_minY are in range
+						// of my_minX and my_maxY
+						curr_maxX = curr_corners.at(2)->get_Location().get_X();
+						curr_minY = curr_corners.at(0)->get_Location().get_Y();
+						
+						if ( (curr_maxX > my_minX) || ( (my_minX - curr_maxX) < sec_threshold) ) {
+							checkA = true;
+						}
+
+						if ( (curr_minY < my_maxY) || ( (curr_minY - my_maxY) < sec_threshold) ) {
+							checkB = true;
+						}
+
+					}
+				}
+				else { // curr_cX > my_cX
+					if (curr_cY < my_cY) {
+						//check if curr_minX and curr_maxY are in range
+						// of my_maxX and my_minY
+						curr_minX = curr_corners.at(0)->get_Location().get_X();
+						curr_maxY = curr_corners.at(2)->get_Location().get_Y();
+						
+						if ( (curr_minX < my_maxX) || ( (curr_minX - my_maxX) < sec_threshold) ) {
+							checkA = true;
+						}
+
+						if ( (curr_maxY > my_minY) || ( (my_minY - curr_maxY) < sec_threshold) ) {
+							checkB = true;
+						}
+
+					}
+					else {
+						//check if curr_minX and curr_minY are in range
+						// of my_maxX and my_maxY
+						curr_minX = curr_corners.at(0)->get_Location().get_X();
+						curr_minY = curr_corners.at(0)->get_Location().get_Y();
+						
+						if ( (curr_minX < my_maxX) || ( (curr_minX - my_maxX) < sec_threshold) ) {
+							checkA = true;
+						}
+
+						if ( (curr_minY < my_maxY) || ( (curr_minY - my_maxY) < sec_threshold) ) {
+							checkB = true;
+						}
+
+					}
+				}
+
+			}
+			//else already too far away
+				
+			// if both checks come out true, then add curr to neigh cells
+			if ( checkA && checkB) {
+				neigh_cells.push_back(curr);
+			}
+			
+		}
+		//else you're pointing at yourself and shouldnt do anything
+
+	}
+	
+	cout << "Cell: " << rank << " -- neighbors: " << neigh_cells.size() << endl;
 
 	return;
 }
@@ -742,131 +775,6 @@ void Cell::add_Cyt_Node(const int Ti) {
 	return;
 }
 
-// Gets called by update_Node_Locations()
-Cell* Cell::divide_length_wise() {
-	// Current cell splits into two daughter cells
-	//    -"this" will keep its entity as the left sister, 
-	//		create a sister cell to the right of it, and return it 
-	//      to the tissue.
-
-	//ask tissue for new id num
-	int new_id = my_tissue->get();
-	Cell* sister = new Cell(new_id, my_tissue);
-
-	// Find midpoint
-	Coord mid_top = ((corners.at(3)->get_Location() + corners.at(2)->get_Location()) * 0.5);
-	Coord mid_bot = ((corners.at(0)->get_Location() + corners.at(1)->get_Location()) * 0.5);
-	Coord divider = (mid_top - mid_bot);
-	double divide_X = divider.get_X();
-
-	vector<Wall_Node*> corners_A;
-	vector<Wall_Node*> corners_B;
-
-	Wall_Node* curr = corners.at(0);
-	Wall_Node* next = NULL;
-	Wall_Node* prev = NULL;
-	
-	int side = 0;
-
-	// distribute wall nodes between sister cells
-	do { 
-
-		next = curr->get_Left_Neighbor();
-		
-		if (curr->get_Location().get_X() < divide_X) {
-			//Cell A
-			
-			if (curr->is_Corner()) {
-				corners_A.push_back(curr);
-				side++;
-			}
-
-			if (side == 1) {
-				//on bottom end
-				
-				if (next->get_Location().get_X() < divide_X) {
-					//do nothing
-				}
-				else {
-					// delete curr and prev, then add corner
-					Wall_Node* prev_prev = prev->get_Right_Neighbor();
-					Wall_Node* temp = new Corner_Node(prev->get_Location(), this);
-					temp->set_Right_Neighbor(prev_prev);
-					prev_prev->set_Left_Neighbor(temp);
-					
-					//delete curr
-					//delete prev
-				}
-
-			}
-			else if (side == 3) {
-				//on top end
-				if (corners_A.size() < 3) {
-					//need to delete curr and next, then insert a corner
-					//WARNING: prev is set to null, do not try to access
-					Wall_Node* next_next = next->get_Left_Neighbor();
-					Wall_Node* temp = new Corner_Node(next->get_Location(), this);
-					temp->set_Left_Neighbor(next_next);
-					next_next->set_Right_Neighbor(temp);
-
-					//delete curr
-					//delete next
-
-					next = temp
-				}
-				else {
-					//do nothing
-				}
-			}
-			else if (side == 2) {
-				cout << "ERROR: DIVISION. CAN'T BE ON THIS FLANK" << endl;
-			}
-			else { //side == 4
-				//on left flank
-				//do nothing
-			}
-
-
-		}
-		
-		else {
-			//Cell B
-
-			if (bottomEnd) {
-
-			}
-			else {
-
-			}
-			
-		}
-
-	
-		curr = next;
-
-	} while(curr != corners.at(0));
-
-	// create new flank walls for both cells
-
-	// distribute cyt nodes between sister cells
-	
-
-	return sister;
-}
-
-
-// Gets called by update_Node_Locations()
-Cell* Cell::divide_width_wise() {
-	// Current cell splits into two daughter cells
-	//    -"this" will keep its entity, create a sister cell, and return it 
-	//      to the tissue.
-	Cell* sister = NULL;
-
-	// Find midpoint
-
-
-	return sister;
-}
 
 
 
