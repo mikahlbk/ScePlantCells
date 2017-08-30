@@ -50,7 +50,7 @@ int main() {
 
 		//Print to dataOutput and VTK files
 
-		if (Ti % 250 == 0) {
+		if (Ti % 300 == 0) {
 	
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {

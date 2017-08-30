@@ -72,7 +72,7 @@ class Cell {
 		void print_VTK_Vectors(ofstream& ofs);
 		
 		// Growth of cell
-		void find_Big_Gaps(vector<Wall_Node*>& walls, vector<int>& sides);
+		Wall_Node* find_Largest_Length(int& side);
 		void add_Wall_Node(const int Ti);
 		void add_Cyt_Node(const int Ti);
 

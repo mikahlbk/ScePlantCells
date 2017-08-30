@@ -652,7 +652,45 @@ void Cell::print_VTK_Vectors(ofstream& ofs) {
 	return;
 }
 
-void Cell::find_Big_Gaps(vector<Wall_Node*>& walls, vector<int>& sides) {
+Wall_Node* Cell::find_Largest_Length(int& side) {
+	side = 0; //know that we start on bottom flank
+	// We know we start at first entry of corner vector. 
+	//Each time we pass another corner, increment side by 1 
+	// side = 1 or 3 => end
+	// side = 2 or 4 => flank
+	Wall_Node* curr = corners.at(0);
+	Wall_Node* biggest = NULL;
+	Coord left_Neighb_loc;
+	Coord curr_Loc;
+	Coord diff_vect;
+	double max_len = 0;
+	double len;
+	//loop through all possible Cell Wall 'links' to find biggest
+	do {
+		//if encounter a corner, increment side to know if end or flank
+		if (curr->is_Corner()) {
+			side++;
+		}
+
+		//finding current lengths and comparing
+		left_Neighb_loc = curr->get_Left_Neighbor()->get_Location();
+		curr_Loc = curr->get_Location();
+		diff_vect = left_Neighb_loc - curr_Loc;
+		len = diff_vect.length();
+		if(len > MembrCutOFFLen) {
+			if(len > max_len) {
+				max_len = len;
+				biggest = curr;
+			}
+		}
+		curr = curr->get_Left_Neighbor();
+
+	} while (curr != corners.at(0));
+
+	return biggest;
+}
+
+/*void Cell::find_Big_Gaps(vector<Wall_Node*>& walls, vector<int>& sides) {
 	
 	int side = 0;
 	// We know we start at first entry of corner vector. 
@@ -690,7 +728,7 @@ void Cell::find_Big_Gaps(vector<Wall_Node*>& walls, vector<int>& sides) {
 
 	return;
 }
-
+*/
 
 void Cell::add_Wall_Node(const int Ti) {
 
@@ -703,26 +741,26 @@ void Cell::add_Wall_Node(const int Ti) {
 	//Cell Wall link is to the left of that node
 	//first we apply find_Largest_Length() to the cell to get a pointer to the right
 	//of where the new node is added
-	vector<Wall_Node*> walls;
-	vector<int> sides;
-
-	find_Big_Gaps(walls, sides);
-
-	cout << "Find_Big_Gaps size: " << walls.size() << endl;
-
+	int side = 0;
+	
 	Wall_Node* right = NULL;
 	Wall_Node* left = NULL;
 	Coord newCoord;
 	Wall_Node* newNode = NULL;
 
-	for (unsigned int i = 0; i < walls.size(); i++) {
-		//Get nodes to right and left of new node
-		right = walls.at(i);
+	//Get nodes to right and left of new node
+	right = find_Largest_Length(side);
+	if (right == NULL) {
+		//do nothing
+		return;
+	}
+	else {
+
 		left = right->get_Left_Neighbor();
 		// New node's location
 		newCoord = ((right->get_Location() + left->get_Location()) * 0.5);
 		
-		if (sides.at(i) % 2 == 1) {
+		if (side % 2 == 1) {
 			newNode = new End_Node(newCoord, this, left, right);
 		}
 		else { //flank
@@ -733,9 +771,8 @@ void Cell::add_Wall_Node(const int Ti) {
 		//update neighbors of left and right
 		right->set_Left_Neighbor(newNode);
 		left->set_Right_Neighbor(newNode);
+		return;
 	}
-
-	return;
 }
 
 void Cell::add_Cyt_Node(const int Ti) {
@@ -782,41 +819,4 @@ void Cell::add_Cyt_Node(const int Ti) {
 
 
 
-/*
-Wall_Node* Cell::find_Largest_Length(int& side) {
-	side = 0; //know that we start on bottom flank
-	// We know we start at first entry of corner vector. 
-	//Each time we pass another corner, increment side by 1 
-	// side = 1 or 3 => end
-	// side = 2 or 4 => flank
-	Wall_Node* curr = corners.at(0);
-	Wall_Node* biggest = NULL;
-	Coord left_Neighb_loc;
-	Coord curr_Loc;
-	Coord diff_vect;
-	double max_len = 0;
-	double len;
-	//loop through all possible Cell Wall 'links' to find biggest
-	do {
-		//if encounter a corner, increment side to know if end or flank
-		if (curr->is_Corner()) {
-			side++;
-		}
-
-		//finding current lengths and comparing
-		left_Neighb_loc = curr->get_Left_Neighbor()->get_Location();
-		curr_Loc = curr->get_Location();
-		diff_vect = left_Neighb_loc - curr_Loc;
-		len = diff_vect.length();
-		if(len > max_len) {
-			max_len = len;
-			biggest = curr;
-		}
-		curr = curr->get_Left_Neighbor();
-
-	} while (curr != corners.at(0));
-
-	return biggest;
-}
-*/
 

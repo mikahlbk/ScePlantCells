@@ -20,7 +20,7 @@ Cell* Cell::divide(const int Ti) {
 
 	Cell* sister = NULL;
 
-	if (Ti - init_cell_time % CELL_DIV_TIME == CELL_DIV_TIME - 1) {
+	if ((Ti - init_cell_time) % CELL_DIV_TIME == CELL_DIV_TIME - 1) {
 		sister = this->divide_width_wise(Ti);
 	}
 

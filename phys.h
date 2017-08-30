@@ -15,12 +15,12 @@
 // Simulation Constants
 const double dt = 0.0003;
 const int ADD_WALL_TIMER = 2000;
-const int ADD_CYT_TIMER = 2500;
+const int ADD_CYT_TIMER = 1000;
 
 const int MAX_NUM_WALL = 200;
 const int MAX_NUM_CYT = 60;
 
-const int CELL_DIV_TIME = 30000;
+const int CELL_DIV_TIME = 50000;
 // Global Physics Constants
 
 const double pi = acos(-1.0);
@@ -50,7 +50,7 @@ const double kLinearFlank = 25;
 
 //linear spring equilibrium length
 const double MembrEquLen = .0625; 
-const double MembrCutOFFLen = 0.15; 
+const double MembrCutOFFLen = 0.125; 
 
 ///// Subcellular element parameters for membrane - membrane interactions
 
