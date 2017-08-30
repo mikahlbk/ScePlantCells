@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <ctime>
 
 #include "phys.h"
 #include "coord.h"
@@ -21,6 +22,8 @@ using namespace std;
 //============================
 
 int main() {
+
+	int start = clock();
 
 	string init_tissue = "cell_start.txt";
 	//make a new cell object
@@ -75,6 +78,11 @@ int main() {
 		if (Ti % 1000 == 0) {
 			cout << "Simulation still running. Ti: " << Ti << endl;
 		}
+		
+		// Update Each cell's neighboring cells
+		if (Ti % 5000 == 0) {
+			growing_Tissue.update_Neighbor_Cells();
+		}
 
 		//New Tissue GRowth
 		growing_Tissue.grow_Cells(Ti);
@@ -82,8 +90,14 @@ int main() {
 		growing_Tissue.calc_New_Forces();
 		//Update node positions
 		growing_Tissue.update_Cell_Locations();
+		//Allow Cells to divide
+		growing_Tissue.cell_Division(Ti);
 		
 	}
+
+	int stop = clock();
+
+	cout << "Time: " << (stop - start) / double(CLOCKS_PER_SEC) * 1000 << endl;
 		
 	return 0;
 }

@@ -16,7 +16,8 @@
 // Public Member Functions for Tissue.cpp
 
 Tissue::Tissue(string filename) {
-
+	
+	num_cells = 0;
 	ifstream ifs(filename.c_str());
 
 	if(!ifs) {
@@ -57,12 +58,23 @@ Tissue::Tissue(string filename) {
 			//create new cell with collected data and push onto vector 
 			curr = new Cell(rank, corner, height, width, 0, this);
 			cells.push_back(curr);
+			num_cells++;
 		}
 
 		ss.clear();
 	}
 
 	ifs.close();
+}
+
+Tissue::~Tissue() {
+	
+	Cell* curr = NULL;
+	while ( !cells.empty() ) {
+		curr = cells.at(cells.size() - 1);
+		delete curr;
+		cells.pop_back();
+	}
 }
 
 void Tissue::get_Cells(vector<Cell*>& cells) {
@@ -73,6 +85,7 @@ void Tissue::get_Cells(vector<Cell*>& cells) {
 void Tissue::calc_New_Forces() {
 
 	for (unsigned int i = 0; i < cells.size(); i++) {
+		//cout << "calc new forces" << endl;
 		cells.at(i)->calc_New_Forces();
 	}
 
@@ -88,6 +101,18 @@ void Tissue::update_Cell_Locations() {
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->update_Wall_Angles();
 	}
+
+	
+
+	return;
+}
+
+void Tissue::update_Neighbor_Cells() {
+	//update vectors of neighboring cells
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->update_Neighbor_Cells();
+	}
+	
 
 	return;
 }
@@ -121,6 +146,7 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 		end_points.push_back(count - 1);
 	}
 
+	ofs << endl;
 	ofs << "CELLS " << cells.size() << ' ' << num_Points + start_points.size() << endl;
 
 	for (unsigned int i = 0; i < cells.size(); i++) {
@@ -139,6 +165,24 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 		ofs << 2 << endl;
 	}
 
+	ofs << endl;
+
+	ofs << "POINT_DATA " << num_Points << endl;
+	ofs << "SCALARS magnitude float " << 1 << endl;
+	ofs << "LOOKUP_TABLE default" << endl;
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->print_VTK_Scalars(ofs);
+	}
+
+	ofs << endl;
+
+	ofs << "VECTORS force float" << endl;
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->print_VTK_Vectors(ofs);
+	}
+
+
+
 	return;
 }
 
@@ -147,6 +191,30 @@ void Tissue::grow_Cells(const int Ti) {
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->add_Wall_Node(Ti);
 		cells.at(i)->add_Cyt_Node(Ti);
+	}
+
+	return;
+}
+
+void Tissue::cell_Division(const int Ti) {
+	
+	bool divided = false;
+	Cell* new_cell = NULL;
+	//cout << "CElls size: " << cells.size() << endl;
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		new_cell = cells.at(i)->divide(Ti);
+
+		if (new_cell != NULL) {
+			divided = true;
+			new_cell->set_Rank(num_cells);
+			num_cells++;
+			cells.push_back(new_cell);
+		}
+
+	}
+
+	if (divided) {
+		this->update_Neighbor_Cells();
 	}
 
 	return;

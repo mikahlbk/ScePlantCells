@@ -28,11 +28,15 @@ class Node {
         //some functions you can define in base class because 
         //    all nodes will use the exact same function
         virtual Coord get_Location();
+		virtual Coord get_Force();
 		virtual void update_Location();
+		virtual void set_My_Cell(Cell* cell);
         //other functions might be executed differently based on
         //    which node you are. Thus define as "pure virtual" and 
         //    properly define them in a derived class
         virtual void calc_Forces() = 0;
+
+		virtual ~Node();
 };
 
 class Cyt_Node: public Node {
@@ -46,6 +50,8 @@ class Cyt_Node: public Node {
 		Coord calc_Morse_MI(Wall_Node* curr);
 		Coord morse_Equation(Cyt_Node* cyt);
 		Coord morse_Equation(Wall_Node* wall);
+
+		~Cyt_Node();
 };
 
 class Wall_Node: public Node {
@@ -55,6 +61,7 @@ class Wall_Node: public Node {
         Wall_Node* right;
         double my_angle;
 		double cross_Prod;
+		Coord cyt_force;
 
     public:
     //function that you want performed on all wall nodes
@@ -66,6 +73,7 @@ class Wall_Node: public Node {
 
 		// Getters and Setters
 		virtual double get_Angle();
+		virtual Coord get_CytForce();
         virtual Wall_Node* get_Left_Neighbor();
 		virtual Wall_Node* get_Right_Neighbor();
 		virtual void set_Left_Neighbor(Wall_Node* new_Left);
@@ -89,6 +97,8 @@ class Wall_Node: public Node {
 		virtual double get_linearSpring() = 0;
 		virtual double get_bendingSpring() = 0;
 		virtual bool is_Corner() = 0;
+
+		virtual ~Wall_Node();
 };
 
 class Corner_Node: public Wall_Node {
@@ -100,6 +110,8 @@ class Corner_Node: public Wall_Node {
 		virtual double get_bendingSpring();
 		virtual Coord calc_Linear();
 		virtual bool is_Corner();
+
+		~Corner_Node();
 };
 
 class Flank_Node: public Wall_Node {
@@ -111,6 +123,8 @@ class Flank_Node: public Wall_Node {
 		virtual double get_linearSpring();
 		virtual double get_bendingSpring();
 		virtual bool is_Corner();
+
+		~Flank_Node();
 };
 
 class End_Node: public Wall_Node {
@@ -122,6 +136,8 @@ class End_Node: public Wall_Node {
 		virtual double get_linearSpring();
 		virtual double get_bendingSpring();
 		virtual bool is_Corner();
+
+		~End_Node();
 };
 
 //===========================
