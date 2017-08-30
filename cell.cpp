@@ -427,8 +427,8 @@ Cell* Cell::divide_length_wise() {
 	//      to the tissue.
 
 	//ask tissue for new id num
-	int new_id = my_tissue->get();
-	Cell* sister = new Cell(new_id, my_tissue);
+//	int new_id = my_tissue->get();
+//	Cell* sister = new Cell(new_id, my_tissue);
 
 	// Find midpoint
 	Coord mid_top = ((corners.at(3)->get_Location() + corners.at(2)->get_Location()) * 0.5);
@@ -444,88 +444,88 @@ Cell* Cell::divide_length_wise() {
 	Wall_Node* prev = NULL;
 	
 	int side = 0;
-
+	corners_A.push_back(curr);
 	// distribute wall nodes between sister cells
 	do { 
 
-		next = curr->get_Left_Neighbor();
-		
-		if (curr->get_Location().get_X() < divide_X) {
-			//Cell A
+		next  = curr->get_Left_Neighbor();
 			
-			if (curr->is_Corner()) {
-				corners_A.push_back(curr);
-				side++;
-			}
 
-			if (side == 1) {
-				//on bottom end
-				
-				if (next->get_Location().get_X() < divide_X) {
-					//do nothing
-				}
-				else {
-					// delete curr and prev, then add corner
-					Wall_Node* prev_prev = prev->get_Right_Neighbor();
-					Wall_Node* temp = new Corner_Node(prev->get_Location(), this);
-					temp->set_Right_Neighbor(prev_prev);
-					prev_prev->set_Left_Neighbor(temp);
-					
-					//delete curr
-					//delete prev
-				}
+	} while(next->get_Location().get_X() < divide_x);
 
-			}
-			else if (side == 3) {
-				//on top end
-				if (corners_A.size() < 3) {
-					//need to delete curr and next, then insert a corner
-					//WARNING: prev is set to null, do not try to access
-					Wall_Node* next_next = next->get_Left_Neighbor();
-					Wall_Node* temp = new Corner_Node(next->get_Location(), this);
-					temp->set_Left_Neighbor(next_next);
-					next_next->set_Right_Neighbor(temp);
-
-					//delete curr
-					//delete next
-
-					next = temp
-				}
-				else {
-					//do nothing
-				}
-			}
-			else if (side == 2) {
-				cout << "ERROR: DIVISION. CAN'T BE ON THIS FLANK" << endl;
-			}
-			else { //side == 4
-				//on left flank
-				//do nothing
-			}
-
-
-		}
-		
-		else {
-			//Cell B
-
-			if (bottomEnd) {
-
-			}
-			else {
-
-			}
-			
-		}
-
+	// curr is new corner1
+	corners_A.push_back(curr);
+	corners_B.push_back(next);
+	corners_B.push_back(corners.at(1));
+	corners_B.push_back(corners.at(2));
 	
-		curr = next;
+	curr = corners.at(3);
+	do { 
 
-	} while(curr != corners.at(0));
+		next  = curr->get_Right_Neighbor();
+			
 
-	// create new flank walls for both cells
+	} while(next->get_Location().get_X() < divide_x);
+	corners_A.push_back(curr);
+	corners_A.push_back(corners.at(3));
+	corners_B.push_back(next);
+	
+	//reset corner vector of cell A and add side to nodes
+	int num_nodes = 0;
+	curr = corners.at(1);
+	do {
+		next = curr->get_Left_Neighbor();
+		num_nodes++;
+	} while(next->isCorner() ==  False)
+	
+	Coord total_dist_coord = corners_A.at(2)-corners_A.at(1);
+	double total_dist  = total_dist_coord.length();
+	double space = total_dist/(num_nodes-1);
+	prevw = corners_A.at(1);
+	curr get x x coord
+	curr get y y coord
+	
+	for (int i = 0; i < num_nodes-1; i++) {
+		location = Coord(curr_X, curr_Y);
+		currW = new Flank_Node(location, this);
 
-	// distribute cyt nodes between sister cells
+		// Set neighbor relationships
+		currW->set_Right_Neighbor(prevW);
+		prevW->set_Left_Neighbor(currW);
+		
+		//update for next iteration
+		prevW = currW;
+		curr_Y += space;
+		num_wall_nodes++;	
+	}
+
+	prevw = corners_B.at(0);
+	curr get x x coord
+	curr get y y coord
+	
+	for (int i = 0; i < num_nodes-1; i++) {
+		location = Coord(curr_X, curr_Y);
+		currW = new Flank_Node(location, this);
+
+		// Set neighbor relationships
+		currW->set_Left_Neighbor(prevW);
+		prevW->set_Right_Neighbor(currW);
+		
+		//update for next iteration
+		prevW = currW;
+		curr_Y += space;
+		num_wall_nodes++;	
+	}
+
+
+	//add side to nodes for cell b
+	//same as above
+	//split up cytoplasm
+	//reassign cyt vector to A
+	//make sister cell by feeding in starter corner and cyt node
+	//create new cell with inputs as the corner vec and cyt vec
+	//
+
 	
 
 	return sister;
