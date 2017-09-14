@@ -19,20 +19,22 @@
 // Cell Class Member functions
 
 // Constructors
-Cell::Cell(int Ti, Tissue* tiss) {
+Cell::Cell(int Ti, Tissue* tiss, double color) {
 	init_cell_time = Ti;
 	my_tissue = tiss;
 	num_wall_nodes = 0;
 	num_cyt_nodes = 0;
 	rank = -1;
+	this->color = color;
 }
 
-Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* tiss)    {
+Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* tiss, double color) {
 	
 	num_wall_nodes = 0;
 	num_cyt_nodes = 0;	
 	this->my_tissue = tiss;
 	this->rank = rank;
+	this->color = color;
 
 	cell_center = Coord(corner.get_X() + (width / 2), corner.get_Y() + (height / 2));
 
@@ -630,6 +632,15 @@ void Cell::print_VTK_Scalars(ofstream& ofs) {
 		ofs << force.length() << endl;
 	}
 
+	return;
+}
+
+void Cell::print_VTK_Colorings(ofstream& ofs) {
+
+	for (int i = 0; i < num_wall_nodes + num_cyt_nodes; i++) {
+		ofs << color << endl;
+	}
+	
 	return;
 }
 

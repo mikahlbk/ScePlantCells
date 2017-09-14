@@ -2,64 +2,75 @@ CellRank:0
 Corner:0.0,0.0
 Height:1.8
 Width:1.325
+Color:0
 End_Cell
 
 CellRank:1
 Corner:1.525,0.0
 Height:1.8
 Width:1.325
+Color:10
 End_Cell
 
 CellRank:2
 Corner:-1.525,0.0
 Height:1.8
 Width:1.325
+Color:0
 End_Cell
 
 CellRank:3
 Corner:-1.525,-1.535
 Height:1.325
 Width:1.9875
+Color:0
 End_Cell
 
 CellRank:4
 Corner:.6625,-1.535
 Height:1.325
 Width:1.9875
+Color:0
 End_Cell
 
 CellRank:5
 Corner:-1.525, 2
 Height:1.325
 Width:1.9875
+Color:5
 End_Cell
 
 CellRank:6
 Corner:.6625, 2
 Height:1.325
 Width:1.9875
+Color:0
 End_Cell
 
 CellRank:7
 Corner:-3.2, 1.6
 Height:1.8
 Width:1.325
+Color:0
 End_Cell
 
 CellRank:8
 Corner:-3.2, -.4
 Height:1.8
 Width:1.325
+Color:0
 End_Cell
 
 CellRank:9
 Corner:3.2,1.6
 Height:1.8
 Width:1.325
+Color:0
 End_Cell
 
 CellRank:10
 Corner:3.2, -.4
 Height:1.8
 Width:1.325
+Color:0
 End_Cell

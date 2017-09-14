@@ -30,6 +30,7 @@ Tissue::Tissue(string filename) {
 	string temp;
 	char trash;
 	int rank;
+	double color;
 	double height, width;
 	Coord corner;
 	double x, y;
@@ -54,9 +55,12 @@ Tissue::Tissue(string filename) {
 		else if (temp == "Width") {
 			ss >> width;
 		}
+		else if (temp == "Color") {
+			ss >> color;
+		}
 		else if (temp == "End_Cell") {
 			//create new cell with collected data and push onto vector 
-			curr = new Cell(rank, corner, height, width, 0, this);
+			curr = new Cell(rank, corner, height, width, 0, this, color);
 			cells.push_back(curr);
 			num_cells++;
 		}
@@ -172,6 +176,14 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 	ofs << "LOOKUP_TABLE default" << endl;
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->print_VTK_Scalars(ofs);
+	}
+
+	ofs << endl;
+
+	ofs << "SCALARS coloring float " << 1 << endl;
+	ofs << "LOOKUP_TABLE default" << endl;
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->print_VTK_Colorings(ofs);
 	}
 
 	ofs << endl;

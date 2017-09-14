@@ -55,7 +55,7 @@ Cell* Cell::divide_length_wise(const int Ti) {
 	//      to the tissue.
 
 	//ask tissue for new id num
-	Cell* sister = new Cell(Ti, my_tissue);
+	Cell* sister = new Cell(Ti, my_tissue, color);
 
 	// Find midpoint
 	Coord mid_top = ((corners.at(3)->get_Location() + corners.at(2)->get_Location()) * 0.5);
@@ -314,7 +314,7 @@ Cell* Cell::divide_width_wise(const int Ti) {
 	// Current cell splits into two daughter cells
 	//    -"this" will keep its entity, create a sister cell, and return it 
 	//      to the tissue.
-	Cell* sister = new Cell(Ti, my_tissue);
+	Cell* sister = new Cell(Ti, my_tissue, color);
 
 	// Find midpoint
 	Coord mid_left = ((corners.at(0)->get_Location() + corners.at(3)->get_Location()) * 0.5);

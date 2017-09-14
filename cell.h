@@ -28,6 +28,7 @@ class Cell {
 		int init_cell_time;
 		//approx location
 		Coord cell_center;
+		double color;
 		//keep track of how many nodes the cell has created
 		int num_wall_nodes;
 		int num_cyt_nodes;
@@ -39,9 +40,9 @@ class Cell {
 
 	public:
 		// Constructors
-		Cell(int Ti, Tissue* tiss);
+		Cell(int Ti, Tissue* tiss, double color);
 		Cell(int rank, Coord corner, double height, double width, 
-			 int Ti, Tissue* tiss);
+			 int Ti, Tissue* tiss, double color);
 		// Destructors
 		~Cell();
 
@@ -69,6 +70,7 @@ class Cell {
 		void print_Data_Output(ofstream& ofs);
 		void print_VTK_Points(ofstream& ofs, int& count);
 		void print_VTK_Scalars(ofstream& ofs);
+		void print_VTK_Colorings(ofstream& ofs);
 		void print_VTK_Vectors(ofstream& ofs);
 		
 		// Growth of cell
