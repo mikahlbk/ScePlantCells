@@ -4,8 +4,8 @@ CFLAGS=-c -Wall
 
 all: program
 
-program: folder main.o coord.o node.o cell.o tissue.o
-		$(CC) main.o coord.o node.o cell.o tissue.o -o program
+program: folder main.o coord.o node.o side.o cell.o tissue.o
+		$(CC) main.o coord.o node.o side.o cell.o tissue.o -o program
 
 folder: 
 		mkdir -p ./Animation ./DataOutput
@@ -18,6 +18,9 @@ coord.o: coord.cpp
 
 node.o: node.cpp
 		$(CC) $(CFLAGS) node.cpp
+
+side.o: side.cpp
+		$(CC) $(CFLAGS) side.cpp
 
 cell.o: cell.cpp
 		$(CC) $(CFLAGS) cell.cpp

@@ -79,13 +79,15 @@ int main() {
 			cout << "Simulation still running. Ti: " << Ti << endl;
 		}
 		
+		/*
 		// Update Each cell's neighboring cells
 		if (Ti % 5000 == 0) {
 			growing_Tissue.update_Neighbor_Cells();
 		}
+		*/
 
-		//New Tissue GRowth
-		growing_Tissue.grow_Cells(Ti);
+		// Tissue Growth
+		growing_Tissue.update_Life_Length();
 		//Calculate new forces on cells and nodes
 		growing_Tissue.calc_New_Forces();
 		//Update node positions

@@ -80,6 +80,14 @@ void Tissue::get_Cells(vector<Cell*>& cells) {
 	return;
 }
 
+void Tissue::update_Life_Length() {
+
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->update_Life_Length();
+	}
+	return;
+}
+
 void Tissue::calc_New_Forces() {
 
 	for (unsigned int i = 0; i < cells.size(); i++) {
@@ -96,25 +104,18 @@ void Tissue::update_Cell_Locations() {
 		cells.at(i)->update_Node_Locations();
 	}
 
-	for (unsigned int i = 0; i < cells.size(); i++) {
-		cells.at(i)->update_Wall_Angles();
-	}
-
-	
-
 	return;
 }
-
+/*
 void Tissue::update_Neighbor_Cells() {
 	//update vectors of neighboring cells
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->update_Neighbor_Cells();
 	}
 	
-
 	return;
 }
-
+*/
 void Tissue::print_Data_Output(ofstream & ofs) {
 	return;
 }
@@ -183,7 +184,7 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 
 	return;
 }
-
+/*
 void Tissue::grow_Cells(const int Ti) {
 	
 	for (unsigned int i = 0; i < cells.size(); i++) {
@@ -193,6 +194,7 @@ void Tissue::grow_Cells(const int Ti) {
 
 	return;
 }
+*/
 
 //=========================
 //End of tissue.cpp

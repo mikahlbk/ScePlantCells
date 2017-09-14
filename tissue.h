@@ -29,15 +29,15 @@ class Tissue {
 		Tissue(string filename);
 		
 		void get_Cells(vector<Cell*>& cells);
-
+		void update_Life_Length();
 		void calc_New_Forces();
 		void update_Cell_Locations();
-		void update_Neighbor_Cells();
+		//void update_Neighbor_Cells();
 
 		void print_Data_Output(ofstream& ofs);
 		void print_VTK_File(ofstream& ofs);
 
-		void grow_Cells(const int Ti);
+		//void grow_Cells(const int Ti);
 		//Destructor
 		~Tissue();
 };

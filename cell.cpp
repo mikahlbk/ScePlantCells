@@ -13,203 +13,97 @@
 #include "coord.h"
 #include "node.h"
 #include "cell.h"
+#include "side.h"
 #include "tissue.h"
 //===================
 
 // Cell Class Member functions
 
 // Constructors
+Cell::Cell(int rank, Tissue* tissue) {
+	this->rank = rank;
+	my_tissue = tissue;
+	num_cyt_nodes = 0;
+	life_length = 0;
+}
 
 Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* tiss)    {
 	
-	num_wall_nodes = 0;
 	num_cyt_nodes = 0;	
 	this->my_tissue = tiss;
 	this->rank = rank;
 
 	cell_center = Coord(corner.get_X() + (width / 2), corner.get_Y() + (height / 2));
 
-	init_cell_time = Ti;
+	life_length = 0;
 
+	//rough estimates for cell sizing
 	int num_Init_Wall_Nodes = 100;
 	double perim = (height * 2) + (width * 2);
 	//space between wall nodes
 	double space = perim / num_Init_Wall_Nodes;
-	int num_end_nodes = (width / space) - 1;
-	int num_flank_nodes = (height / space) - 1;
+	int num_end_nodes = (width / space);
+	int num_flank_nodes = (height / space);
 
-	/*
-	int num_end_nodes = 19;
-	int num_flank_nodes = 34;
+	// Side A
+	Coord locA = ( corner + Coord(0.04,0.0) );
+	Coord locZ = ( corner + Coord((width - 0.08),0.0) ); 
+	Side* s = new Side(locA, locZ, this, num_end_nodes);
+	s->set_Phys_Parameters(kBendHigh, kLinearHigh);
+	sides.push_back(s);
+	
+	//Side B
+	locA = locZ + Coord(0.04,0.04);
+	locZ = locA + Coord(0.0, (height - 0.08));
+	s = new Side(locA, locZ, this, num_flank_nodes);
+	s->set_Phys_Parameters(kBendLow, kLinearLow);
+	sides.push_back(s);
 
-	double f_space = height / num_flank_nodes;
-	double e_space = width / num_end_nodes;
-	*/
-	double curr_X;
-	double curr_Y;
+	//side C
+	locA = locZ + Coord(-0.04, 0.04);
+	locZ = locA + Coord(-(weight - 0.08), 0.0);
+	s = new Side(locA, locZ, this, num_end_nodes);
+	s->set_Phys_Parameters(kBendHigh, kLinearHigh);
+	sides.push_back(s);
+
+	//side D
+	locA = locZ + Coord(-0.04, -0.04);
+	locZ = corner + Coord(0.0, 0.04);
+	s = new Side(locA, locZ, this, num_flank_nodes);
+	s->set_Phys_Parameters(kBendLow, kLinearLow);
+	sides.push_back(s);
+
+	//Connect the four disjoint sides
+	sides.at(0)->connect_Ends(sides.at(1));
+	sides.at(1)->connect_Ends(sides.at(2));
+	sides.at(2)->connect_Ends(sides.at(3));
+	sides.at(3)->connect_Ends(sides.at(0));
+	
+	
+	//Insert cytoplasm nodes
+	num_cyt_nodes = 20;
+	
+	Coord corn_off(0.1 * width, 0.1 * height);
+	double scal_x_offset = 0.8;
+	double scal_y_offset = 0.8;
 	Coord location;
-
-	Wall_Node* currW;
-	Wall_Node* prevW;
-
-	// Create first corner
-	prevW = new Corner_Node(corner, this);
-	corners.push_back(prevW);
-	num_wall_nodes++;
-
-	//create lower end
-	curr_X = corner.get_X() + space;
-	curr_Y = corner.get_Y();
-
-	for (int i = 0; i < num_end_nodes; i++) {
-		location = Coord(curr_X, curr_Y);
-		currW = new End_Node(location, this);
-
-		// Set neighbor relationships
-		currW->set_Right_Neighbor(prevW);
-		prevW->set_Left_Neighbor(currW);
-		
-		//update for next iteration
-		prevW = currW;
-		curr_X += space;
-		num_wall_nodes++;
-	}
-
-	//create second corner
-	location = Coord(curr_X, curr_Y);
-	currW = new Corner_Node(location, this);
-	currW->set_Right_Neighbor(prevW);
-	prevW->set_Left_Neighbor(currW);
-	corners.push_back(currW);
-	prevW = currW;
-	num_wall_nodes++;
-
-	//create right flank
-	//   curr_X should be good
-	curr_Y += space;
-	
-	for (int i = 0; i < num_flank_nodes; i++) {
-		location = Coord(curr_X, curr_Y);
-		currW = new Flank_Node(location, this);
-
-		// Set neighbor relationships
-		currW->set_Right_Neighbor(prevW);
-		prevW->set_Left_Neighbor(currW);
-		
-		//update for next iteration
-		prevW = currW;
-		curr_Y += space;
-		num_wall_nodes++;
-	}
-
-	//create third corner
-	location = Coord(curr_X, curr_Y);
-	currW = new Corner_Node(location, this);
-	currW->set_Right_Neighbor(prevW);
-	prevW->set_Left_Neighbor(currW);
-	corners.push_back(currW);
-	prevW = currW;
-	num_wall_nodes++;
-
-	//create upper end
-	curr_X -= space;
-		//curr_Y should be good
-	
-	for (int i = 0; i < num_end_nodes; i++) {
-		location = Coord(curr_X, curr_Y);
-		currW = new End_Node(location, this);
-
-		// Set neighbor relationships
-		currW->set_Right_Neighbor(prevW);
-		prevW->set_Left_Neighbor(currW);
-		
-		//update for next iteration
-		prevW = currW;
-		curr_X -= space;
-		num_wall_nodes++;
-	}
-
-	//create fourth corner
-	location = Coord(curr_X, curr_Y);
-	currW = new Corner_Node(location, this);
-	currW->set_Right_Neighbor(prevW);
-	prevW->set_Left_Neighbor(currW);
-	corners.push_back(currW);
-	prevW = currW;
-	num_wall_nodes++;
-
-	//create left flank
-	//	remember that we already have first corner. 
-	//	don't make it again.
-	
-	//   curr_X should be good
-	curr_Y -= space;
-	
-	for (int i = 0; i < num_flank_nodes; i++) {
-		location = Coord(curr_X, curr_Y);
-		currW = new Flank_Node(location, this);
-
-		// Set neighbor relationships
-		currW->set_Right_Neighbor(prevW);
-		prevW->set_Left_Neighbor(currW);
-		
-		//update for next iteration
-		prevW = currW;
-		curr_Y -= space;
-		num_wall_nodes++;	
-	}
-
-	//connect first and last nodes
-	prevW->set_Left_Neighbor(corners.at(0));
-	corners.at(0)->set_Right_Neighbor(prevW);
-
-	//initialize angles
-	update_Wall_Angles();
-
-	//update cell_Center
-	double x_val = ((corners.at(0)->get_Location().get_X()) + (corners.at(1)->get_Location().get_X())) / 2;
-	double y_val = ((corners.at(0)->get_Location().get_Y()) + (corners.at(3)->get_Location().get_Y())) / 2;
-
-	cell_center = Coord(x_val, y_val);
-
-	//make cytoplasm node
-	// For rectangular distribution
-
-	Coord corn_off(0.05 * width, 0.05 * height);
-	double scal_x_offset = 0.9;
-	double scal_y_offset = 0.9;
-
-	int init_Cyt_Count = 20;
-
+	Cyt_Node* cyt;
 	double x;
 	double y;
 
-	for(int i = 0; i < init_Cyt_Count; i++) {
-		
+	for (int i = 0; i < num_cyt_nodes; i++) {
 		// USING POSITIONS OF CORNER NODES FOR CYT NODE ALLOCATION
 		// ---distributes more evenly throughout start cell
 		x = (static_cast<double>(rand()) / RAND_MAX) * scal_x_offset * width;
 		y = (static_cast<double>(rand()) / RAND_MAX) * scal_y_offset * height; 
-
 		Coord rand_off(x,y);
-		
 		location = (corner + corn_off + rand_off);
 
-		/* USING ANGLE AND RADIUS FOR CYT NODE ALLOCATION
-
-		random_angle = 2*pi*(static_cast<double>(rand()) / RAND_MAX);
-		random_radius = init_Cell_Radius*(static_cast<double>(rand()) / RAND_MAX);
-		x = (random_radius * cos(random_angle)) + corner.get_X() + (width / 2);
-		//also need to add the x and y value of corner node
-		//of this cell to put these values in the right place
-		y = (random_radius * sin(random_angle)) + corner.get_Y() + (height / 2);
-		*/
-
-		//create cyt node
-		Cyt_Node* cyt = new Cyt_Node(location,this);
+		cyt = new Cyt_Node(location,this);
 		cyt_nodes.push_back(cyt);
-		num_cyt_nodes++;
 	}
+
+
 }
 
 // Destructor
@@ -223,7 +117,7 @@ Cell::~Cell() {
 		cyt_nodes.pop_back();
 	}
 	// Delete Wall Nodes
-	Wall_Node* curr = corners.at(0);
+	Wall_Node* curr = sides.at(0)->get_Wall_Nodes();
 	Wall_Node* next = NULL;
 	Wall_Node* last = curr->get_Right_Neighbor();
 	last->set_Left_Neighbor(NULL);
@@ -234,34 +128,52 @@ Cell::~Cell() {
 		curr = next;
 	}
 
-	// Extra clean up of pointers
-	while ( !corners.empty() ) {
-		corners.at(corners.size() - 1) = NULL;
-		corners.pop_back();
-	}
-	
 	my_tissue = NULL;
 }
 
+//=============================================================
+//========================================
 // Getters and Setters
+//========================================
+//=============================================================
 Coord Cell::get_Cell_Center() {
 	return cell_center;
 }
 
-void Cell::get_CytNodes(vector<Cyt_Node*>& cyts) {
+void Cell::get_Cyt_Nodes(vector<Cyt_Node*>& cyts) {
 	cyts = cyt_nodes;
 	return;
 }
 
-Wall_Node* Cell::get_WallNodes() {
-	return corners.at(0);
+Wall_Node* Cell::get_Wall_Nodes() {
+	return sides.at(0)->get_Wall_Nodes();
 }
 
-void Cell::get_CornerNodes(vector<Wall_Node*>& corns) {
-	corns = this->corners;
+void Cell::get_Sides(vector<Side*>& sides) {
+	sides = this->sides;
 	return;
 }
 
+void Cell::get_Neighbor_Cells(vector<Cell*>& cells) {
+	cells = neigh_cells;
+	return;
+}
+
+int Cell::get_Node_Count() {
+	int wall_cnt = 0;
+	for (unsigned int i = 0; i < sides.length(); i++) {
+		wall_cnt += sides.at(i)->get_Wall_Count();
+	}
+
+	return (wall_cnt + num_cyt_nodes);
+}
+
+//=============================================================
+//=========================================
+// Keep Track of neighbor cells
+//=========================================
+//=============================================================
+/*
 void Cell::update_Neighbor_Cells() {
 	//clear prev vector of neigh cells
 	neigh_cells.clear();
@@ -392,17 +304,6 @@ void Cell::update_Neighbor_Cells() {
 	return;
 }
 
-void Cell::get_Neighbor_Cells(vector<Cell*>& cells) {
-	//copy over neighboring cells
-	cells = neigh_cells;
-
-	return;
-}
-
-int Cell::get_Num_Nodes() {
-	return num_wall_nodes + num_cyt_nodes;
-}
-
 bool Cell::get_Reasonable_Bounds(Wall_Node* curr, Wall_Node* & A, Wall_Node* & B) {
 
 	bool close_enough = true;
@@ -498,10 +399,13 @@ bool Cell::get_Reasonable_Bounds(Wall_Node* curr, Wall_Node* & A, Wall_Node* & B
 
 	return close_enough;
 }
+*/
 
-
-// Calc Force
-
+//===============================================================
+//============================
+//  Forces and Positioning
+//============================
+//===============================================================
 void Cell::calc_New_Forces() {
 	//calc forces on cyt nodes
 	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
@@ -509,22 +413,18 @@ void Cell::calc_New_Forces() {
 	}
 
 	//calc forces on wall nodes
-	Wall_Node* curr = corners.at(0);
+	Wall_Node* curr = sides.at(0)->get_Wall_Nodes();
+	Wall_Node* orig = curr;
 	
 	do {
-		//cout << " calc force for this node" << endl;
 		curr->calc_Forces();
 		curr = curr->get_Left_Neighbor();
 	
-	} while (curr != corners.at(0));
+	} while (curr != orig);
 
-	//cout << "Finished Cell::calc_NewForces" << endl;
 
 	return;
 }
-
-// Update Node Locations
-
 
 
 void Cell::update_Node_Locations() {
@@ -535,34 +435,81 @@ void Cell::update_Node_Locations() {
 	}
 
 	//update wall nodes
-	Wall_Node* curr = corners.at(0);
-	
+	Wall_Node* curr = sides.at(0)->get_Wall_Nodes();
+	Wall_Node* orig = curr;
+
 	do {
 		curr->update_Location();
 		curr = curr->get_Left_Neighbor();
 	
-	} while(curr != corners.at(0));
+	} while(curr != orig);
 
 	//update cell_Center
-	double x_val = ((corners.at(0)->get_Location().get_X()) + (corners.at(1)->get_Location().get_X())) / 2;
-	double y_val = ((corners.at(0)->get_Location().get_Y()) + (corners.at(3)->get_Location().get_Y())) / 2;
-
-	cell_center = Coord(x_val, y_val);
+	update_Cell_Center();
+	//update wall_angles
+	update_Wall_Angles();
 	
 	return;
 }
 
 void Cell::update_Wall_Angles() {
 
-	Wall_Node* curr = corners.at(0);
-	
+	Wall_Node* curr = sides.at(0)->get_Wall_Nodes();
+	Wall_Node* orig = curr;
+
 	do {
 		curr->update_Angle();
 		curr = curr->get_Left_Neighbor();
-	} while (curr != corners.at(0));	
+	} while (curr != orig);	
 
 	return;
 }
+
+void Cell::update_Cell_Center() {
+/*
+	double min_x = (sides.at(0)->get_Wall_Nodes()->get_Location()).get_X();
+	double max_x = (sides.at(2)->get_Wall_Nodes()->get_Location()).get_X();
+	double min_y = (sides.at(1)->get_Wall_Nodes()->get_Location()).get_Y();
+	double max_y = (sides.at(3)->get_Wall_Nodes()->get_Location()).get_Y();
+
+	double x = (min_x + max_x) / 2;
+	double y = (min_y + max_y) / 2;
+
+	Coord center(x,y);
+
+	cell_center = center;
+*/
+
+	Coord low = sides.at(0)->get_Wall_Nodes()->get_Location();
+	Coord high = sides.at(2)->get_Wall_Nodes()->get_Location();
+
+	Coord mid = ((low + high) * 0.5);
+	cell_center = mid;
+
+	return;
+}
+
+void update_Life_Length() {
+	life_length++;
+
+	//check if cell can add a cyt or wall node
+
+	if (life_length % ADD_WALL_TIMER == ADD_WALL_TIMER - 1) {
+		add_Wall_Node();
+	}
+
+	if (life_length % ADD_CYT_TIMER == ADD_CYT_TIMER - 1) {
+		add_Cyt_Node();
+	}
+
+	return;
+}
+
+//===========================================================
+//==================================
+// Output Functions
+//==================================
+//===========================================================
 
 void Cell::print_Data_Output(ofstream& ofs) {
 	
@@ -573,14 +520,14 @@ void Cell::print_Data_Output(ofstream& ofs) {
 
 void Cell::print_VTK_Points(ofstream& ofs, int& count) {
 
-	Wall_Node* curr_wall = corners.at(0);
+	Wall_Node* curr_wall = sides.at(0)->get_Wall_Nodes();
 	do {
 		Coord loc = curr_wall->get_Location();
 		ofs << loc.get_X() << ' ' << loc.get_Y() << ' ' << 0 << endl;
 
 		curr_wall = curr_wall->get_Left_Neighbor();
 		count++;
-	} while(curr_wall != corners.at(0));
+	} while (curr_wall != sides.at(0)->get_Wall_Nodes());
 
 	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
 		Coord loc = cyt_nodes.at(i)->get_Location();
@@ -593,14 +540,14 @@ void Cell::print_VTK_Points(ofstream& ofs, int& count) {
 
 void Cell::print_VTK_Scalars(ofstream& ofs) {
 
-	Wall_Node* curr_wall = corners.at(0);
+	Wall_Node* curr_wall = sides.at(0)->get_Wall_Nodes();
 	do {
 		Coord force = curr_wall->get_CytForce();
 		ofs << force.length() << endl;
 
 		curr_wall = curr_wall->get_Left_Neighbor();
 		
-	} while(curr_wall != corners.at(0));
+	} while (curr_wall != sides.at(0)->get_Wall_Nodes());
 
 	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
 		Coord force = cyt_nodes.at(i)->get_Force();
@@ -612,14 +559,14 @@ void Cell::print_VTK_Scalars(ofstream& ofs) {
 
 void Cell::print_VTK_Vectors(ofstream& ofs) {
 
-	Wall_Node* curr_wall = corners.at(0);
+	Wall_Node* curr_wall = sides.at(0)->get_Wall_Nodes();
 	do {
 		Coord force = curr_wall->get_CytForce();
 		ofs << force.get_X() << ' ' << force.get_Y() << ' ' << 0 << endl;
 
 		curr_wall = curr_wall->get_Left_Neighbor();
 		
-	} while(curr_wall != corners.at(0));
+	} while(curr_wall != sides.at(0)->get_Wall_Nodes());
 
 	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
 		Coord force = cyt_nodes.at(i)->get_Force();
@@ -629,161 +576,61 @@ void Cell::print_VTK_Vectors(ofstream& ofs) {
 	return;
 }
 
-/*
-Wall_Node* Cell::find_Largest_Length(int& side) {
-	side = 0; //know that we start on bottom flank
-	// We know we start at first entry of corner vector. 
-	//Each time we pass another corner, increment side by 1 
-	// side = 1 or 3 => end
-	// side = 2 or 4 => flank
-	Wall_Node* curr = corners.at(0);
+//=====================================================================
+//==========================================
+// Growth of Cell
+//==========================================
+//=====================================================================
+
+
+Wall_Node* Cell::find_Largest_Length() {
+	
+	Wall_Node* curr = sides.at(0)->get_Wall_Nodes;
 	Wall_Node* biggest = NULL;
 	Coord left_Neighb_loc;
 	Coord curr_Loc;
 	Coord diff_vect;
 	double max_len = 0;
 	double len;
+	int big_gaps = 0;
 	//loop through all possible Cell Wall 'links' to find biggest
 	do {
-		//if encounter a corner, increment side to know if end or flank
-		if (curr->is_Corner()) {
-			side++;
-		}
-
 		//finding current lengths and comparing
 		left_Neighb_loc = curr->get_Left_Neighbor()->get_Location();
 		curr_Loc = curr->get_Location();
 		diff_vect = left_Neighb_loc - curr_Loc;
 		len = diff_vect.length();
-		if(len > max_len) {
-			max_len = len;
-			biggest = curr;
+		if (len > MEMBR_THRESH_LENGTH) {
+			big_gaps++;
+			if(len > max_len) {
+				max_len = len;
+				biggest = curr;
+			}
 		}
 		curr = curr->get_Left_Neighbor();
 
 	} while (curr != corners.at(0));
+
+	cout << "Cell " << rank << " -- big gaps: " << big_gaps << endl;
 
 	return biggest;
 }
-*/
 
-void Cell::find_Big_Gaps(vector<Wall_Node*>& walls, vector<int>& sides) {
-	
-	int side = 0;
-	// We know we start at first entry of corner vector. 
-	//Each time we pass another corner, increment side by 1 
-	// side = 1 or 3 => end
-	// side = 2 or 4 => flank
-	Wall_Node* curr = corners.at(0);
 
-	Coord left_loc;
-	Coord curr_loc;
-	Coord diff_vect;
-	double cut_off = 0.15;
-	double len;
-
-	do {
-		//if encounter a corner, increment side to know if end or flank
-		if (curr->is_Corner()) {
-			side++;
-		}
-
-		//finding current lengths and comparing
-		left_loc = curr->get_Left_Neighbor()->get_Location();
-		curr_loc = curr->get_Location();
-		diff_vect = left_loc - curr_loc;
-		len = diff_vect.length();
-		if(len > cut_off) {
-			//Push wall node and it's side ID onto vectors
-			walls.push_back(curr);
-			sides.push_back(side);
-		}
-
-		curr = curr->get_Left_Neighbor();
-
-	} while (curr != corners.at(0));
+void Cell::add_Wall_Node() {
+	//find node to the right of largest spring
+	Wall_Node* right = find_Largest_Length();
+	//find which side this node belongs to
+	Side* s = right->get_My_Side();
+	//tell that side to add a new node to the left of curr pointer
+	s->add_Wall_Node(right);
 
 	return;
 }
 
+void Cell::add_Cyt_Node() {
 
-void Cell::add_Wall_Node(const int Ti) {
-
-	if ((Ti - init_cell_time) % ADD_WALL_TIMER != 0) {
-		return;
-	}
-
-	//we will add the node based on what the function find_Largest_Length() returns
-	//find_Largest_Length() returns a pointer to the node where the largest
-	//Cell Wall link is to the left of that node
-	//first we apply find_Largest_Length() to the cell to get a pointer to the right
-	//of where the new node is added
-	vector<Wall_Node*> walls;
-	vector<int> sides;
-
-	find_Big_Gaps(walls, sides);
-
-	cout << "Find_Big_Gaps size: " << walls.size() << endl;
-
-	Wall_Node* right = NULL;
-	Wall_Node* left = NULL;
-	Coord newCoord;
-	Wall_Node* newNode = NULL;
-
-	for (unsigned int i = 0; i < walls.size(); i++) {
-		//Get nodes to right and left of new node
-		right = walls.at(i);
-		left = right->get_Left_Neighbor();
-		// New node's location
-		newCoord = ((right->get_Location() + left->get_Location()) * 0.5);
-		
-		if (sides.at(i) % 2 == 1) {
-			newNode = new End_Node(newCoord, this, left, right);
-		}
-		else { //flank
-			newNode = new Flank_Node(newCoord, this, left, right);
-		}
-		//increment wall node counter
-		num_wall_nodes++;
-		//update neighbors of left and right
-		right->set_Left_Neighbor(newNode);
-		left->set_Right_Neighbor(newNode);
-	}
-
-	return;
-}
-
-void Cell::add_Cyt_Node(const int Ti) {
-
-	if ((Ti - init_cell_time) % ADD_CYT_TIMER != 0) {
-		return;
-	}
-
-	// Puts cyt node anywhere in cell with a min dist away from walls
-	double min_x = max(corners.at(0)->get_Location().get_X(), corners.at(3)->get_Location().get_X());
-	double max_x = min(corners.at(1)->get_Location().get_X(), corners.at(2)->get_Location().get_X()); 
-	double min_y = max(corners.at(0)->get_Location().get_Y(), corners.at(1)->get_Location().get_Y());
-	double max_y = min(corners.at(2)->get_Location().get_Y(), corners.at(3)->get_Location().get_Y());
-
-	Coord init_off((max_x - min_x) * 0.05, (max_y - min_y) * 0.05);
-	Coord min_corner(min_x, min_y);
-
-	double scal_x_offset = 0.9;
-	double scal_y_offset = 0.9;
-	double scal_x = (static_cast<double>(rand()) / RAND_MAX) * scal_x_offset * (max_x - min_x);
-	double scal_y = (static_cast<double>(rand()) / RAND_MAX) * scal_y_offset * (max_y - min_y);
-	Coord scal_C(scal_x, scal_y);
-
-	/* Puts new cyt node in dead center of cell
-	Coord len_mid = (corners.at(0)->get_Location() + corners.at(3)->get_Location()) * 0.5;
-	Coord width_mid = (corners.at(0)->get_Location() + corners.at(1)->get_Location()) * 0.5;
-	double new_x = width_mid.get_X();  
-	double new_y = len_mid.get_Y();
-	*/
-
-	Coord new_Coord = (min_corner + init_off + scal_C);
-
-	Cyt_Node* cyt = new Cyt_Node(new_Coord, this);
+	Cyt_Node* cyt = new Cyt_Node(cell_center, this);
 	cyt_nodes.push_back(cyt);
 
 	num_cyt_nodes++;

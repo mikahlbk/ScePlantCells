@@ -27,30 +27,18 @@ const double pi = acos(-1.0);
 
 ///// Cell wall mechanical parameters
 
-//equilibrium angle for end node
-const double thetaEnd = pi;
+const double thetaFlat = pi;
+const double thetaCurve = pi * (11.0 / 12.0);
 
-//equilibrium angle for corner node
-const double thetaCorner = pi/2;
+const double kBendHigh = 5;
+const double kBendLow = 5;
 
-//equilibrium angle for flank node
-const double thetaFlank = pi;
-
-//rotational spring constant for end node
-const double kBendEnd = 6;
-
-//rotational spring constant for flank node
-const double kBendFlank = 6;
-
-//linear spring constant for end node
-const double kLinearEnd = 40;
-
-//linear spring constant for flank node
-const double kLinearFlank = 25;
+const double kLinearHigh = 28;
+const double kLinearLow = 20;
 
 //linear spring equilibrium length
 const double MembrEquLen = .0625; 
-const double MembrCutOFFLen = 0.15; 
+const double MEMBR_THRESH_LENGTH = 0.15; 
 
 ///// Subcellular element parameters for membrane - membrane interactions
 
