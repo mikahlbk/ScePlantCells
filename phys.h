@@ -14,8 +14,8 @@
 
 // Simulation Constants
 const double dt = 0.0003;
-const int ADD_WALL_TIMER = 2000;
-const int ADD_CYT_TIMER = 1000;
+const int ADD_WALL_TIMER = 2500;
+const int ADD_CYT_TIMER = 2000;
 
 const int MAX_NUM_WALL = 200;
 const int MAX_NUM_CYT = 60;

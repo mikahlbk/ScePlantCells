@@ -32,7 +32,7 @@ int main() {
 
 	cout << "Finished creating Cell" << endl;
 	//parameters for time step
-    double numSteps = 40;
+    double numSteps = 100;
 
 	// Variable for dataoutput
 	int digits;
@@ -50,7 +50,7 @@ int main() {
 
 		//Print to dataOutput and VTK files
 
-		if (Ti % 300 == 0) {
+		if (Ti % 500 == 0) {
 	
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {

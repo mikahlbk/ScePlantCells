@@ -19,10 +19,31 @@
 Cell* Cell::divide(const int Ti) {
 
 	Cell* sister = NULL;
-
-	if ((Ti - init_cell_time) % CELL_DIV_TIME == CELL_DIV_TIME - 1) {
-		sister = this->divide_width_wise(Ti);
+    //calculate area
+	double area = 0;
+	Coord x_vec;
+	Coord y_vec;
+	double x_length = 0;
+	double y_length = 0;
+	y_vec = corners.at(3)->get_Location() - corners.at(0)->get_Location();
+	x_vec = corners.at(1)->get_Location() - corners.at(0)->get_Location();
+	y_length = y_vec.length();
+	x_length = x_vec.length();
+	area = y_length*x_length;
+	if ((area >  6)) {
+			if ((this->rank == 3) || (this->rank == 4) || (this->rank == 5) || (this->rank  == 6)) {
+				sister = this -> divide_length_wise(Ti);
+			}
+			else {
+				if (y_length > x_length) {
+					sister = this->divide_width_wise(Ti);
+			    }		
+				else {
+					sister = this->divide_length_wise(Ti);
+				}		
+			}			
 	}
+
 
 	return sister;
 }
