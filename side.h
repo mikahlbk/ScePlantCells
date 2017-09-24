@@ -39,7 +39,8 @@ class Side {
 		int get_Wall_Count() {return num_wall_nodes;}
 			//cell level
 		Cell* get_My_Cell() {return my_cell;}
-			//parameters for forces
+		//add setter for division to set new cell
+		//parameters for forces
 		void set_Phys_Parameters(double kbend, double klin);
 		double get_Linear_Spring() {return linear_spring;}
 		double get_Bending_Spring() {return bending_spring;}

@@ -14,8 +14,8 @@
 
 // Simulation Constants
 const double dt = 0.0003;
-const int ADD_WALL_TIMER = 2000;
-const int ADD_CYT_TIMER = 2500;
+const int ADD_WALL_TIMER = 5500;
+const int ADD_CYT_TIMER = 5000;
 
 const int MAX_NUM_WALL = 200;
 const int MAX_NUM_CYT = 60;
@@ -30,11 +30,11 @@ const double pi = acos(-1.0);
 const double thetaFlat = pi;
 const double thetaCurve = pi * (11.0 / 12.0);
 
-const double kBendHigh = 5;
-const double kBendLow = 5;
+const double kBendHigh = 2;
+const double kBendLow = 2;
 
-const double kLinearHigh = 28;
-const double kLinearLow = 20;
+const double kLinearHigh = 10;
+const double kLinearLow = 8;
 
 //linear spring equilibrium length
 const double MembrEquLen = .0625; 

@@ -30,7 +30,6 @@ class Cell {
 		vector<Side*> sides;
 		vector<Cyt_Node*> cyt_nodes;
 		vector<Cell*> neigh_cells;
-
 	public:
 		// Constructors
 		Cell(int rank, Tissue* tissue);
@@ -44,9 +43,10 @@ class Cell {
 		Coord get_Cell_Center();
 		void get_Cyt_Nodes(vector<Cyt_Node*>& cyts);
 		Wall_Node* get_Wall_Nodes();
-		void get_Sides();
+		void get_Sides(vector<Side*>& sides);
 		void get_Neighbor_Cells(vector<Cell*>& cells);
 		int get_Node_Count();
+		int get_Rank();
 		
 		// Keep track of neighbor cells
 		void update_Neighbor_Cells();
@@ -56,7 +56,7 @@ class Cell {
 		void calc_New_Forces();
 		void update_Node_Locations();
 		void update_Wall_Angles();
-		void udpate_Cell_Center();
+		void update_Cell_Center();
 		void update_Life_Length();
 
 		//Output Functions

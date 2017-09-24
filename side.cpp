@@ -24,24 +24,26 @@ Side::Side(Coord locA, Coord locZ, Cell* cell, int num_nodes) {
 
 	end_A = new Wall_Node(locA, this);
 	end_Z = new Wall_Node(locZ, this);
-	
+//	cout << "made end a and z" << endl;
 	Coord diff = ((locZ - locA) / (num_nodes - 1));
 	Coord curr_loc = locA + diff;
 	Wall_Node* curr;
 	Wall_Node* prev = end_A;
-
+ 
 	for (int i = 0; i < num_nodes - 2; i++) {
 		curr = new Wall_Node(curr_loc, this);
 		curr->set_Right_Neighbor(prev);
 		prev->set_Left_Neighbor(curr);
 		curr_loc += diff;
+		prev = curr;
 	}
+//	cout << " made in between nodes" << endl;
 	//link up end_Z
 	end_Z->set_Right_Neighbor(prev);
 	prev->set_Left_Neighbor(end_Z);
 
 	num_wall_nodes = num_nodes;
-
+//	cout << "linked ends " << endl;
 	//set curve parameters on each end
 	curr = end_A;
 	for (int i = 0; i < 3; i++) {
@@ -56,7 +58,7 @@ Side::Side(Coord locA, Coord locZ, Cell* cell, int num_nodes) {
 		curr->set_Equi_Angle(thetaCurve);
 		curr = curr->get_Right_Neighbor();
 	}
-
+//	cout << "set curve nodes" << endl;
 }
 
 void Side::connect_Ends(Side* s) {
@@ -139,7 +141,7 @@ void Side::add_Wall_Node(Wall_Node* right) {
 		for (int i = 0; i < 3; i++) {
 			curr->set_Curve(true);
 			curr->set_Equi_Angle(thetaCurve);
-			curr = curr->get_Left_Neighbor();
+			curr = curr->get_Right_Neighbor();
 		}
 
 		curr->set_Curve(false);

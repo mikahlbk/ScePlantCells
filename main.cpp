@@ -24,15 +24,15 @@ using namespace std;
 int main() {
 
 	int start = clock();
-
+	
 	string init_tissue = "cell_start.txt";
 	//make a new cell object
-
+	
 	Tissue growing_Tissue(init_tissue);
 
 	cout << "Finished creating Cell" << endl;
 	//parameters for time step
-    double numSteps = 1;
+    double numSteps = 100;
 
 	// Variable for dataoutput
 	int digits;
@@ -44,13 +44,13 @@ int main() {
 	int out = 0; //counter for creating output/vtk files
 
 	//loop for time steps
-	for(int Ti = 0; Ti*dt < numSteps; Ti++) {
+	for(int Ti = 0; Ti < 5; Ti++) {
 		//loop through all cells
 		//for now only one cell
 
 		//Print to dataOutput and VTK files
 
-		if (Ti % 250 == 0) {
+		if (Ti % 100 == 0) {
 	
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {
@@ -79,20 +79,22 @@ int main() {
 			cout << "Simulation still running. Ti: " << Ti << endl;
 		}
 		
-		/*
+		
 		// Update Each cell's neighboring cells
-		if (Ti % 5000 == 0) {
+		if (Ti % 1 == 0) {
 			growing_Tissue.update_Neighbor_Cells();
 		}
-		*/
+		
 
 		// Tissue Growth
 		growing_Tissue.update_Life_Length();
+		//cout << "updated life length" << endl;
 		//Calculate new forces on cells and nodes
 		growing_Tissue.calc_New_Forces();
+		//cout << "calculated forces" << endl;
 		//Update node positions
 		growing_Tissue.update_Cell_Locations();
-		
+		//cout << "updated node positions" << endl;
 	}
 
 	int stop = clock();

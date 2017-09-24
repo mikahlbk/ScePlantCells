@@ -81,7 +81,7 @@ void Tissue::get_Cells(vector<Cell*>& cells) {
 }
 
 void Tissue::update_Life_Length() {
-
+//	cout << "tissue life length check" << endl;
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->update_Life_Length();
 	}
@@ -91,11 +91,13 @@ void Tissue::update_Life_Length() {
 void Tissue::calc_New_Forces() {
 
 	for (unsigned int i = 0; i < cells.size(); i++) {
-		//cout << "calc new forces" << endl;
+//		cout << "calc new forces" << endl;
 		cells.at(i)->calc_New_Forces();
 	}
 
 	return;
+//	cout<<"calculated forces"<<endl;
+
 }
 
 void Tissue::update_Cell_Locations() {
@@ -105,8 +107,10 @@ void Tissue::update_Cell_Locations() {
 	}
 
 	return;
+//	cout<<"Updated locations"<<endl;
 }
-/*
+	
+
 void Tissue::update_Neighbor_Cells() {
 	//update vectors of neighboring cells
 	for (unsigned int i = 0; i < cells.size(); i++) {
@@ -115,7 +119,7 @@ void Tissue::update_Neighbor_Cells() {
 	
 	return;
 }
-*/
+
 void Tissue::print_Data_Output(ofstream & ofs) {
 	return;
 }
@@ -131,7 +135,7 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 	//Need total number of points for all cells
 	int num_Points = 0;
 	for (unsigned int i = 0; i < cells.size(); i++) {
-		num_Points += cells.at(i)->get_Num_Nodes();
+		num_Points += cells.at(i)->get_Node_Count();
 	}
 
 	ofs << "POINTS " << num_Points << " float" << endl;
@@ -149,7 +153,7 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 	ofs << "CELLS " << cells.size() << ' ' << num_Points + start_points.size() << endl;
 
 	for (unsigned int i = 0; i < cells.size(); i++) {
-		ofs << cells.at(i)->get_Num_Nodes();
+		ofs << cells.at(i)->get_Node_Count();
 
 		for (int k = start_points.at(i); k <= end_points.at(i); k++) {
 			ofs << ' ' << k;
@@ -166,6 +170,7 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 
 	ofs << endl;
 
+	/*
 	ofs << "POINT_DATA " << num_Points << endl;
 	ofs << "SCALARS magnitude float " << 1 << endl;
 	ofs << "LOOKUP_TABLE default" << endl;
@@ -180,7 +185,7 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 		cells.at(i)->print_VTK_Vectors(ofs);
 	}
 
-
+	*/
 
 	return;
 }

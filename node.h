@@ -7,6 +7,7 @@
 // Forward Declarations 
 class Wall_Node;
 class Side;
+class Cell;
 //=====================
 // Include Declarations
 #include <iostream>
@@ -20,11 +21,10 @@ class Node {
     //variables that will be shared by all nodes
 		Coord my_loc;
 		Coord new_force;
-		Side* my_side;
     public:
     //functions that you will want performed on all nodes
         //Constructor
-        Node(Coord loc, Side* my_side);
+        Node(Coord loc);
         //some functions you can define in base class because 
         //    all nodes will use the exact same function
         virtual Coord get_Location();
@@ -41,9 +41,9 @@ class Node {
 class Cyt_Node: public Node {
     private: 
     //if don't need to keep any more information then just leave blank
-
+		Cell* my_cell;
     public:
-        Cyt_Node(Coord loc, Side* my_side);
+        Cyt_Node(Coord loc, Cell* my_cell);
         virtual void calc_Forces();
 		Coord calc_Morse_II();
 		Coord calc_Morse_MI(Wall_Node* orig);
@@ -62,7 +62,7 @@ class Wall_Node: public Node {
 		double cross_Prod;
 		Coord cyt_force;
 		bool on_curve;
-
+		Side* my_side;
     public:
     //function that you want performed on all wall nodes
 		// Constructors

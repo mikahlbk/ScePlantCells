@@ -13,10 +13,9 @@
 
 //========================================
 /** class Node Functions **/
-Node::Node(Coord loc, Side* my_side) {
+Node::Node(Coord loc) {
 	my_loc = loc;
 	new_force = Coord();
-	this->my_side = my_side;
 }
 
 Coord Node::get_Location() {
@@ -32,20 +31,21 @@ void Node::update_Location() {
     return;
 }
 
-Node::~Node() {
-	my_side = NULL;
-}
+Node::~Node() {}
 //========================================
 /** class Cyt Node Functions **/
-Cyt_Node::Cyt_Node(Coord loc, Side* my_side) : Node(loc, my_side) {};
+Cyt_Node::Cyt_Node(Coord loc, Cell* my_cell) : Node(loc) {
+	this->my_cell = my_cell;
+
+}
 
 void Cyt_Node::calc_Forces() {
 	//for cyt, just need morse potential for int-int and int-membr
-
+//	cout << "trying to do the cyt pots" << endl;
 	Coord Fii = calc_Morse_II();
-
-	Coord Fmi = calc_Morse_MI(my_side->get_Wall_Nodes());
-	
+//	cout << " i did the ii potentials" << endl;
+	Coord Fmi = calc_Morse_MI(my_cell->get_Wall_Nodes());
+//	cout << "i got the wall nodes" << endl;	
     new_force = Fmi + Fii;
 
 	return;
@@ -59,8 +59,12 @@ Coord Cyt_Node::calc_Morse_II() {
 	Coord Fii; //initialized to zero
 
 	vector<Cyt_Node*>cyts;
-	my_side->get_Cyt_Nodes(cyts);
-
+//	cout << "made vector to hold cyt nodes" << endl;
+	if (my_cell==NULL) {
+		cout << "TRUE" << endl;
+	}
+	my_cell->get_Cyt_Nodes(cyts);
+//	cout << "filling vector" << endl;
 	for (unsigned int j = 0; j < cyts.size(); j++) {
 		//don't calculate yourself
 		if (cyts.at(j) != this) {
@@ -124,16 +128,24 @@ Coord Cyt_Node::morse_Equation(Wall_Node* wall) {
 	return Fmi;
 }
 
-Cyt_Node::~Cyt_Node() {}
+Cyt_Node::~Cyt_Node() {
+	my_cell = NULL;
+}
+
 
 //======================================================
 /** class Wall Node Functions **/
 
 // Constructors-----------------
-Wall_Node::Wall_Node(Coord loc, Side* my_side) : Node(loc, my_side) {};
+Wall_Node::Wall_Node(Coord loc, Side* my_side) : Node(loc) {
+	this-> my_side = my_side;
+	cyt_force = Coord();
+	equi_angle = thetaFlat;
+	on_curve = false;
+}
 
 Wall_Node::Wall_Node(Coord loc, Side* my_side, Wall_Node* left, Wall_Node* right) 
-	: Node(loc, my_side)   {
+	: Node(loc)   {
 
     this->left = left;
     this->right = right;
@@ -145,6 +157,7 @@ Wall_Node::Wall_Node(Coord loc, Side* my_side, Wall_Node* left, Wall_Node* right
 }
 
 Wall_Node::~Wall_Node() {
+	my_side = NULL;	
 	left = NULL;
 	right = NULL;
 }
@@ -183,10 +196,10 @@ void Wall_Node::calc_Forces() {
 	Coord sum;
 
 	sum += calc_Morse_SC();
-
+	
 	cyt_force = sum;
 
-	//sum += calc_Morse_DC();
+	sum += calc_Morse_DC();
 	sum += calc_Linear();
 	sum += calc_Bending();
 
@@ -206,17 +219,17 @@ Coord Wall_Node::calc_Morse_SC() {
 	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
 		Fmi += this->morse_Equation(cyt_nodes.at(i));
 	}
-	
+	//cout << "	morse_sc: " << Fmi << endl;	
 	return Fmi;
 }
 
-/*
+
 //morse potential between wall node i and every cyt node in cell
 Coord Wall_Node::calc_Morse_DC() {
 	Coord Fdc;
 
 	vector<Cell*> cells;
-	my_side->get_Neighbor_Cells(cells);
+	my_side->get_My_Cell()->get_Neighbor_Cells(cells);
 	
 	Wall_Node* curr = NULL;
 	Wall_Node* orig = NULL;
@@ -233,7 +246,7 @@ Coord Wall_Node::calc_Morse_DC() {
 
 	return Fdc;
 }
-*/
+
 
 //bending force of node
 Coord Wall_Node::calc_Bending() {
@@ -246,7 +259,7 @@ Coord Wall_Node::calc_Bending() {
 	if (cross_Prod < 0.0) {
 		F_bend = F_bend*(-1);
 	}	
-
+	//cout << "	bending: " << F_bend << endl;
 	return F_bend;
 }
 
@@ -259,7 +272,7 @@ Coord Wall_Node::calc_Linear() {
 
 	//calc right
 	F_lin += linear_Equation(right);
-
+	//cout << "	linear: " << F_lin << endl;
 	return F_lin;
 }
 
@@ -349,7 +362,7 @@ Coord Wall_Node::bending_Equation_Center() {
 	Coord term_r2 = right_vect*cos(my_angle)/pow(right_len,2);
 
 	F_center = (term_l1 + term_l2 + term_r1 + term_r2) * self_Constant;
-	
+	//cout << "Bending center: " << F_center << endl;	
 	return F_center;
 }
 
@@ -377,7 +390,7 @@ Coord Wall_Node::bending_Equation_Left() {
 	Coord left_term2 = left_vect*cos(left_angle)/pow(left_len,2);
 
 	F_left = (left_left_term1 + left_term2) * left_Constant;
-	
+	//cout << "Bending left: " << F_left << endl;
 	return F_left;
 }
 
@@ -405,6 +418,7 @@ Coord Wall_Node::bending_Equation_Right() {
 	Coord right_term2 = right_vect*cos(right_angle)/pow(right_len,2);
 
 	F_right = (right_right_term1 + right_term2)*right_Constant;
+	//cout << "Bending right: " << F_right << endl;
 	return F_right;
 }
 
