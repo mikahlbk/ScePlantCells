@@ -39,6 +39,7 @@ class Side {
 		int get_Wall_Count() {return num_wall_nodes;}
 			//cell level
 		Cell* get_My_Cell() {return my_cell;}
+		void set_My_Cell(Cell* new_cell);
 		//add setter for division to set new cell
 		//parameters for forces
 		void set_Phys_Parameters(double kbend, double klin);

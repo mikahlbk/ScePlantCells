@@ -147,6 +147,11 @@ int Cell::get_Rank(){
 	return rank;
 }
 
+void Cell::set_Rank(const int id) {
+	rank = id;
+	return;
+}
+
 void Cell::get_Cyt_Nodes(vector<Cyt_Node*>& cyts) {
 	cyts = cyt_nodes;
 	return;
@@ -158,6 +163,11 @@ Wall_Node* Cell::get_Wall_Nodes() {
 
 void Cell::get_Sides(vector<Side*>& sides) {
 	sides = this->sides;
+	return;
+}
+
+void Cell::set_Sides(vector<Side*>& sides) {
+	this->sides = sides;
 	return;
 }
 
@@ -260,7 +270,7 @@ void Cell::update_Neighbor_Cells() {
 						}
 
 					}
-					cout << "right A: " << checkA << "right B: " << checkB << endl;
+					//cout << "right A: " << checkA << "right B: " << checkB << endl;
 				}
 				else { // curr_cX > my_cX
 					if (curr_cY < my_cY) {
@@ -290,7 +300,7 @@ void Cell::update_Neighbor_Cells() {
 
 					}
 				}
-				cout << "left A: " << checkA << "left B: " << checkB << endl;
+				//cout << "left A: " << checkA << "left B: " << checkB << endl;
 
 			}
 			//else already too far away
@@ -298,7 +308,7 @@ void Cell::update_Neighbor_Cells() {
 			// if both checks come out true, then add curr to neigh cells
 			if ( checkA && checkB) {
 				neigh_cells.push_back(curr);
-				cout << rank << "has neighbor" << curr->get_Rank() << endl;
+				//cout << rank << "has neighbor" << curr->get_Rank() << endl;
 			}
 			
 		}
@@ -306,7 +316,7 @@ void Cell::update_Neighbor_Cells() {
 
 	}
 	
-	cout << "Cell: " << rank << " -- neighbors: " << neigh_cells.size() << endl;
+	//cout << "Cell: " << rank << " -- neighbors: " << neigh_cells.size() << endl;
 
 	return;
 }
@@ -462,10 +472,9 @@ void Cell::update_Node_Locations() {
 }
 
 void Cell::update_Wall_Angles() {
-
+	
 	Wall_Node* curr = sides.at(0)->get_Wall_Nodes();
 	Wall_Node* orig = curr;
-
 	do {
 		curr->update_Angle();
 		curr = curr->get_Left_Neighbor();
@@ -645,6 +654,29 @@ void Cell::add_Wall_Node() {
 void Cell::add_Cyt_Node() {
 
 	Cyt_Node* cyt = new Cyt_Node(cell_center, this);
+	cyt_nodes.push_back(cyt);
+
+	num_cyt_nodes++;
+	return;
+}
+
+void Cell::add_Cyt_Node_Div() {
+	Side* s0 = sides.at(0);
+	Side* s1 = sides.at(1);
+	double x_length = s0->get_End_Z()->get_Location().get_X()-s0->get_End_A()->get_Location().get_X();
+	double y_length = s1->get_End_Z()->get_Location().get_Y()-s1->get_End_A()->get_Location().get_Y();
+	Coord init_off(x_length*0.05, y_length*0.05);
+	Coord min_corner(s0->get_End_A()->get_Location().get_X(),s0->get_End_A()->get_Location().get_Y());
+
+	double x_coord_offset = 0.9;
+	double y_coord_offset = 0.9;
+	double x_coord_scaled = (static_cast<double>(rand())/RAND_MAX)*x_coord_offset*x_length;
+	double y_coord_scaled = (static_cast<double>(rand())/RAND_MAX)*y_coord_offset*y_length;
+	Coord scal(x_coord_scaled, y_coord_scaled); 
+	
+	Coord rand_Coord = (min_corner+init_off + scal);
+		
+	Cyt_Node* cyt = new Cyt_Node(rand_Coord,this);
 	cyt_nodes.push_back(cyt);
 
 	num_cyt_nodes++;

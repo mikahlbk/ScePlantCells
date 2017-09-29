@@ -279,6 +279,7 @@ Coord Wall_Node::calc_Linear() {
 void Wall_Node::update_Angle() {
 	Coord left_vect = get_Left_Neighbor()->get_Location() - get_Location();
 	Coord right_vect = get_Right_Neighbor()->get_Location() - get_Location();
+
 	
 	double left_len = left_vect.length();
 	double right_len = right_vect.length();

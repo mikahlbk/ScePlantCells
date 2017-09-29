@@ -47,7 +47,8 @@ class Cell {
 		void get_Neighbor_Cells(vector<Cell*>& cells);
 		int get_Node_Count();
 		int get_Rank();
-		
+		void set_Rank(const int id);
+		void set_Sides(vector<Side*>& sides);
 		// Keep track of neighbor cells
 		void update_Neighbor_Cells();
 		bool get_Reasonable_Bounds(Wall_Node* curr, Wall_Node* & A, Wall_Node* & B);
@@ -69,7 +70,12 @@ class Cell {
 		Wall_Node* find_Largest_Length();
 		void add_Wall_Node();
 		void add_Cyt_Node();
+		void add_Cyt_Node_Div();
 
+		//Division 
+		Cell* divide(const int Ti);
+		Cell* divide_length_wise(const int Ti);
+		Cell* divide_width_wise(const int Ti);
 };
 
 

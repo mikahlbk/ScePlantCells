@@ -34,7 +34,7 @@ class Node {
         //    which node you are. Thus define as "pure virtual" and 
         //    properly define them in a derived class
         virtual void calc_Forces() = 0;
-
+		
 		virtual ~Node();
 };
 
@@ -45,6 +45,7 @@ class Cyt_Node: public Node {
     public:
         Cyt_Node(Coord loc, Cell* my_cell);
         virtual void calc_Forces();
+		Cell* get_My_Cell(){return my_cell;}
 		Coord calc_Morse_II();
 		Coord calc_Morse_MI(Wall_Node* orig);
 		Coord morse_Equation(Cyt_Node* cyt);

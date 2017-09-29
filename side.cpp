@@ -97,6 +97,11 @@ void Side::set_Phys_Parameters(double kbend, double klin) {
 	return;
 }
 
+void Side::set_My_Cell(Cell* new_cell) {
+	this-> my_cell = new_cell;
+	return;
+}
+
 //=================================================================
 //=======================================
 //Cell Growth

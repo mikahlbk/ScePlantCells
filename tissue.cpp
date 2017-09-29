@@ -16,7 +16,7 @@
 // Public Member Functions for Tissue.cpp
 
 Tissue::Tissue(string filename) {
-
+	num_cells = 0;
 	ifstream ifs(filename.c_str());
 
 	if(!ifs) {
@@ -117,6 +117,27 @@ void Tissue::update_Neighbor_Cells() {
 		cells.at(i)->update_Neighbor_Cells();
 	}
 	
+	return;
+}
+
+void Tissue::cell_Division(const int Ti) {
+	bool divided = false;
+	Cell* new_cell = NULL;
+	cout << "number cells: " << cells.size()<< endl;
+	for(unsigned int i = 0; i < 1;i++) {
+		cout << "current divide cell: " << i << endl;
+		new_cell = cells.at(i)->divide(Ti);
+		if(new_cell !=NULL) {
+			divided = true;
+			new_cell->set_Rank(num_cells);
+			num_cells++;
+			cells.push_back(new_cell);
+		}
+
+	}
+	if(divided) {
+		this->update_Neighbor_Cells();
+	}
 	return;
 }
 
