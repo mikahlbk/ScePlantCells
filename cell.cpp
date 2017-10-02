@@ -50,7 +50,10 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	Coord locZ = ( corner + Coord((width - 0.08),0.0) ); 
 	Side* s = new Side(locA, locZ, this, num_end_nodes);
 //	cout << "made side" << endl;
-	s->set_Phys_Parameters(kBendHigh, kLinearHigh);
+	s->set_Phys_Parameters(kBendLow, kLinearHigh);
+	if ((this->get_Rank() == 3) || (this->get_Rank() == 4)) {
+		s->set_Phys_Parameters(kBendHigh, kLinearLow);
+    }
 //	cout << "set params" << endl;
 	sides.push_back(s);
 //	cout << "I made side A" << endl;
@@ -58,21 +61,30 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	locA = locZ + Coord(0.04,0.04);
 	locZ = locA + Coord(0.0, (height - 0.08));
 	s = new Side(locA, locZ, this, num_flank_nodes);
-	s->set_Phys_Parameters(kBendLow, kLinearLow);
+	s->set_Phys_Parameters(kBendHigh, kLinearLow);
+	if ((this->get_Rank() == 3) || (this->get_Rank() == 4)) {
+		s->set_Phys_Parameters(kBendLow, kLinearHigh);
+    }
 	sides.push_back(s);
 //	cout << "I made side B" << endl;
 	//side C
 	locA = locZ + Coord(-0.04, 0.04);
 	locZ = locA + Coord(-(width - 0.08), 0.0);
 	s = new Side(locA, locZ, this, num_end_nodes);
-	s->set_Phys_Parameters(kBendHigh, kLinearHigh);
+	s->set_Phys_Parameters(kBendLow, kLinearHigh);
+	if ((this->get_Rank() == 3) || (this->get_Rank()==4)) {
+		s->set_Phys_Parameters(kBendHigh, kLinearLow);
+    }
 	sides.push_back(s);
 //	cout << "I made side C" << endl;
 	//side D
 	locA = locZ + Coord(-0.04, -0.04);
 	locZ = corner + Coord(0.0, 0.04);
 	s = new Side(locA, locZ, this, num_flank_nodes);
-	s->set_Phys_Parameters(kBendLow, kLinearLow);
+	s->set_Phys_Parameters(kBendHigh, kLinearLow);
+	if ((this->get_Rank() == 3) || (this->get_Rank() ==4)) {
+		s->set_Phys_Parameters(kBendLow, kLinearHigh);
+    }
 	sides.push_back(s);
 //	cout << "I made side D" << endl;
 	//Connect the four disjoint sides
@@ -215,11 +227,12 @@ void Cell::update_Neighbor_Cells() {
 	double my_maxY = sides.at(3)->get_End_A()->get_Location().get_Y();
 
 	double prelim_threshold = 5.0;
-	double sec_threshold = 0.5;
+	double sec_threshold = 2;
 
 	bool checkA = false;
 	bool checkB = false;
-
+	
+//	cout<<"number cells in system " << all_Cells.size() << endl;
 	// iterate through all cells
 	for (unsigned int i = 0; i < all_Cells.size(); i++) {
 		curr = all_Cells.at(i);
@@ -316,7 +329,7 @@ void Cell::update_Neighbor_Cells() {
 
 	}
 	
-	//cout << "Cell: " << rank << " -- neighbors: " << neigh_cells.size() << endl;
+	cout << "Cell: " << rank << " -- neighbors: " << neigh_cells.size() << endl;
 
 	return;
 }

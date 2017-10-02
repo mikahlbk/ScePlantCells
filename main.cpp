@@ -32,7 +32,7 @@ int main() {
 
 	cout << "Finished creating Cell" << endl;
 	//parameters for time step
-    double numSteps = 1500;
+    double numSteps = 1;
 
 	// Variable for dataoutput
 	int digits;
@@ -44,13 +44,13 @@ int main() {
 	int out = 0; //counter for creating output/vtk files
 
 	//loop for time steps
-	for(int Ti = 0; Ti < numSteps; Ti++) {
+	for(int Ti = 0; Ti*dt < numSteps; Ti++) {
 		//loop through all cells
 		//for now only one cell
-		cout << "Ti = " << Ti << endl;
+		//cout << "Ti = " << Ti << endl;
 		//Print to dataOutput and VTK files
 
-		if (true) {
+		if (Ti % 100 == 0) {
 	
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {
@@ -75,15 +75,15 @@ int main() {
 			out++;
 		}
 
-//		if (Ti % 1 == 0) {
+		if (Ti % 1000 == 0) {
 			cout << "Simulation still running. Ti: " << Ti << endl;
-//		}
+		}
 		
 		
 		// Update Each cell's neighboring cells
-		if (Ti % 1 == 0) {
+		if (Ti % 100 == 1) {
 			growing_Tissue.update_Neighbor_Cells();
-		}
+    	}
 		
 
 		// Tissue Growth
@@ -95,8 +95,8 @@ int main() {
 		//Update node positions
 		growing_Tissue.update_Cell_Locations();
 		//cout << "updated node positions" << endl;
-		cout << "division" << endl;
-		growing_Tissue.cell_Division(Ti);
+		//cout << "division" << endl;
+	//	growing_Tissue.cell_Division(Ti);
 		}
 
 	int stop = clock();

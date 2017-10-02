@@ -33,9 +33,9 @@ Cell* Cell::divide(const int Ti) {
 	x_length = x_vec.length();
 	y_length = y_vec.length();
 	area = y_length*x_length;
-	if(Ti == 490) {
-		cout << "cell will divide" << endl;
-		sister = this->divide_length_wise(Ti);		
+	if(area > 3) {
+		//cout << "cell will divide" << endl;
+		sister = this->divide_width_wise(Ti);		
 	}
 	return sister;
 
@@ -84,7 +84,7 @@ Cell* Cell::divide_length_wise(const int Ti) {
 	Side* B0 = new Side(B0_End_A->get_Location()+Coord(.1,0), sides.at(0)->get_End_Z()->get_Location(), sister, sides.at(0)->get_Wall_Count()-num_nodes-1);
 	B0->set_Phys_Parameters(kBendLow,kLinearHigh);
 	//delete previous A0
-	cout << "deleting side 0" << endl;
+	//cout << "deleting side 0" << endl;
 	delete sides.at(0);
 	//set new A0 and B0
 	sides.at(0) = A0;
@@ -132,14 +132,14 @@ Cell* Cell::divide_length_wise(const int Ti) {
 	//Assign A1 and B3
 	sides.at(1) = A1;
 	sister_sides.push_back(B3);
-	cout<< "reassign sides in a" << endl;
+	//cout<< "reassign sides in a" << endl;
 	//connect the sides cell A
 	this->sides.at(0)->connect_Ends(sides.at(1));
 	this->sides.at(1)->connect_Ends(sides.at(2));
 	this->sides.at(2)->connect_Ends(sides.at(3));
 	this->sides.at(3)->connect_Ends(sides.at(0));  
 
-	cout << "reassign sides in b" << endl;
+	//cout << "reassign sides in b" << endl;
 	//connect the sides cell B	
 	sister_sides.at(0)->connect_Ends(sister_sides.at(1));
 	sister_sides.at(1)->connect_Ends(sister_sides.at(2));
@@ -150,17 +150,17 @@ Cell* Cell::divide_length_wise(const int Ti) {
 	sister->set_Sides(sister_sides);
 
 
-	cout << "updating angles" << endl;
+	//cout << "updating angles" << endl;
 	//update angles and cell centers for both cells
-	cout << "cell A update wall angles" << endl;
+	//cout << "cell A update wall angles" << endl;
 	this->update_Wall_Angles();
-	cout << "cell B update wall angles" << endl;
+	//cout << "cell B update wall angles" << endl;
 	sister->update_Wall_Angles();
-	cout << "update centers" << endl;
+	//cout << "update centers" << endl;
 	this->update_Cell_Center();
 	sister->update_Cell_Center();
 	
-	cout << "Updated Angles and cell centers"<< endl;
+	//cout << "Updated Angles and cell centers"<< endl;
 	
 	//distribute cyt nodes between sister cells
 	int new_cyt_cnt = 20;
@@ -173,13 +173,13 @@ Cell* Cell::divide_length_wise(const int Ti) {
 		num_cyt_nodes--;
 	}	
 
-	cout << "Finished deleting old cyt nodes" << endl;
+	//cout << "Finished deleting old cyt nodes" << endl;
 	//create new ones for each cell
 	for(int i = 0; i < new_cyt_cnt; i++) {
 		this->add_Cyt_Node_Div();
 		sister->add_Cyt_Node_Div();
 	}
-	cout << "Cell A" << endl;
+	//cout << "Cell A" << endl;
 	vector<Cyt_Node*>CellA;
 	this->get_Cyt_Nodes(CellA);
 	int counter = 0;
@@ -188,9 +188,9 @@ Cell* Cell::divide_length_wise(const int Ti) {
 			counter++;
 		}
 	}
-	cout << "Number cyt nodes assigned to Cell A is: " << counter << endl;
+	//cout << "Number cyt nodes assigned to Cell A is: " << counter << endl;
 	
-	cout << "Cell B" << endl;
+	//cout << "Cell B" << endl;
 	vector<Cyt_Node*>CellB;
 	sister->get_Cyt_Nodes(CellB);
 	counter = 0;
@@ -199,7 +199,7 @@ Cell* Cell::divide_length_wise(const int Ti) {
 			counter++;
 		}
 	}
-	cout << "Number cyt nodes assigned to Cell B is: " << counter << endl;
+	//cout << "Number cyt nodes assigned to Cell B is: " << counter << endl;
 		
 	return sister;
 }
@@ -219,7 +219,7 @@ Cell* Cell::divide_width_wise(const int Ti) {
 	Coord divider = ((mid_left + mid_right)/2);
 	double divide_Y = divider.get_Y();
 
-	cout << "Begin Iterating Through Wall Nodes" << endl;
+	//cout << "Begin Iterating Through Wall Nodes" << endl;
 
 	Wall_Node* curr = sides.at(1)->get_End_A();
 	Wall_Node* next = NULL;
@@ -247,7 +247,7 @@ Cell* Cell::divide_width_wise(const int Ti) {
 	Side* B1 = new Side(B1_End_A->get_Location()+Coord(0,0.1), sides.at(1)->get_End_Z()->get_Location(), sister, sides.at(1)->get_Wall_Count()-num_nodes-1);
 	B1->set_Phys_Parameters(kBendHigh,kLinearLow);
 	//delete previous A1
-	cout << "deleting side 1" << endl;
+	//cout << "deleting side 1" << endl;
 	delete sides.at(1);
 	//set new A1 and B1
 	sides.at(1) = A1;
@@ -297,14 +297,14 @@ Cell* Cell::divide_width_wise(const int Ti) {
 	sister_sides.push_back(B1);
 	sister_sides.push_back(B2);
 	sister_sides.push_back(B3);
-	cout<< "reassign sides in a" << endl;
+	//cout<< "reassign sides in a" << endl;
 	//connect the sides cell A
 	this->sides.at(0)->connect_Ends(sides.at(1));
 	this->sides.at(1)->connect_Ends(sides.at(2));
 	this->sides.at(2)->connect_Ends(sides.at(3));
 	this->sides.at(3)->connect_Ends(sides.at(0));  
 
-	cout << "reassign sides in b" << endl;
+	//cout << "reassign sides in b" << endl;
 	//connect the sides cell B	
 	sister_sides.at(0)->connect_Ends(sister_sides.at(1));
 	sister_sides.at(1)->connect_Ends(sister_sides.at(2));
@@ -315,17 +315,17 @@ Cell* Cell::divide_width_wise(const int Ti) {
 	sister->set_Sides(sister_sides);
 
 
-	cout << "updating angles" << endl;
+	//cout << "updating angles" << endl;
 	//update angles and cell centers for both cells
-	cout << "cell A update wall angles" << endl;
+	//cout << "cell A update wall angles" << endl;
 	this->update_Wall_Angles();
-	cout << "cell B update wall angles" << endl;
+	//cout << "cell B update wall angles" << endl;
 	sister->update_Wall_Angles();
-	cout << "update centers" << endl;
+	//cout << "update centers" << endl;
 	this->update_Cell_Center();
 	sister->update_Cell_Center();
 	
-	cout << "Updated Angles and cell centers"<< endl;
+	//cout << "Updated Angles and cell centers"<< endl;
 	
 	//distribute cyt nodes between sister cells
 	int new_cyt_cnt = 20;
@@ -338,13 +338,13 @@ Cell* Cell::divide_width_wise(const int Ti) {
 		num_cyt_nodes--;
 	}	
 
-	cout << "Finished deleting old cyt nodes" << endl;
+	//cout << "Finished deleting old cyt nodes" << endl;
 	//create new ones for each cell
 	for(int i = 0; i < new_cyt_cnt; i++) {
 		this->add_Cyt_Node_Div();
 		sister->add_Cyt_Node_Div();
 	}
-	cout << "Cell A" << endl;
+	//cout << "Cell A" << endl;
 	vector<Cyt_Node*>CellA;
 	this->get_Cyt_Nodes(CellA);
 	int counter = 0;
@@ -353,9 +353,9 @@ Cell* Cell::divide_width_wise(const int Ti) {
 			counter++;
 		}
 	}
-	cout << "Number cyt nodes assigned to Cell A is: " << counter << endl;
+	//cout << "Number cyt nodes assigned to Cell A is: " << counter << endl;
 	
-	cout << "Cell B" << endl;
+	//cout << "Cell B" << endl;
 	vector<Cyt_Node*>CellB;
 	sister->get_Cyt_Nodes(CellB);
 	counter = 0;
@@ -364,7 +364,7 @@ Cell* Cell::divide_width_wise(const int Ti) {
 			counter++;
 		}
 	}
-	cout << "Number cyt nodes assigned to Cell B is: " << counter << endl;
+	//cout << "Number cyt nodes assigned to Cell B is: " << counter << endl;
 		
 	return sister;
 }
