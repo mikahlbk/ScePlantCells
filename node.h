@@ -64,7 +64,9 @@ class Wall_Node: public Node {
 		Coord cyt_force;
 		bool on_curve;
 		Side* my_side;
-    public:
+		Wall_Node* closest;
+    	double closest_len;
+	public:
     //function that you want performed on all wall nodes
 		// Constructors
         Wall_Node(Coord loc, Side* my_side);
@@ -77,6 +79,7 @@ class Wall_Node: public Node {
 		double get_Equi_Angle() {return equi_angle;}
 		void set_Equi_Angle(double angle);
 		bool is_Curve() {return on_curve;}
+		void set_Closest(Wall_Node* closest, double closest_len);
 		void set_Curve(bool on_curve);
 		Coord get_CytForce() {return cyt_force;}
         Wall_Node* get_Left_Neighbor() {return left;}
@@ -86,7 +89,9 @@ class Wall_Node: public Node {
 		void set_Left_Neighbor(Wall_Node* new_Left);
 		void set_Right_Neighbor(Wall_Node* new_Right);
 		Side* get_My_Side() {return my_side;}
-
+		Wall_Node* get_Closest() {return closest;}
+		Wall_Node* find_Closest_Node(vector<Side*>& neighbor_Sides);
+		void make_Connection(Wall_Node* curr_Closest);
 		// Force Calculations
 		virtual void calc_Forces();
 		Coord calc_Morse_SC();
@@ -102,10 +107,9 @@ class Wall_Node: public Node {
 		Coord bending_Equation_Left();
 		Coord bending_Equation_Right();
 		Coord linear_Equation(Wall_Node* wall);
-
+		Coord linear_Equation_ADH(Wall_Node* wall);
 		~Wall_Node();
+
 };
-
-
 //===========================
 #endif  

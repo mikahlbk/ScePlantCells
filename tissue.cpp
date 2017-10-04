@@ -120,6 +120,26 @@ void Tissue::update_Neighbor_Cells() {
 	return;
 }
 
+void Tissue::update_Adhesion() {
+	Wall_Node* curr = NULL;
+	Wall_Node* orig = NULL;
+	Wall_Node* next = NULL;
+	for (unsigned int i = 0;i<cells.size();i++) {
+		cout<< "going into adhesion function" << endl;
+		curr = cells.at(i)->get_Wall_Nodes();
+		orig = curr;
+		do {
+			next = curr->get_Left_Neighbor();
+			curr->set_Closest(NULL, 100);
+			curr = next;
+		} while(next != orig);
+	}
+	
+	for(unsigned int i=0;i<cells.size();i++) {
+	//	cells.at(i)->update_adhesion_springs();
+	}
+}
+
 void Tissue::cell_Division(const int Ti) {
 	bool divided = false;
 	Cell* new_cell = NULL;
@@ -137,6 +157,7 @@ void Tissue::cell_Division(const int Ti) {
 	}
 	if(divided) {
 		this->update_Neighbor_Cells();
+		this->update_Adhesion();
 	}
 	return;
 }

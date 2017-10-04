@@ -36,7 +36,7 @@ class Tissue {
 		void cell_Division(const int Ti);
 		void print_Data_Output(ofstream& ofs);
 		void print_VTK_File(ofstream& ofs);
-
+		void update_Adhesion();
 		//void grow_Cells(const int Ti);
 		//Destructor
 		~Tissue();

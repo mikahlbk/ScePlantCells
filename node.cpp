@@ -142,6 +142,8 @@ Wall_Node::Wall_Node(Coord loc, Side* my_side) : Node(loc) {
 	cyt_force = Coord();
 	equi_angle = thetaFlat;
 	on_curve = false;
+	closest = NULL;
+	closest_len = 100;
 }
 
 Wall_Node::Wall_Node(Coord loc, Side* my_side, Wall_Node* left, Wall_Node* right) 
@@ -152,7 +154,8 @@ Wall_Node::Wall_Node(Coord loc, Side* my_side, Wall_Node* left, Wall_Node* right
 	cyt_force = Coord();
 	equi_angle = thetaFlat;
 	on_curve = false;
-
+	closest = NULL;
+	closest_len = 0;
 	update_Angle();
 }
 
@@ -160,6 +163,7 @@ Wall_Node::~Wall_Node() {
 	my_side = NULL;	
 	left = NULL;
 	right = NULL;
+	closest = NULL;
 }
 
 //  Getters and Setters--------------------
@@ -172,6 +176,51 @@ void Wall_Node::set_Equi_Angle(double angle) {
 void Wall_Node::set_Curve(bool on_curve) {
 	this->on_curve = on_curve;
 	return;
+}
+void Wall_Node::set_Closest(Wall_Node*  closest, double closest_len) {
+	this->closest = closest;
+	this->closest_len = closest_len;
+	return;
+}
+Wall_Node* Wall_Node::find_Closest_Node(vector<Side*>& neighbor_Sides) {
+	Wall_Node* curr = NULL;
+	Wall_Node* next = NULL;
+	Wall_Node* closest = NULL;
+	double curr_dist = 0;
+	double smallest = 100;
+	Side* curr_Side = NULL;
+	bool seen_yes = false;
+	for(int i = 0; i < neighbor_Sides.size(); i++) {
+		curr_Side = neighbor_Sides.at(i);
+		curr = curr_Side->get_End_A();
+		do{
+			next = curr->get_Left_Neighbor();
+			curr_dist = (this->my_loc-curr->get_Location()).length();
+			if(curr_dist < smallest) {
+				closest = curr;
+				smallest = curr_dist;
+				seen_yes = true;
+			}	
+			curr = next;
+			if(seen_yes && (curr_dist > ADHThresh)) {
+					break;
+			}
+		} while(next->get_My_Side() != curr_Side);
+	}
+	return closest;
+}
+void Wall_Node::make_Connection(Wall_Node* curr_Closest) {
+	double curr_dist = 0;
+	if(curr_Closest != NULL) {
+		if(curr_Closest->get_Closest() != NULL) {
+			curr_dist = (this->get_Location() - curr_Closest->get_Location()).length();
+			if(curr_dist < closest_len) {
+				this->closest_len = curr_dist;
+				this->closest = curr_Closest;
+				curr_Closest->set_Closest(this, curr_dist);
+			}
+		}
+	}
 }
 
 double Wall_Node::get_Linear_Spring() {
@@ -243,7 +292,9 @@ Coord Wall_Node::calc_Morse_DC() {
 		} while (curr != orig);
 
 	}
-
+	if(this->closest != NULL){
+		Fdc += linear_Equation_ADH(this->closest);
+	}
 	return Fdc;
 }
 
@@ -428,15 +479,16 @@ Coord Wall_Node::bending_Equation_Right() {
 Coord Wall_Node::linear_Equation(Wall_Node* wall) {
 	if (wall == NULL) {
 		cout << "ERROR: Trying to access NULL pointer. Aborting!" << endl;
+		cout << "This is happening" << endl;
 	}
 	
 	//decide on spring constant
 	double k_linear = 0.0;
-	if (my_side == wall->get_My_Side()) {
-		k_linear = get_Linear_Spring();
+	if (this->left == wall) {
+		k_linear = wall->get_My_Side()->get_Linear_Spring();
 	}
 	else {
-		k_linear = max(get_Linear_Spring(), wall->get_Linear_Spring());
+		k_linear = get_Linear_Spring();
 	}
 
 	//use spring constant variables
@@ -447,6 +499,18 @@ Coord Wall_Node::linear_Equation(Wall_Node* wall) {
 	F_lin = (diff_vect/diff_len)*(k_linear * (diff_len - MembrEquLen));
 
 	return F_lin;	
+}
+
+Coord Wall_Node::linear_Equation_ADH(Wall_Node* wall) {
+	if (wall == NULL) {
+		cout << "Problems for days" << endl;
+	}
+	Coord F_lin;
+	Coord diff_vect = wall->get_Location() - my_loc;
+	double diff_len = diff_vect.length();
+	F_lin = (diff_vect/diff_len)*(K_ADH*(diff_len - MembrEquLen_ADH));
+
+	return F_lin;
 }
 
 //======================================

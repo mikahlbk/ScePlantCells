@@ -21,7 +21,6 @@
 Side::Side(Coord locA, Coord locZ, Cell* cell, int num_nodes) {
 
 	my_cell = cell;
-
 	end_A = new Wall_Node(locA, this);
 	end_Z = new Wall_Node(locZ, this);
 //	cout << "made end a and z" << endl;
@@ -101,6 +100,81 @@ void Side::set_My_Cell(Cell* new_cell) {
 	this-> my_cell = new_cell;
 	return;
 }
+void Side::get_Neighbor_Sides(vector<Side*>& neighbor_Sides) {
+	neighbor_Sides = this->neighbor_Sides;
+	return;
+}
+
+void Side::update_Neighbor_Sides(vector<Cell*>& neighbor_Cells) {
+	Coord my_Cell_Center = my_cell->get_Cell_Center();
+	Coord my_Mid_Point = (this->get_End_A()->get_Location() + this->get_End_Z()->get_Location())*.5;
+	string side = "NULL";
+	vector<Cell*> touching_Neighbors;
+	double my_Mid_Point_Y = my_Mid_Point.get_Y();
+	double my_Mid_Point_X = my_Mid_Point.get_X();
+	Cell* curr_Cell = NULL;
+	Coord curr_Cell_Center;
+	double center_X = 0;
+	double center_Y = 0;
+	if(my_Mid_Point_Y < my_Cell_Center.get_Y()) {
+		side = "bottom";
+	}
+	else if(my_Mid_Point_X > my_Cell_Center.get_X()) {
+		side = "right";
+	}
+	else if(my_Mid_Point_Y > my_Cell_Center.get_Y()) {
+		side = "top";
+	}
+	else if(my_Mid_Point_X < my_Cell_Center.get_X()) {
+		side = "right";
+	}
+
+	for(int i = 0; i < neighbor_Cells.size(); i++) {
+		curr_Cell = neighbor_Cells.at(i);
+		curr_Cell_Center = curr_Cell->get_Cell_Center();
+		center_X = curr_Cell_Center.get_X();
+		center_Y = curr_Cell_Center.get_Y();
+		if((side == "bottom") && (center_Y < my_Mid_Point_Y)) {
+			touching_Neighbors.push_back(curr_Cell);
+		}
+		else if((side == "right") && (center_X > my_Mid_Point_X)) {
+			touching_Neighbors.push_back(curr_Cell);
+		}
+		else if((side == "top") && (center_Y > my_Mid_Point_Y)) {
+			touching_Neighbors.push_back(curr_Cell);
+		}
+		else if((side == "left") && (center_X < my_Mid_Point_X)) {
+			touching_Neighbors.push_back(curr_Cell);
+		}
+
+	}
+	Coord curr_Side_Mid_Point;
+	vector<Side*> neighbor_Sides;
+	vector<Side*> curr_Cell_Sides;
+	Side* curr_Side = NULL;
+	double curr_len = 0;
+	double smallest = 100;
+	for(int j = 0; j < touching_Neighbors.size();j++) {
+		curr_Cell = touching_Neighbors.at(j);
+		curr_Cell->get_Sides(curr_Cell_Sides);
+		for(int i = 0; i < curr_Cell_Sides.size(); i++) {
+			curr_Side = curr_Cell_Sides.at(i);
+			curr_Side_Mid_Point = (curr_Side->get_End_A()->get_Location() + curr_Side->get_End_Z()->get_Location())*.5;
+			curr_len = (my_Mid_Point - curr_Side_Mid_Point).length();
+			if(curr_len < smallest) {
+				neighbor_Sides.push_back(curr_Side);
+				smallest = curr_len;
+			}
+		}
+	}
+	
+	this->neighbor_Sides = neighbor_Sides;
+}
+
+
+
+		
+		
 
 //=================================================================
 //=======================================

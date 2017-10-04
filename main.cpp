@@ -32,7 +32,7 @@ int main() {
 
 	cout << "Finished creating Cell" << endl;
 	//parameters for time step
-    double numSteps = 1;
+    double numSteps = 100;
 
 	// Variable for dataoutput
 	int digits;
@@ -50,7 +50,7 @@ int main() {
 		//cout << "Ti = " << Ti << endl;
 		//Print to dataOutput and VTK files
 
-		if (Ti % 100 == 0) {
+		if (Ti % 300 == 0) {
 	
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {
@@ -83,6 +83,7 @@ int main() {
 		// Update Each cell's neighboring cells
 		if (Ti % 100 == 1) {
 			growing_Tissue.update_Neighbor_Cells();
+		//	growing_Tissue.update_Adhesion();
     	}
 		
 

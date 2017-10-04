@@ -170,7 +170,7 @@ void Cell::get_Cyt_Nodes(vector<Cyt_Node*>& cyts) {
 }
 
 Wall_Node* Cell::get_Wall_Nodes() {
-	return sides.at(0)->get_Wall_Nodes();
+	return sides.at(0)->get_End_A();
 }
 
 void Cell::get_Sides(vector<Side*>& sides) {
@@ -328,11 +328,39 @@ void Cell::update_Neighbor_Cells() {
 		//else you're pointing at yourself and shouldnt do anything
 
 	}
-	
+	Side* side = NULL;
+	for(int i = 0; i<sides.size();i++) {
+		side = sides.at(i);
+		side->update_Neighbor_Sides(neigh_cells);
+	}
+		
 	cout << "Cell: " << rank << " -- neighbors: " << neigh_cells.size() << endl;
 
 	return;
 }
+
+void Cell::update_adhesion_springs() {
+	vector<Cell*> neighbor_Cells;
+	this->get_Neighbor_Cells(neighbor_Cells);
+	vector<Side*> neighbor_Sides;
+	Side* curr_side = NULL;
+	Wall_Node* curr_Node = NULL;
+	Wall_Node* next_Node = NULL;
+	Wall_Node* curr_Closest = NULL;
+	double curr_len = 0;
+	for(int i = 0; i<sides.size();i++) {
+		curr_side = sides.at(i);
+		curr_side->get_Neighbor_Sides(neighbor_Sides);
+		curr_Node = curr_side->get_End_A();
+		do {
+			next_Node = curr_Node->get_Left_Neighbor();
+			curr_Closest = curr_Node->find_Closest_Node(neighbor_Sides);
+			curr_Node->make_Connection(curr_Closest);
+			curr_Node = next_Node;
+		} while(next_Node->get_My_Side() != curr_side);
+	}
+}
+	
 /*
 bool Cell::get_Reasonable_Bounds(Wall_Node* curr, Wall_Node* & A, Wall_Node* & B) {
 
@@ -650,16 +678,16 @@ Wall_Node* Cell::find_Largest_Length() {
 
 
 void Cell::add_Wall_Node() {
-//	cout << "add wall node check" << endl;
+	cout << "add wall node check" << endl;
 	//find node to the right of largest spring
 	Wall_Node* right = find_Largest_Length();
-//	cout << "LL found" << endl;
+  cout << "LL found" << endl;
 	//find which side this node belongs to
 	if(right != NULL) {
 		Side* s = right->get_My_Side();
 		//tell that side to add a new node to the left of curr pointer
 		s->add_Wall_Node(right);
-		//cout << "wall node added" << endl;
+		cout << "wall node added" << endl;
 	}
 	return;
 }

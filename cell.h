@@ -51,7 +51,8 @@ class Cell {
 		void set_Sides(vector<Side*>& sides);
 		// Keep track of neighbor cells
 		void update_Neighbor_Cells();
-		bool get_Reasonable_Bounds(Wall_Node* curr, Wall_Node* & A, Wall_Node* & B);
+		void update_adhesion_springs();
+	//	bool get_Reasonable_Bounds(Wall_Node* curr, Wall_Node* & A, Wall_Node* & B);
 
 		// Forces and Positionsing
 		void calc_New_Forces();
@@ -70,12 +71,13 @@ class Cell {
 		Wall_Node* find_Largest_Length();
 		void add_Wall_Node();
 		void add_Cyt_Node();
-		void add_Cyt_Node_Div();
-
+	
 		//Division 
 		Cell* divide(const int Ti);
 		Cell* divide_length_wise(const int Ti);
 		Cell* divide_width_wise(const int Ti);
+		void add_Cyt_Node_Div();
+		
 };
 
 
