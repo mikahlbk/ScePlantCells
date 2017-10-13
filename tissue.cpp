@@ -29,6 +29,7 @@ Tissue::Tissue(string filename) {
 	string temp;
 	char trash;
 	int rank;
+	int layer;
 	double height, width;
 	Coord corner;
 	double x, y;
@@ -53,9 +54,13 @@ Tissue::Tissue(string filename) {
 		else if (temp == "Width") {
 			ss >> width;
 		}
+		else if (temp == "Layer") {
+			ss >> layer;
+		}
 		else if (temp == "End_Cell") {
 			//create new cell with collected data and push onto vector 
-			curr = new Cell(rank, corner, height, width, 0, this);
+			curr = new Cell(rank, corner, height, width, 0, this, layer);
+			num_cells++;
 			cells.push_back(curr);
 		}
 
@@ -63,6 +68,7 @@ Tissue::Tissue(string filename) {
 	}
 
 	ifs.close();
+	this->num_cells = num_cells;
 }
 
 Tissue::~Tissue() {
@@ -136,7 +142,7 @@ void Tissue::update_Adhesion() {
 	}
 	
 	for(unsigned int i=0;i<cells.size();i++) {
-	//	cells.at(i)->update_adhesion_springs();
+		cells.at(i)->update_adhesion_springs();
 	}
 }
 

@@ -100,55 +100,63 @@ void Side::set_My_Cell(Cell* new_cell) {
 	this-> my_cell = new_cell;
 	return;
 }
-void Side::get_Neighbor_Sides(vector<Side*>& neighbor_Sides) {
-	neighbor_Sides = this->neighbor_Sides;
+void Side::get_Touching_Neighbors(vector<Cell*>& touching_neighbors) {
+	touching_neighbors = this->touching_Neighbors;
 	return;
 }
+//void Side::update_Touching_Neighbors(vector<Cell*>* touching_Neighbors) {
+//	this->touching_Neighbors = touching_Neighbors;
+//	return;
+//}
 
-void Side::update_Neighbor_Sides(vector<Cell*>& neighbor_Cells) {
+void Side::update_Touching_Neighbors(vector<Cell*>& neighbor_Cells) {
 	Coord my_Cell_Center = my_cell->get_Cell_Center();
-	Coord my_Mid_Point = (this->get_End_A()->get_Location() + this->get_End_Z()->get_Location())*.5;
-	string side = "NULL";
-	vector<Cell*> touching_Neighbors;
-	double my_Mid_Point_Y = my_Mid_Point.get_Y();
+	double my_Cell_Center_X = my_Cell_Center.get_X();
+	double my_Cell_Center_Y = my_Cell_Center.get_Y();
+	Coord my_Mid_Point = (this->get_End_A()->get_Location() + this->get_End_Z()->get_Location())*0.5;
 	double my_Mid_Point_X = my_Mid_Point.get_X();
+	double my_Mid_Point_Y = my_Mid_Point.get_Y();
+	string side;
+	vector<Cell*> touching_Neighbors;
 	Cell* curr_Cell = NULL;
 	Coord curr_Cell_Center;
 	double center_X = 0;
 	double center_Y = 0;
-	if(my_Mid_Point_Y < my_Cell_Center.get_Y()) {
+//	cout << "Side is : " << side << endl;
+	if((this->get_End_A()->get_Location().get_Y() < my_Cell_Center_Y) && (this->get_End_A()->get_Location().get_X() < my_Cell_Center_X)) {
 		side = "bottom";
 	}
-	else if(my_Mid_Point_X > my_Cell_Center.get_X()) {
+	else if((this->get_End_A()->get_Location().get_Y() < my_Cell_Center_Y) && (this->get_End_A()->get_Location().get_X() > my_Cell_Center_X)) {
 		side = "right";
 	}
-	else if(my_Mid_Point_Y > my_Cell_Center.get_Y()) {
+	else if((this->get_End_A()->get_Location().get_Y() > my_Cell_Center_Y) && (this->get_End_A()->get_Location().get_X() > my_Cell_Center_X)) {
 		side = "top";
 	}
-	else if(my_Mid_Point_X < my_Cell_Center.get_X()) {
-		side = "right";
+	else {
+		side = "left";
 	}
-
+//	cout << "Side is : " << side << endl;
+//	cout << "Number of neighbor cells: " << neighbor_Cells.size() << endl;
 	for(int i = 0; i < neighbor_Cells.size(); i++) {
 		curr_Cell = neighbor_Cells.at(i);
 		curr_Cell_Center = curr_Cell->get_Cell_Center();
 		center_X = curr_Cell_Center.get_X();
 		center_Y = curr_Cell_Center.get_Y();
-		if((side == "bottom") && (center_Y < my_Mid_Point_Y)) {
+		if((side == "bottom") && (center_Y < this->get_End_A()->get_Location().get_Y())) {
 			touching_Neighbors.push_back(curr_Cell);
 		}
-		else if((side == "right") && (center_X > my_Mid_Point_X)) {
+		else if((side == "right") && (center_X > this->get_End_A()->get_Location().get_X())) {
 			touching_Neighbors.push_back(curr_Cell);
 		}
-		else if((side == "top") && (center_Y > my_Mid_Point_Y)) {
+		else if((side == "top") && (center_Y > this->get_End_A()->get_Location().get_Y())) {
 			touching_Neighbors.push_back(curr_Cell);
 		}
-		else if((side == "left") && (center_X < my_Mid_Point_X)) {
+		else if((side == "left") && (center_X < this->get_End_A()->get_Location().get_X())) {
 			touching_Neighbors.push_back(curr_Cell);
 		}
 
 	}
-	Coord curr_Side_Mid_Point;
+	/*Coord curr_Side_Mid_Point;
 	vector<Side*> neighbor_Sides;
 	vector<Side*> curr_Cell_Sides;
 	Side* curr_Side = NULL;
@@ -156,6 +164,7 @@ void Side::update_Neighbor_Sides(vector<Cell*>& neighbor_Cells) {
 	double smallest = 100;
 	for(int j = 0; j < touching_Neighbors.size();j++) {
 		curr_Cell = touching_Neighbors.at(j);
+		cout << "Rank : " << curr_Cell->get_Rank() << endl;
 		curr_Cell->get_Sides(curr_Cell_Sides);
 		for(int i = 0; i < curr_Cell_Sides.size(); i++) {
 			curr_Side = curr_Cell_Sides.at(i);
@@ -166,9 +175,13 @@ void Side::update_Neighbor_Sides(vector<Cell*>& neighbor_Cells) {
 				smallest = curr_len;
 			}
 		}
-	}
+	}*/
 	
-	this->neighbor_Sides = neighbor_Sides;
+//	cout << "Side is: " << side << endl;
+//	cout << "With touching neighbors size: " << touching_Neighbors.size() << endl;
+	this->touching_Neighbors = touching_Neighbors;
+//	cout << "After assigment: " << this->touching_Neighbors.size() << endl;
+	return;
 }
 
 
@@ -178,7 +191,7 @@ void Side::update_Neighbor_Sides(vector<Cell*>& neighbor_Cells) {
 
 //=================================================================
 //=======================================
-//Cell Growth
+//Cell
 //=======================================
 //=================================================================
 
@@ -227,6 +240,7 @@ void Side::add_Wall_Node(Wall_Node* right) {
 		curr->set_Equi_Angle(thetaFlat);
 	}
 	
+
 
 	return;
 }

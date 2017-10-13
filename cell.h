@@ -26,6 +26,7 @@ class Cell {
 		Tissue* my_tissue;
 		int life_length;
 		int num_cyt_nodes;
+		int layer;
 		Coord cell_center;
 		vector<Side*> sides;
 		vector<Cyt_Node*> cyt_nodes;
@@ -34,7 +35,7 @@ class Cell {
 		// Constructors
 		Cell(int rank, Tissue* tissue);
 		Cell(int rank, Coord corner, double height, double width, 
-			 int Ti, Tissue* tiss);
+			 int Ti, Tissue* tiss, int layer);
 
 		// Destructor
 		~Cell();
@@ -49,6 +50,8 @@ class Cell {
 		int get_Rank();
 		void set_Rank(const int id);
 		void set_Sides(vector<Side*>& sides);
+		int get_Layer(){return layer;}
+		void set_Layer(int layer);
 		// Keep track of neighbor cells
 		void update_Neighbor_Cells();
 		void update_adhesion_springs();

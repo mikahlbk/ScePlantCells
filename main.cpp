@@ -32,7 +32,7 @@ int main() {
 
 	cout << "Finished creating Cell" << endl;
 	//parameters for time step
-    double numSteps = 100;
+    double numSteps = 10000;
 
 	// Variable for dataoutput
 	int digits;
@@ -50,7 +50,7 @@ int main() {
 		//cout << "Ti = " << Ti << endl;
 		//Print to dataOutput and VTK files
 
-		if (Ti % 300 == 0) {
+		if (Ti % 500 == 0) {
 	
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {
@@ -83,21 +83,21 @@ int main() {
 		// Update Each cell's neighboring cells
 		if (Ti % 100 == 1) {
 			growing_Tissue.update_Neighbor_Cells();
-		//	growing_Tissue.update_Adhesion();
+			growing_Tissue.update_Adhesion();
     	}
 		
 
 		// Tissue Growth
 		growing_Tissue.update_Life_Length();
-		//cout << "updated life length" << endl;
+	//	cout << "updated life length" << endl;
 		//Calculate new forces on cells and nodes
 		growing_Tissue.calc_New_Forces();
-		//cout << "calculated forces" << endl;
+	//	cout << "calculated forces" << endl;
 		//Update node positions
 		growing_Tissue.update_Cell_Locations();
-		//cout << "updated node positions" << endl;
-		//cout << "division" << endl;
-	//	growing_Tissue.cell_Division(Ti);
+	//	cout << "updated node positions" << endl;
+	//	cout << "division" << endl;
+		growing_Tissue.cell_Division(Ti);
 		}
 
 	int stop = clock();

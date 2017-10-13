@@ -90,7 +90,7 @@ class Wall_Node: public Node {
 		void set_Right_Neighbor(Wall_Node* new_Right);
 		Side* get_My_Side() {return my_side;}
 		Wall_Node* get_Closest() {return closest;}
-		Wall_Node* find_Closest_Node(vector<Side*>& neighbor_Sides);
+		Wall_Node* find_Closest_Node(vector<Cell*>& touching_neighbors);
 		void make_Connection(Wall_Node* curr_Closest);
 		// Force Calculations
 		virtual void calc_Forces();

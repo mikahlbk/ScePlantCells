@@ -27,7 +27,7 @@ Cell::Cell(int rank, Tissue* tissue) {
 	life_length = 0;
 }
 
-Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* tiss)    {
+Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* tiss, int layer)    {
 	
 	num_cyt_nodes = 0;	
 	this->my_tissue = tiss;
@@ -51,7 +51,7 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	Side* s = new Side(locA, locZ, this, num_end_nodes);
 //	cout << "made side" << endl;
 	s->set_Phys_Parameters(kBendLow, kLinearHigh);
-	if ((this->get_Rank() == 3) || (this->get_Rank() == 4)) {
+	if (layer == 1) {
 		s->set_Phys_Parameters(kBendHigh, kLinearLow);
     }
 //	cout << "set params" << endl;
@@ -62,7 +62,7 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	locZ = locA + Coord(0.0, (height - 0.08));
 	s = new Side(locA, locZ, this, num_flank_nodes);
 	s->set_Phys_Parameters(kBendHigh, kLinearLow);
-	if ((this->get_Rank() == 3) || (this->get_Rank() == 4)) {
+	if (layer == 1) {
 		s->set_Phys_Parameters(kBendLow, kLinearHigh);
     }
 	sides.push_back(s);
@@ -72,7 +72,7 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	locZ = locA + Coord(-(width - 0.08), 0.0);
 	s = new Side(locA, locZ, this, num_end_nodes);
 	s->set_Phys_Parameters(kBendLow, kLinearHigh);
-	if ((this->get_Rank() == 3) || (this->get_Rank()==4)) {
+	if (layer == 1) {
 		s->set_Phys_Parameters(kBendHigh, kLinearLow);
     }
 	sides.push_back(s);
@@ -82,7 +82,7 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	locZ = corner + Coord(0.0, 0.04);
 	s = new Side(locA, locZ, this, num_flank_nodes);
 	s->set_Phys_Parameters(kBendHigh, kLinearLow);
-	if ((this->get_Rank() == 3) || (this->get_Rank() ==4)) {
+	if (layer == 1) {
 		s->set_Phys_Parameters(kBendLow, kLinearHigh);
     }
 	sides.push_back(s);
@@ -182,7 +182,10 @@ void Cell::set_Sides(vector<Side*>& sides) {
 	this->sides = sides;
 	return;
 }
-
+void Cell::set_Layer(int layer) {
+	this->layer = layer;
+	return;
+}
 void Cell::get_Neighbor_Cells(vector<Cell*>& cells) {
 	cells = neigh_cells;
 	return;
@@ -227,7 +230,7 @@ void Cell::update_Neighbor_Cells() {
 	double my_maxY = sides.at(3)->get_End_A()->get_Location().get_Y();
 
 	double prelim_threshold = 5.0;
-	double sec_threshold = 2;
+	double sec_threshold = 0.7;
 
 	bool checkA = false;
 	bool checkB = false;
@@ -243,7 +246,7 @@ void Cell::update_Neighbor_Cells() {
 		if (curr != this) {
 			curr_Cent = curr->get_Cell_Center();
 			// Check if cell centers are close enough together
-			if ( (curr_Cent - cell_center).length() < prelim_threshold ) {
+			if ( (this->cell_center - curr_Cent).length() < prelim_threshold ) {
 				
 				curr_cX = curr_Cent.get_X();
 				curr_cY = curr_Cent.get_Y();
@@ -321,17 +324,23 @@ void Cell::update_Neighbor_Cells() {
 			// if both checks come out true, then add curr to neigh cells
 			if ( checkA && checkB) {
 				neigh_cells.push_back(curr);
-				//cout << rank << "has neighbor" << curr->get_Rank() << endl;
+			//	cout << rank << "has neighbor" << curr->get_Rank() << endl;
 			}
 			
 		}
 		//else you're pointing at yourself and shouldnt do anything
 
 	}
+	
 	Side* side = NULL;
-	for(int i = 0; i<sides.size();i++) {
+	vector<Cell*>touch;
+	for(int i = 0; i < sides.size();i++) {
+	//	cout << "Update step. Cell rank : " << this->get_Rank() << endl;
+	//	cout << "Side: " << i << endl;
 		side = sides.at(i);
-		side->update_Neighbor_Sides(neigh_cells);
+		side->update_Touching_Neighbors(neigh_cells);
+		side->get_Touching_Neighbors(touch);
+	//	cout << "Num touching Neighbs is : " << touch.size() << endl;
 	}
 		
 	cout << "Cell: " << rank << " -- neighbors: " << neigh_cells.size() << endl;
@@ -342,26 +351,50 @@ void Cell::update_Neighbor_Cells() {
 void Cell::update_adhesion_springs() {
 	vector<Cell*> neighbor_Cells;
 	this->get_Neighbor_Cells(neighbor_Cells);
-	vector<Side*> neighbor_Sides;
+	//cout << "neighbor cells size :" << neighbor_Cells.size() << endl;
+	vector<Cell*>touching_neighbors;
 	Side* curr_side = NULL;
 	Wall_Node* curr_Node = NULL;
 	Wall_Node* next_Node = NULL;
 	Wall_Node* curr_Closest = NULL;
 	double curr_len = 0;
 	for(int i = 0; i<sides.size();i++) {
+	//	cout << "Rank : " << this->get_Rank() << endl;
+	//	cout << "Side: " << i << endl;
 		curr_side = sides.at(i);
-		curr_side->get_Neighbor_Sides(neighbor_Sides);
+		curr_side->get_Touching_Neighbors(touching_neighbors);
+	//	cout << "Number touching neighbors: " << touching_neighbors.size() << endl;
 		curr_Node = curr_side->get_End_A();
 		do {
 			next_Node = curr_Node->get_Left_Neighbor();
-			curr_Closest = curr_Node->find_Closest_Node(neighbor_Sides);
+			curr_Closest = curr_Node->find_Closest_Node(touching_neighbors);
+		//	if(curr_Closest == NULL) {
+				//cout << "Did not find a curr closest" << endl;
+		//	}
 			curr_Node->make_Connection(curr_Closest);
 			curr_Node = next_Node;
 		} while(next_Node->get_My_Side() != curr_side);
 	}
 }
-	
-/*
+
+/*void Cell::ADH_Check() {
+	Wall_Node* curr = NULL;
+	Wall_Node* orig = NULL;
+	int counter_node = 0;
+	curr = this->get_Wall_Nodes()
+	orig = curr;
+	Wall_Node* next = NULL;
+	do {
+		next = curr->get_Left_Neighbor();
+		counter_node++;
+		if(curr->get_Closest() != NULL) {
+			cout << "node: " << counter_node << "has as closest" << endl;
+		}
+		curr = next;
+	} while(next! = orig);
+}
+*/
+		/*
 bool Cell::get_Reasonable_Bounds(Wall_Node* curr, Wall_Node* & A, Wall_Node* & B) {
 
 	bool close_enough = true;
@@ -471,18 +504,21 @@ void Cell::calc_New_Forces() {
 //		cout << "entered loop" << endl;
 		cyt_nodes.at(i)->calc_Forces();
 	}
-//	cout << "cyt nodes forces calced" << endl;
+//cout << "cyt nodes forces calced" << endl;
 	//calc forces on wall nodes
 	Wall_Node* curr = sides.at(0)->get_Wall_Nodes();
+	//cout << "got the end a" << endl;
 	Wall_Node* orig = curr;
-	
+//	int ticker = 0;
 	do {
 		curr->calc_Forces();
+		//ticker++;
+		//cout << "calculated forces for node: " << ticker << endl;
 		curr = curr->get_Left_Neighbor();
 	
 	} while (curr != orig);
 
-//	cout << "wall nodes forces calced" << endl;
+//cout << "wall nodes forces calced" << endl;
 	return;
 }
 
@@ -678,16 +714,19 @@ Wall_Node* Cell::find_Largest_Length() {
 
 
 void Cell::add_Wall_Node() {
-	cout << "add wall node check" << endl;
+	//cout << "add wall node check" << endl;
 	//find node to the right of largest spring
 	Wall_Node* right = find_Largest_Length();
-  cout << "LL found" << endl;
+  //cout << "LL found" << endl;
 	//find which side this node belongs to
 	if(right != NULL) {
 		Side* s = right->get_My_Side();
 		//tell that side to add a new node to the left of curr pointer
 		s->add_Wall_Node(right);
-		cout << "wall node added" << endl;
+		//cout << "wall node added" << endl;
+	}
+	else {
+		cout << "null" << endl;
 	}
 	return;
 }
@@ -723,7 +762,6 @@ void Cell::add_Cyt_Node_Div() {
 	num_cyt_nodes++;
 	return;
 }
-
 
 
 

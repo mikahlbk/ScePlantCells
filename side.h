@@ -20,7 +20,7 @@ class Side {
 		Wall_Node* end_Z;
 		int num_wall_nodes;
 		Cell* my_cell;
-		vector<Side*> neighbor_Sides;
+		vector<Cell*> touching_Neighbors;
 		double linear_spring;
 		double bending_spring;
 	public:
@@ -37,8 +37,9 @@ class Side {
 		Wall_Node* get_End_Z() {return end_Z;}
 		int get_Wall_Count() {return num_wall_nodes;}
 		//cell level
-		void update_Neighbor_Sides(vector<Cell*>& neighbor_Cells);
-		void get_Neighbor_Sides(vector<Side*>& neighbor_Sides);
+		void update_Touching_Neighbors(vector<Cell*>& neighbor_Cells);
+		void get_Touching_Neighbors(vector<Cell*>& touching_neighbors);
+		//void update_Touching_Neighbors(vector<Cell*>& touching_Neighbors);
 		Cell* get_My_Cell() {return my_cell;}
 		void set_My_Cell(Cell* new_cell);
 		//add setter for division to set new cell

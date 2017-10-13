@@ -33,9 +33,14 @@ Cell* Cell::divide(const int Ti) {
 	x_length = x_vec.length();
 	y_length = y_vec.length();
 	area = y_length*x_length;
-	if(area > 3) {
-		//cout << "cell will divide" << endl;
-		sister = this->divide_width_wise(Ti);		
+	if(area > 4) {
+		if(this->layer == 0){
+			//cout << "cell will divide" << endl;
+			sister = this->divide_width_wise(Ti);		
+		}
+		else {
+			sister = this->divide_length_wise(Ti);
+		}
 	}
 	return sister;
 
@@ -46,7 +51,11 @@ Cell* Cell::divide_length_wise(const int Ti) {
 	//	-"this" will keep its entity as the left sister
 	//	this functoin will create a sister cell to the right
 	//	and return it to the tissue
+//  cout << "Number Cells : " << my_tissue->get_Num_Cells() << endl;
+//	int new_Rank = my_tissue->get_Num_Cells();
+//	cout << new_Rank << " is new rank " << endl;
 	Cell* sister = new Cell(Ti, my_tissue);
+//	sister->set_Rank(new_Rank);
 	vector<Side*> sister_sides;
 	//Find division point
 	//divide at midpoint
@@ -79,9 +88,9 @@ Cell* Cell::divide_length_wise(const int Ti) {
 		curr = next;
 		num_nodes++;
 	} while( !passed_div_line );
-	Side* A0 = new Side(sides.at(0)->get_End_A()->get_Location(),A0_End_Z->get_Location()-Coord(.1,0),this, num_nodes-1);
+	Side* A0 = new Side(sides.at(0)->get_End_A()->get_Location(),A0_End_Z->get_Location()-Coord(.3,0),this, num_nodes-1);
 	A0->set_Phys_Parameters(kBendLow,kLinearHigh);
-	Side* B0 = new Side(B0_End_A->get_Location()+Coord(.1,0), sides.at(0)->get_End_Z()->get_Location(), sister, sides.at(0)->get_Wall_Count()-num_nodes-1);
+	Side* B0 = new Side(B0_End_A->get_Location()+Coord(.3,0), sides.at(0)->get_End_Z()->get_Location(), sister, sides.at(0)->get_Wall_Count()-num_nodes-1);
 	B0->set_Phys_Parameters(kBendLow,kLinearHigh);
 	//delete previous A0
 	//cout << "deleting side 0" << endl;
@@ -110,9 +119,9 @@ Cell* Cell::divide_length_wise(const int Ti) {
 		num_nodes++;
 	} while(!passed_div_line);
 	
-	Side* A2 = new Side(A2_End_A->get_Location()-Coord(.1,0),sides.at(2)->get_End_Z()->get_Location(),this, num_nodes-1);
+	Side* A2 = new Side(A2_End_A->get_Location()-Coord(.3,0),sides.at(2)->get_End_Z()->get_Location(),this, num_nodes-1);
 	A2->set_Phys_Parameters(kBendLow,kLinearHigh);
-	Side* B2 = new Side(sides.at(2)->get_End_A()->get_Location(),B2_End_Z->get_Location()+Coord(.1,0), sister, sides.at(2)->get_Wall_Count()-num_nodes-1);
+	Side* B2 = new Side(sides.at(2)->get_End_A()->get_Location(),B2_End_Z->get_Location()+Coord(.3,0), sister, sides.at(2)->get_Wall_Count()-num_nodes-1);
 	B2->set_Phys_Parameters(kBendLow,kLinearHigh);
 	//delete current A2
 	delete sides.at(2);
@@ -149,6 +158,8 @@ Cell* Cell::divide_length_wise(const int Ti) {
 	//changes sides vector in cell B aka sister
 	sister->set_Sides(sister_sides);
 
+	int layer = this->get_Layer();
+	sister->set_Layer(layer);
 
 	//cout << "updating angles" << endl;
 	//update angles and cell centers for both cells
@@ -209,7 +220,11 @@ Cell* Cell::divide_width_wise(const int Ti) {
 	//	-"this" will keep its entity as the left sister
 	//	this functoin will create a sister cell to the top
 	//	and return it to the tissue
+	//  cout << "Number Cells : " << my_tissue->get_Num_Cells() << endl;
+//	int new_Rank = my_tissue->get_Num_Cells();
+    //cout << new_Rank << " is new rank " << endl;
 	Cell* sister = new Cell(Ti, my_tissue);
+//	sister->set_Rank(new_Rank);
 	vector<Side*> sister_sides;
 	//Find division point
 	//divide at midpoint
@@ -242,9 +257,9 @@ Cell* Cell::divide_width_wise(const int Ti) {
 		curr = next;
 		num_nodes++;
 	} while( !passed_div_line );
-	Side* A1 = new Side(sides.at(1)->get_End_A()->get_Location(),A1_End_Z->get_Location()-Coord(0,0.1),this, num_nodes-1);
+	Side* A1 = new Side(sides.at(1)->get_End_A()->get_Location(),A1_End_Z->get_Location()-Coord(0,0.3),this, num_nodes-1);
 	A1->set_Phys_Parameters(kBendHigh,kLinearLow);
-	Side* B1 = new Side(B1_End_A->get_Location()+Coord(0,0.1), sides.at(1)->get_End_Z()->get_Location(), sister, sides.at(1)->get_Wall_Count()-num_nodes-1);
+	Side* B1 = new Side(B1_End_A->get_Location()+Coord(0,0.3), sides.at(1)->get_End_Z()->get_Location(), sister, sides.at(1)->get_Wall_Count()-num_nodes-1);
 	B1->set_Phys_Parameters(kBendHigh,kLinearLow);
 	//delete previous A1
 	//cout << "deleting side 1" << endl;
@@ -277,9 +292,9 @@ Cell* Cell::divide_width_wise(const int Ti) {
 		num_nodes++;
 	} while(!passed_div_line);
 	
-	Side* A3 = new Side(A3_End_A->get_Location()-Coord(0,0.1),sides.at(3)->get_End_Z()->get_Location(),this, num_nodes-1);
+	Side* A3 = new Side(A3_End_A->get_Location()-Coord(0,0.3),sides.at(3)->get_End_Z()->get_Location(),this, num_nodes-1);
 	A3->set_Phys_Parameters(kBendHigh,kLinearLow);
-	Side* B3 = new Side(sides.at(3)->get_End_A()->get_Location(),B3_End_Z->get_Location()+Coord(0,0.1), sister, sides.at(3)->get_Wall_Count()-num_nodes-1);
+	Side* B3 = new Side(sides.at(3)->get_End_A()->get_Location(),B3_End_Z->get_Location()+Coord(0,0.3), sister, sides.at(3)->get_Wall_Count()-num_nodes-1);
 	B3->set_Phys_Parameters(kBendHigh,kLinearLow);
 	//delete current A3
 	delete sides.at(3);

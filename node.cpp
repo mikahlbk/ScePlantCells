@@ -33,7 +33,7 @@ void Node::update_Location() {
 
 Node::~Node() {}
 //========================================
-/** class Cyt Node Functions **/
+
 Cyt_Node::Cyt_Node(Coord loc, Cell* my_cell) : Node(loc) {
 	this->my_cell = my_cell;
 
@@ -151,11 +151,12 @@ Wall_Node::Wall_Node(Coord loc, Side* my_side, Wall_Node* left, Wall_Node* right
 
     this->left = left;
     this->right = right;
+	this-> my_side = my_side;
 	cyt_force = Coord();
 	equi_angle = thetaFlat;
 	on_curve = false;
 	closest = NULL;
-	closest_len = 0;
+	closest_len = 100;
 	update_Angle();
 }
 
@@ -182,44 +183,53 @@ void Wall_Node::set_Closest(Wall_Node*  closest, double closest_len) {
 	this->closest_len = closest_len;
 	return;
 }
-Wall_Node* Wall_Node::find_Closest_Node(vector<Side*>& neighbor_Sides) {
+Wall_Node* Wall_Node::find_Closest_Node(vector<Cell*>& touching_neighbors) {
 	Wall_Node* curr = NULL;
+	Wall_Node* orig = NULL;
 	Wall_Node* next = NULL;
 	Wall_Node* closest = NULL;
 	double curr_dist = 0;
 	double smallest = 100;
-	Side* curr_Side = NULL;
+	Cell* curr_Cell = NULL;
 	bool seen_yes = false;
-	for(int i = 0; i < neighbor_Sides.size(); i++) {
-		curr_Side = neighbor_Sides.at(i);
-		curr = curr_Side->get_End_A();
+	for(int i = 0; i < touching_neighbors.size(); i++) {
+		curr_Cell = touching_neighbors.at(i);
+		curr = curr_Cell->get_Wall_Nodes();
+		orig = curr;
 		do{
 			next = curr->get_Left_Neighbor();
 			curr_dist = (this->my_loc-curr->get_Location()).length();
-			if(curr_dist < smallest) {
+			if(curr_dist > ADHThresh) {
+				//do nothing
+			}
+			else if(curr_dist < smallest) {
+				//cout << "made it in here" << endl;
 				closest = curr;
 				smallest = curr_dist;
-				seen_yes = true;
+				//seen_yes = true;
 			}	
 			curr = next;
-			if(seen_yes && (curr_dist > ADHThresh)) {
-					break;
-			}
-		} while(next->get_My_Side() != curr_Side);
+		} while (next != orig);
+		
 	}
 	return closest;
 }
 void Wall_Node::make_Connection(Wall_Node* curr_Closest) {
 	double curr_dist = 0;
 	if(curr_Closest != NULL) {
-		if(curr_Closest->get_Closest() != NULL) {
+	/*	if(curr_Closest->get_Closest() != NULL) {
 			curr_dist = (this->get_Location() - curr_Closest->get_Location()).length();
-			if(curr_dist < closest_len) {
+			if(curr_dist < this->closest_len) {
 				this->closest_len = curr_dist;
 				this->closest = curr_Closest;
 				curr_Closest->set_Closest(this, curr_dist);
 			}
 		}
+		else {*/
+		this->closest_len = curr_dist;
+		this->closest = curr_Closest;
+		curr_Closest->set_Closest(this, curr_dist);
+		//}
 	}
 }
 
@@ -249,8 +259,11 @@ void Wall_Node::calc_Forces() {
 	cyt_force = sum;
 
 	sum += calc_Morse_DC();
+	//cout << "DC" << endl;
 	sum += calc_Linear();
+	//cout << "linear" << endl;
 	sum += calc_Bending();
+	//cout << "bending" << endl;
 
 	// Update new_force variable for location updating
 	new_force = sum;
@@ -276,24 +289,23 @@ Coord Wall_Node::calc_Morse_SC() {
 //morse potential between wall node i and every cyt node in cell
 Coord Wall_Node::calc_Morse_DC() {
 	Coord Fdc;
-
 	vector<Cell*> cells;
-	my_side->get_My_Cell()->get_Neighbor_Cells(cells);
-	
+	my_side->get_My_Cell()->get_Neighbor_Cells(cells);	
 	Wall_Node* curr = NULL;
 	Wall_Node* orig = NULL;
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		curr = cells.at(i)->get_Wall_Nodes();
 		orig = curr;
-
 		do {
 			Fdc += morse_Equation(curr);
 			curr = curr->get_Left_Neighbor();
 		} while (curr != orig);
-
 	}
+	//int counter = 0;
 	if(this->closest != NULL){
 		Fdc += linear_Equation_ADH(this->closest);
+		//counter++;
+		//cout << "Counter: "  << counter <<  endl; 
 	}
 	return Fdc;
 }
@@ -318,10 +330,10 @@ Coord Wall_Node::calc_Bending() {
 Coord Wall_Node::calc_Linear() {
 	Coord F_lin;
 
-	//calc left
+	//cout << "calc left" << endl;
 	F_lin += linear_Equation(left);
 
-	//calc right
+	//cout << "calc right" << endl;
 	F_lin += linear_Equation(right);
 	//cout << "	linear: " << F_lin << endl;
 	return F_lin;
@@ -479,7 +491,7 @@ Coord Wall_Node::bending_Equation_Right() {
 Coord Wall_Node::linear_Equation(Wall_Node* wall) {
 	if (wall == NULL) {
 		cout << "ERROR: Trying to access NULL pointer. Aborting!" << endl;
-		cout << "This is happening" << endl;
+		//cout << "This is happening" << endl;
 	}
 	
 	//decide on spring constant
@@ -503,7 +515,7 @@ Coord Wall_Node::linear_Equation(Wall_Node* wall) {
 
 Coord Wall_Node::linear_Equation_ADH(Wall_Node* wall) {
 	if (wall == NULL) {
-		cout << "Problems for days" << endl;
+		//cout << "Problems for days" << endl;
 	}
 	Coord F_lin;
 	Coord diff_vect = wall->get_Location() - my_loc;
