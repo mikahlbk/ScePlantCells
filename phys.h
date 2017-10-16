@@ -13,9 +13,9 @@
 //=====================
 
 // Simulation Constants
-const double dt = 0.003;
-const int ADD_WALL_TIMER = 1500;
-const int ADD_CYT_TIMER = 1000;
+const double dt = 0.0003;
+const int ADD_WALL_TIMER = 5500;
+const int ADD_CYT_TIMER = 5000;
 
 const int MAX_NUM_WALL = 200;
 const int MAX_NUM_CYT = 60;
@@ -30,19 +30,19 @@ const double pi = acos(-1.0);
 const double thetaFlat = pi;
 const double thetaCurve = pi * (11.0 / 12.0);
 
-const double kBendHigh = 6;
-const double kBendLow = 6;
+const double kBendHigh = 35;
+const double kBendLow = 20;
 
 const double kLinearHigh = 200;
-const double kLinearLow = 200;
+const double kLinearLow = 100;
 
-const double K_ADH = 60;
+const double K_ADH = 20;
 const double MembrEquLen_ADH = .4;
 //linear spring equilibrium length
 const double MembrEquLen = .0625; 
 const double MEMBR_THRESH_LENGTH = 0.15; 
 const double ADHThresh = .78125;
-//const double damping = 36.0;
+const double damping = 1;
 ///// Subcellular element parameters for membrane - membrane interactions
 
 const double U_MM = 0.2;
