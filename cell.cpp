@@ -34,7 +34,7 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	this->rank = rank;
 
 	Coord cell_center = Coord(corner.get_X() + (width / 2), corner.get_Y() + (height / 2));
-
+	
 	life_length = 0;
 
 	//rough estimates for cell sizing
@@ -51,9 +51,9 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	Side* s = new Side(locA, locZ, this, num_end_nodes);
 //	cout << "made side" << endl;
 	s->set_Phys_Parameters(kBendLow, kLinearHigh);
-	if (layer == 1) {
-		s->set_Phys_Parameters(kBendHigh, kLinearLow);
-    }
+//	if (layer == 1) {
+//		s->set_Phys_Parameters(kBendHigh, kLinearLow);
+//  }
 //	cout << "set params" << endl;
 	sides.push_back(s);
 //	cout << "I made side A" << endl;
@@ -62,9 +62,9 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	locZ = locA + Coord(0.0, (height - 0.08));
 	s = new Side(locA, locZ, this, num_flank_nodes);
 	s->set_Phys_Parameters(kBendHigh, kLinearLow);
-	if (layer == 1) {
-		s->set_Phys_Parameters(kBendLow, kLinearHigh);
-    }
+//	if (layer == 1) {
+//		s->set_Phys_Parameters(kBendLow, kLinearHigh);
+//  }
 	sides.push_back(s);
 //	cout << "I made side B" << endl;
 	//side C
@@ -82,9 +82,9 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	locZ = corner + Coord(0.0, 0.04);
 	s = new Side(locA, locZ, this, num_flank_nodes);
 	s->set_Phys_Parameters(kBendHigh, kLinearLow);
-	if (layer == 1) {
-		s->set_Phys_Parameters(kBendLow, kLinearHigh);
-    }
+//	if (layer == 1) {
+//		s->set_Phys_Parameters(kBendLow, kLinearHigh);
+//  }
 	sides.push_back(s);
 //	cout << "I made side D" << endl;
 	//Connect the four disjoint sides
@@ -95,7 +95,9 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	
 	//update wall angles
 	update_Wall_Angles();
-	
+	//update cell center
+	update_Cell_Center();
+
 //	cout << "I connected the sides" << endl;
 	//Insert cytoplasm nodes
 	num_cyt_nodes = 20;
@@ -217,6 +219,7 @@ void Cell::update_Neighbor_Cells() {
 	// Empty variables for holding info about other cells
 	Cell* curr = NULL;
 	Coord curr_Cent;
+	Coord distance;
 	double curr_cX, curr_cY;
 	double curr_minX, curr_maxX, curr_minY, curr_maxY;
 	vector<Side*> curr_sides;
@@ -246,7 +249,9 @@ void Cell::update_Neighbor_Cells() {
 		if (curr != this) {
 			curr_Cent = curr->get_Cell_Center();
 			// Check if cell centers are close enough together
-			if ( (this->cell_center - curr_Cent).length() < prelim_threshold ) {
+			distance = this->cell_center - curr_Cent;
+			//cout << "Distance = " << distance << endl;
+			if ( distance.length() < prelim_threshold ) {
 				
 				curr_cX = curr_Cent.get_X();
 				curr_cY = curr_Cent.get_Y();
@@ -324,7 +329,7 @@ void Cell::update_Neighbor_Cells() {
 			// if both checks come out true, then add curr to neigh cells
 			if ( checkA && checkB) {
 				neigh_cells.push_back(curr);
-			//	cout << rank << "has neighbor" << curr->get_Rank() << endl;
+				cout << rank << "has neighbor" << curr->get_Rank() << endl;
 			}
 			
 		}
@@ -359,21 +364,24 @@ void Cell::update_adhesion_springs() {
 	Wall_Node* curr_Closest = NULL;
 	double curr_len = 0;
 	for(int i = 0; i<sides.size();i++) {
-	//	cout << "Rank : " << this->get_Rank() << endl;
-	//	cout << "Side: " << i << endl;
+		cout << "Rank : " << this->get_Rank() << endl;
+		cout << "Side: " << i << endl;
 		curr_side = sides.at(i);
 		curr_side->get_Touching_Neighbors(touching_neighbors);
-	//	cout << "Number touching neighbors: " << touching_neighbors.size() << endl;
+		cout << "Number touching neighbors: " << touching_neighbors.size() << endl;
 		curr_Node = curr_side->get_End_A();
 		do {
 			next_Node = curr_Node->get_Left_Neighbor();
 			curr_Closest = curr_Node->find_Closest_Node(touching_neighbors);
-		//	if(curr_Closest == NULL) {
-				//cout << "Did not find a curr closest" << endl;
-		//	}
+			/*if(curr_Closest == NULL) {
+				cout << "Did not find a curr closest" << endl;
+			}
+			else {
+				cout << curr_Closest << endl;
+			}*/
 			curr_Node->make_Connection(curr_Closest);
 			curr_Node = next_Node;
-		} while(next_Node->get_My_Side() != curr_side);
+		} while(next_Node->get_My_Side() == curr_side);
 	}
 }
 

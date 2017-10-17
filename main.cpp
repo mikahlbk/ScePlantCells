@@ -32,7 +32,7 @@ int main() {
 
 	cout << "Finished creating Cell" << endl;
 	//parameters for time step
-    double numSteps = 100;
+    double numSteps = 1000;
 
 	// Variable for dataoutput
 	int digits;
@@ -44,13 +44,13 @@ int main() {
 	int out = 0; //counter for creating output/vtk files
 
 	//loop for time steps
-	for(int Ti = 0; Ti*dt < numSteps; Ti++) {
+	for(int Ti = 0; Ti < numSteps; Ti++) {
 		//loop through all cells
 		//for now only one cell
 		//cout << "Ti = " << Ti << endl;
 		//Print to dataOutput and VTK files
 
-		if (Ti % 1 == 0) {
+		if (Ti % 5 == 0) {
 	
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {
@@ -75,17 +75,17 @@ int main() {
 			out++;
 		}
 
-		if (Ti % 1 == 0) {
+		if (Ti % 1000 == 0) {
 			cout << "Simulation still running. Ti: " << Ti << endl;
 		}
 		
 		
 		// Update Each cell's neighboring cells
-		if (Ti % 100 == 1) {
+		if (Ti % 1 == 0) {
 			cout << "Find Neighbors" << endl;
 			growing_Tissue.update_Neighbor_Cells();
 			cout << "Make Adhesion" << endl;
-			growing_Tissue.update_Adhesion();
+			//growing_Tissue.update_Adhesion();
     	}
 		
 

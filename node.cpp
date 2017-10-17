@@ -33,7 +33,7 @@ void Node::update_Location() {
 
 Node::~Node() {}
 //========================================
-
+/**class Cyt Node Functions**/
 Cyt_Node::Cyt_Node(Coord loc, Cell* my_cell) : Node(loc) {
 	this->my_cell = my_cell;
 
@@ -199,14 +199,13 @@ Wall_Node* Wall_Node::find_Closest_Node(vector<Cell*>& touching_neighbors) {
 		do{
 			next = curr->get_Left_Neighbor();
 			curr_dist = (this->my_loc-curr->get_Location()).length();
-			if(curr_dist > ADHThresh) {
-				//do nothing
-			}
-			else if(curr_dist < smallest) {
+			if(curr_dist < ADHThresh) {
+				if(curr_dist < smallest) {
 				//cout << "made it in here" << endl;
 				closest = curr;
 				smallest = curr_dist;
 				//seen_yes = true;
+				}
 			}	
 			curr = next;
 		} while (next != orig);
@@ -217,19 +216,24 @@ Wall_Node* Wall_Node::find_Closest_Node(vector<Cell*>& touching_neighbors) {
 void Wall_Node::make_Connection(Wall_Node* curr_Closest) {
 	double curr_dist = 0;
 	if(curr_Closest != NULL) {
-	/*	if(curr_Closest->get_Closest() != NULL) {
+		//cout << "Making connection" << endl;
+		if(curr_Closest->get_Closest() != NULL) {
 			curr_dist = (this->get_Location() - curr_Closest->get_Location()).length();
 			if(curr_dist < this->closest_len) {
 				this->closest_len = curr_dist;
 				this->closest = curr_Closest;
 				curr_Closest->set_Closest(this, curr_dist);
 			}
+			else if (curr_dist > this->closest_len) {
+				//do nothing
+			}
 		}
-		else {*/
-		this->closest_len = curr_dist;
-		this->closest = curr_Closest;
-		curr_Closest->set_Closest(this, curr_dist);
-		//}
+	
+		else {
+			this->closest_len = curr_dist;
+			this->closest = curr_Closest;
+			curr_Closest->set_Closest(this, curr_dist);
+		}
 	}
 }
 
@@ -259,7 +263,7 @@ void Wall_Node::calc_Forces() {
 	cyt_force = sum;
 
 	sum += calc_Morse_DC();
-	//cout << "DC" << endl;
+	//cout << "DC" << calc_Morse_DC() << endl;
 	sum += calc_Linear();
 	//cout << "linear" << endl;
 	sum += calc_Bending();

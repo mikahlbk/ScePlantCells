@@ -131,7 +131,7 @@ void Tissue::update_Adhesion() {
 	Wall_Node* orig = NULL;
 	Wall_Node* next = NULL;
 	for (unsigned int i = 0;i<cells.size();i++) {
-		cout<< "going into adhesion function" << endl;
+		//cout<< "clearing current closest info" << endl;
 		curr = cells.at(i)->get_Wall_Nodes();
 		orig = curr;
 		do {
@@ -142,6 +142,7 @@ void Tissue::update_Adhesion() {
 	}
 	
 	for(unsigned int i=0;i<cells.size();i++) {
+		//cout << "Updating adhesion for cell" << endl;
 		cells.at(i)->update_adhesion_springs();
 	}
 }
