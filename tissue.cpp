@@ -219,7 +219,7 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 
 	ofs << endl;
 
-	/*
+	
 	ofs << "POINT_DATA " << num_Points << endl;
 	ofs << "SCALARS magnitude float " << 1 << endl;
 	ofs << "LOOKUP_TABLE default" << endl;
@@ -234,7 +234,7 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 		cells.at(i)->print_VTK_Vectors(ofs);
 	}
 
-	*/
+	
 
 	return;
 }

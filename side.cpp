@@ -96,91 +96,83 @@ void Side::set_Phys_Parameters(double kbend, double klin) {
 	return;
 }
 
+void Side::set_Side_Type(int type) {
+	side_type = type;
+	return;
+}
 void Side::set_My_Cell(Cell* new_cell) {
 	this-> my_cell = new_cell;
 	return;
 }
-void Side::get_Touching_Neighbors(vector<Cell*>& touching_neighbors) {
-	touching_neighbors = this->touching_Neighbors;
+void Side::get_Touching_Sides(vector<Side*>& touching_sides) {
+	touching_sides = this->touching_Sides;
 	return;
 }
-//void Side::update_Touching_Neighbors(vector<Cell*>* touching_Neighbors) {
-//	this->touching_Neighbors = touching_Neighbors;
-//	return;
-//}
 
-void Side::update_Touching_Neighbors(vector<Cell*>& neighbor_Cells) {
-	Coord my_Cell_Center = my_cell->get_Cell_Center();
-	double my_Cell_Center_X = my_Cell_Center.get_X();
-	double my_Cell_Center_Y = my_Cell_Center.get_Y();
+void Side::update_Touching_Sides(vector<Cell*>& neighbor_Cells) {
 	Coord my_Mid_Point = (this->get_End_A()->get_Location() + this->get_End_Z()->get_Location())*0.5;
 	double my_Mid_Point_X = my_Mid_Point.get_X();
 	double my_Mid_Point_Y = my_Mid_Point.get_Y();
-	string side;
-	vector<Cell*> touching_Neighbors;
+	
+	vector<Cell*>touching_Neighbors;
+	vector<Side*>curr_Cell_Sides;
 	Cell* curr_Cell = NULL;
-	Coord curr_Cell_Center;
-	double center_X = 0;
-	double center_Y = 0;
-//	cout << "Side is : " << side << endl;
-	if((this->get_End_A()->get_Location().get_Y() < my_Cell_Center_Y) && (this->get_End_A()->get_Location().get_X() < my_Cell_Center_X)) {
-		side = "bottom";
-	}
-	else if((this->get_End_A()->get_Location().get_Y() < my_Cell_Center_Y) && (this->get_End_A()->get_Location().get_X() > my_Cell_Center_X)) {
-		side = "right";
-	}
-	else if((this->get_End_A()->get_Location().get_Y() > my_Cell_Center_Y) && (this->get_End_A()->get_Location().get_X() > my_Cell_Center_X)) {
-		side = "top";
-	}
-	else {
-		side = "left";
-	}
-//	cout << "Side is : " << side << endl;
-//	cout << "Number of neighbor cells: " << neighbor_Cells.size() << endl;
+	Coord curr_Cell_Left;
+	Coord curr_Cell_Right;
 	for(int i = 0; i < neighbor_Cells.size(); i++) {
 		curr_Cell = neighbor_Cells.at(i);
-		curr_Cell_Center = curr_Cell->get_Cell_Center();
-		center_X = curr_Cell_Center.get_X();
-		center_Y = curr_Cell_Center.get_Y();
-		if((side == "bottom") && (center_Y < this->get_End_A()->get_Location().get_Y())) {
-			touching_Neighbors.push_back(curr_Cell);
-		}
-		else if((side == "right") && (center_X > this->get_End_A()->get_Location().get_X())) {
-			touching_Neighbors.push_back(curr_Cell);
-		}
-		else if((side == "top") && (center_Y > this->get_End_A()->get_Location().get_Y())) {
-			touching_Neighbors.push_back(curr_Cell);
-		}
-		else if((side == "left") && (center_X < this->get_End_A()->get_Location().get_X())) {
-			touching_Neighbors.push_back(curr_Cell);
-		}
-
-	}
-	/*Coord curr_Side_Mid_Point;
-	vector<Side*> neighbor_Sides;
-	vector<Side*> curr_Cell_Sides;
-	Side* curr_Side = NULL;
-	double curr_len = 0;
-	double smallest = 100;
-	for(int j = 0; j < touching_Neighbors.size();j++) {
-		curr_Cell = touching_Neighbors.at(j);
-		cout << "Rank : " << curr_Cell->get_Rank() << endl;
 		curr_Cell->get_Sides(curr_Cell_Sides);
-		for(int i = 0; i < curr_Cell_Sides.size(); i++) {
-			curr_Side = curr_Cell_Sides.at(i);
-			curr_Side_Mid_Point = (curr_Side->get_End_A()->get_Location() + curr_Side->get_End_Z()->get_Location())*.5;
-			curr_len = (my_Mid_Point - curr_Side_Mid_Point).length();
-			if(curr_len < smallest) {
-				neighbor_Sides.push_back(curr_Side);
-				smallest = curr_len;
-			}
+		curr_Cell_Left = curr_Cell_Sides.at(2)->get_End_Z()->get_Location();
+		curr_Cell_Right = curr_Cell_Sides.at(0)->get_End_A()->get_Location();	
+		//for side 0 need the y value of the top left corner
+		//needs to be less than the y value of the midpoint
+		if((side_type == 0) && (curr_Cell_Left.get_Y() < my_Mid_Point_Y)) {
+			touching_Neighbors.push_back(curr_Cell);
 		}
-	}*/
-	
-//	cout << "Side is: " << side << endl;
-//	cout << "With touching neighbors size: " << touching_Neighbors.size() << endl;
-	this->touching_Neighbors = touching_Neighbors;
-//	cout << "After assigment: " << this->touching_Neighbors.size() << endl;
+		//for side 1 the x value of the top left corner 
+		//needs to be greater than the x value of midpoint
+		else if((side_type == 1) && (curr_Cell_Left.get_X() > my_Mid_Point_X)) {
+			touching_Neighbors.push_back(curr_Cell);
+	 	}
+		//for side 2 the y value of the bottom right corner 
+		//needs to be greater than the y valu of midpoint
+		else if((side_type == 2) && (curr_Cell_Right.get_Y() > my_Mid_Point_Y)) {
+			touching_Neighbors.push_back(curr_Cell);
+		}
+		//for side 3 the x value of the bottom right corner
+		//needs to be less than the x value of the midpoint
+		else if((side_type == 3) && (curr_Cell_Right.get_X() < my_Mid_Point_X)) {
+			touching_Neighbors.push_back(curr_Cell);
+		}
+	}
+
+	vector<Side*>touching_Sides;
+	Side* side = NULL;
+	for(int i = 0; i < touching_Neighbors.size(); i++) {
+		curr_Cell = touching_Neighbors.at(i);
+		curr_Cell->get_Sides(curr_Cell_Sides);
+		if(side_type == 0) {
+			side = curr_Cell_Sides.at(2);
+			touching_Sides.push_back(side);
+		}
+		else if(side_type == 1) {
+			side = curr_Cell_Sides.at(3);
+			touching_Sides.push_back(side);
+		}
+		else if(side_type == 2) {
+			side = curr_Cell_Sides.at(0);
+			touching_Sides.push_back(side);
+		}
+		else if(side_type == 3) {
+			side = curr_Cell_Sides.at(1);
+			touching_Sides.push_back(side);
+		}
+	}
+
+	cout << "Side is: " << side_type << endl;
+	cout << "With touching neighbors size: " << touching_Neighbors.size() << endl;
+	this->touching_Sides = touching_Sides;
+	cout << "With touching sides size: " << touching_Sides.size() << endl;
 	return;
 }
 

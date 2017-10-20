@@ -88,10 +88,12 @@ Cell* Cell::divide_length_wise(const int Ti) {
 		curr = next;
 		num_nodes++;
 	} while( !passed_div_line );
-	Side* A0 = new Side(sides.at(0)->get_End_A()->get_Location(),A0_End_Z->get_Location()-Coord(.3,0),this, num_nodes-1);
+	Side* A0 = new Side(sides.at(0)->get_End_A()->get_Location(),A0_End_Z->get_Location()-Coord(.2,0),this, num_nodes-1);
 	A0->set_Phys_Parameters(kBendLow,kLinearHigh);
-	Side* B0 = new Side(B0_End_A->get_Location()+Coord(.3,0), sides.at(0)->get_End_Z()->get_Location(), sister, sides.at(0)->get_Wall_Count()-num_nodes-1);
+	A0->set_Side_Type(0);
+	Side* B0 = new Side(B0_End_A->get_Location()+Coord(.2,0), sides.at(0)->get_End_Z()->get_Location(), sister, sides.at(0)->get_Wall_Count()-num_nodes-1);
 	B0->set_Phys_Parameters(kBendLow,kLinearHigh);
+	B0->set_Side_Type(0);
 	//delete previous A0
 	//cout << "deleting side 0" << endl;
 	delete sides.at(0);
@@ -119,10 +121,13 @@ Cell* Cell::divide_length_wise(const int Ti) {
 		num_nodes++;
 	} while(!passed_div_line);
 	
-	Side* A2 = new Side(A2_End_A->get_Location()-Coord(.3,0),sides.at(2)->get_End_Z()->get_Location(),this, num_nodes-1);
+	Side* A2 = new Side(A2_End_A->get_Location()-Coord(.2,0),sides.at(2)->get_End_Z()->get_Location(),this, num_nodes-1);
 	A2->set_Phys_Parameters(kBendLow,kLinearHigh);
-	Side* B2 = new Side(sides.at(2)->get_End_A()->get_Location(),B2_End_Z->get_Location()+Coord(.3,0), sister, sides.at(2)->get_Wall_Count()-num_nodes-1);
+	A2->set_Side_Type(2);
+
+	Side* B2 = new Side(sides.at(2)->get_End_A()->get_Location(),B2_End_Z->get_Location()+Coord(.2,0), sister, sides.at(2)->get_Wall_Count()-num_nodes-1);
 	B2->set_Phys_Parameters(kBendLow,kLinearHigh);
+	B2->set_Side_Type(2);
 	//delete current A2
 	delete sides.at(2);
 	//set new A2
@@ -137,7 +142,9 @@ Cell* Cell::divide_length_wise(const int Ti) {
 	Side* A1 = new Side(sides.at(0)->get_End_Z()->get_Location()+Coord(0.04,0.04),sides.at(2)->get_End_A()->get_Location() + Coord(0.04,-0.04), this, sides.at(3)->get_Wall_Count());
 	Side* B3 = new Side(sister_sides.at(2)->get_End_Z()->get_Location() - Coord(.04,.04), sister_sides.at(0)->get_End_A()->get_Location() + Coord(-0.04,0.04), sister, sister_sides.at(1)->get_Wall_Count());
 	A1->set_Phys_Parameters(kBendHigh,kLinearLow);
+	A1->set_Side_Type(1);
 	B3->set_Phys_Parameters(kBendHigh,kLinearLow);
+	B3->set_Side_Type(3);
 	//Assign A1 and B3
 	sides.at(1) = A1;
 	sister_sides.push_back(B3);
@@ -257,10 +264,12 @@ Cell* Cell::divide_width_wise(const int Ti) {
 		curr = next;
 		num_nodes++;
 	} while( !passed_div_line );
-	Side* A1 = new Side(sides.at(1)->get_End_A()->get_Location(),A1_End_Z->get_Location()-Coord(0,0.3),this, num_nodes-1);
+	Side* A1 = new Side(sides.at(1)->get_End_A()->get_Location(),A1_End_Z->get_Location()-Coord(0,0.2),this, num_nodes-1);
 	A1->set_Phys_Parameters(kBendHigh,kLinearLow);
-	Side* B1 = new Side(B1_End_A->get_Location()+Coord(0,0.3), sides.at(1)->get_End_Z()->get_Location(), sister, sides.at(1)->get_Wall_Count()-num_nodes-1);
+	A1->set_Side_Type(1);
+	Side* B1 = new Side(B1_End_A->get_Location()+Coord(0,0.2), sides.at(1)->get_End_Z()->get_Location(), sister, sides.at(1)->get_Wall_Count()-num_nodes-1);
 	B1->set_Phys_Parameters(kBendHigh,kLinearLow);
+	B1->set_Side_Type(1);
 	//delete previous A1
 	//cout << "deleting side 1" << endl;
 	delete sides.at(1);
@@ -292,10 +301,12 @@ Cell* Cell::divide_width_wise(const int Ti) {
 		num_nodes++;
 	} while(!passed_div_line);
 	
-	Side* A3 = new Side(A3_End_A->get_Location()-Coord(0,0.3),sides.at(3)->get_End_Z()->get_Location(),this, num_nodes-1);
+	Side* A3 = new Side(A3_End_A->get_Location()-Coord(0,0.2),sides.at(3)->get_End_Z()->get_Location(),this, num_nodes-1);
 	A3->set_Phys_Parameters(kBendHigh,kLinearLow);
-	Side* B3 = new Side(sides.at(3)->get_End_A()->get_Location(),B3_End_Z->get_Location()+Coord(0,0.3), sister, sides.at(3)->get_Wall_Count()-num_nodes-1);
+	A3->set_Side_Type(3);
+	Side* B3 = new Side(sides.at(3)->get_End_A()->get_Location(),B3_End_Z->get_Location()+Coord(0,0.2), sister, sides.at(3)->get_Wall_Count()-num_nodes-1);
 	B3->set_Phys_Parameters(kBendHigh,kLinearLow);
+	B3->set_Side_Type(3);
 	//delete current A3
 	delete sides.at(3);
 	//set new A3
@@ -305,7 +316,9 @@ Cell* Cell::divide_width_wise(const int Ti) {
 	Side* A2 = new Side(sides.at(1)->get_End_Z()->get_Location()+Coord(-0.04,0.04),sides.at(3)->get_End_A()->get_Location() + Coord(0.04,0.04), this, sides.at(0)->get_Wall_Count());
 	Side* B0 = new Side(B3->get_End_Z()->get_Location()+ Coord(.04,-.04), B1->get_End_A()->get_Location()-Coord(0.04,0.04), sister, sides.at(0)->get_Wall_Count());
 	A2->set_Phys_Parameters(kBendLow,kLinearHigh);
+	A2->set_Side_Type(2);
 	B0->set_Phys_Parameters(kBendLow,kLinearHigh);
+	B0->set_Side_Type(0);
 	//Assign A0 and all B
 	sides.at(2) = A2;
 	sister_sides.push_back(B0);

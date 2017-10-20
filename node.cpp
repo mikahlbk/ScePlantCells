@@ -183,33 +183,29 @@ void Wall_Node::set_Closest(Wall_Node*  closest, double closest_len) {
 	this->closest_len = closest_len;
 	return;
 }
-Wall_Node* Wall_Node::find_Closest_Node(vector<Cell*>& touching_neighbors) {
+Wall_Node* Wall_Node::find_Closest_Node(vector<Side*>& touching_Sides) {
+	Side* curr_Side = NULL;
 	Wall_Node* curr = NULL;
 	Wall_Node* orig = NULL;
 	Wall_Node* next = NULL;
 	Wall_Node* closest = NULL;
 	double curr_dist = 0;
 	double smallest = 100;
-	Cell* curr_Cell = NULL;
-	bool seen_yes = false;
-	for(int i = 0; i < touching_neighbors.size(); i++) {
-		curr_Cell = touching_neighbors.at(i);
-		curr = curr_Cell->get_Wall_Nodes();
-		orig = curr;
+	for(int i = 0; i < touching_Sides.size(); i++) {
+		curr_Side = touching_Sides.at(i);
+		//find the closest node on curr_Side
+		curr = curr_Side->get_End_A();
 		do{
 			next = curr->get_Left_Neighbor();
-			curr_dist = (this->my_loc-curr->get_Location()).length();
+			curr_dist = (this->my_loc - curr->get_Location()).length();
 			if(curr_dist < ADHThresh) {
 				if(curr_dist < smallest) {
-				//cout << "made it in here" << endl;
-				closest = curr;
-				smallest = curr_dist;
-				//seen_yes = true;
+					closest = curr;
+					smallest = curr_dist;
 				}
-			}	
+			}
 			curr = next;
-		} while (next != orig);
-		
+		} while (next->get_My_Side() == curr_Side);
 	}
 	return closest;
 }
