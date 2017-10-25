@@ -21,7 +21,14 @@ using namespace std;
 
 //============================
 
-int main() {
+int main(int argc, char* argv[]) {
+
+	if (argc != 2) {
+		cout << "ERROR: Not enough input arguments." << endl;
+		return 1;
+	}
+
+	string anim_folder = argv[1];
 
 	int start = clock();
 	
@@ -38,7 +45,7 @@ int main() {
 	int digits;
 	string format = ".vtk";
 	string Number;
-	string initial = "Animation/Plant_Cell_";
+	string initial = "/Plant_Cell_";
 	string Filename;
 	ofstream ofs;
 	int out = 0; //counter for creating output/vtk files
@@ -66,7 +73,7 @@ int main() {
 				Number = "0" + to_string(out);
 			}
 
-			Filename = initial + Number + format;
+			Filename = anim_folder + initial + Number + format;
 
 			ofs.open(Filename.c_str());
 			growing_Tissue.print_VTK_File(ofs);

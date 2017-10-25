@@ -5,4 +5,6 @@
 #$ -q  long 				# Specify queue
 #$ -N  run_October13	 	# Specify job name
 
-./program
+mkdir Animate2
+
+./program Animate2
