@@ -1,10 +1,8 @@
 #!/bin/csh
 
-#$ -M mbkuhn@math.ucr.edy 	# Email address for job notifications
-#$ -m  abe					# Send mail when job begins, ends and aborts
-#$ -q  long 				# Specify queue
-#$ -N  run_October13	 	# Specify job name
+#$ -q  debug 				# Specify queue
+#$ -N  run_Oct25   		 	# Specify job name
 
-mkdir Animate2
-
-./program Animate2
+#setenv PATH /afs/crc.nd.edu/user/a/awhitake/PlantCells/ScePlantCells:$PATH
+mkdir Animate_debug
+./program Animate_debug

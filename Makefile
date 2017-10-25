@@ -8,7 +8,7 @@ program: folder main.o coord.o node.o side.o cell.o cell_div.o tissue.o
 		$(CC) main.o coord.o node.o side.o cell.o cell_div.o tissue.o -o program
 
 folder: 
-		mkdir -p ./Animation ./DataOutput
+		mkdir -p ./DataOutput
 
 main.o: main.cpp
 		$(CC) $(CFLAGS) main.cpp
