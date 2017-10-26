@@ -34,7 +34,7 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	this->rank = rank;
 	this->layer = layer;
 	Coord cell_center = Coord(corner.get_X() + (width / 2), corner.get_Y() + (height / 2));
-	double rate = -0.25*cell_center.length() + 11.7;
+	double rate = (-0.25*cell_center.length() + 11.7)*2000;
 	this->set_growth_rate(rate);
 	this->cell_center = cell_center;
 

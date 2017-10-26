@@ -176,7 +176,7 @@ Cell* Cell::divide_length_wise(const int Ti) {
 	//cout << "update centers" << endl;
 	this->update_Cell_Center();
 	sister->update_Cell_Center();
-	double rate = -.25*sister->get_Cell_Center().length() + 11.7;
+	double rate = (-.25*sister->get_Cell_Center().length() + 11.7)*2000;
 	sister->set_growth_rate(rate);
 	
 	//cout << "Updated Angles and cell centers"<< endl;
@@ -355,7 +355,7 @@ Cell* Cell::divide_width_wise(const int Ti) {
 	this->update_Cell_Center();
 	sister->update_Cell_Center();
 	
-	double rate = -.25*sister->get_Cell_Center().length() + 11.7;
+	double rate = (-.25*sister->get_Cell_Center().length() + 11.7)*2000;
 	sister->set_growth_rate(rate);
 	//cout << "Updated Angles and cell centers"<< endl;
 	
