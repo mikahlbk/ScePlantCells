@@ -605,11 +605,11 @@ void Cell::update_Life_Length() {
 
 	//check if cell can add a cyt or wall node
 
-	if (life_length % ADD_WALL_TIMER == 0) {
+	//if (life_length % ADD_WALL_TIMER == ADD_WALL_TIMER-1) {
 		add_Wall_Node();
-	}
+	//}
 
-	if (life_length % growth_rate == 0) {
+	if (life_length % growth_rate == growth_rate-1) {
 		add_Cyt_Node();
 	}
 
