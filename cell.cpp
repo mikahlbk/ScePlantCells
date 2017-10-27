@@ -55,9 +55,9 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 //	cout << "made side" << endl;
 	s->set_Side_Type(0);
 	s->set_Phys_Parameters(kBendLow, kLinearHigh);
-//	if (layer == 1) {
-//		s->set_Phys_Parameters(kBendHigh, kLinearLow);
-//  }
+	if (layer == 1) {
+		s->set_Phys_Parameters(kBendHigh, kLinearLow);
+	 }
 //	cout << "set params" << endl;
 	sides.push_back(s);
 //	cout << "I made side A" << endl;
@@ -67,9 +67,9 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	s = new Side(locA, locZ, this, num_flank_nodes);
 	s->set_Side_Type(1);
 	s->set_Phys_Parameters(kBendHigh, kLinearLow);
-//	if (layer == 1) {
-//		s->set_Phys_Parameters(kBendLow, kLinearHigh);
-//  }
+	if (layer == 1) {
+		s->set_Phys_Parameters(kBendLow, kLinearHigh);
+	}
 	sides.push_back(s);
 //	cout << "I made side B" << endl;
 	//side C
@@ -89,9 +89,9 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	s = new Side(locA, locZ, this, num_flank_nodes);
 	s->set_Side_Type(3);
 	s->set_Phys_Parameters(kBendHigh, kLinearLow);
-//	if (layer == 1) {
-//		s->set_Phys_Parameters(kBendLow, kLinearHigh);
-//  }
+	if (layer == 1) {
+		s->set_Phys_Parameters(kBendLow, kLinearHigh);
+  }
 	sides.push_back(s);
 //	cout << "I made side D" << endl;
 	//Connect the four disjoint sides
@@ -605,11 +605,11 @@ void Cell::update_Life_Length() {
 
 	//check if cell can add a cyt or wall node
 
-	//if (life_length % ADD_WALL_TIMER == ADD_WALL_TIMER-1) {
+	if (life_length % ADD_WALL_TIMER == ADD_WALL_TIMER-1) {
 		add_Wall_Node();
-	//}
+	}
 
-	if (life_length % growth_rate == growth_rate-1) {
+	if (life_length % ADD_CYT_TIMER  == ADD_CYT_TIMER-1) {
 		add_Cyt_Node();
 	}
 

@@ -21,14 +21,14 @@ using namespace std;
 
 //============================
 
-int main(int argc, char* argv[]) {
+int main() {
 
-	if (argc != 2) {
-		cout << "ERROR: Not enough input arguments." << endl;
-		return 1;
-	}
+//	if (argc != 2) {
+//		cout << "ERROR: Not enough input arguments." << endl;
+//		return 1;
+//	}
 
-	string anim_folder = argv[1];
+//	string anim_folder = argv[1];
 
 	int start = clock();
 	
@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
 	int digits;
 	string format = ".vtk";
 	string Number;
-	string initial = "/Plant_Cell_";
+	string initial = "Animation/Plant_Cell_";
 	string Filename;
 	ofstream ofs;
 	int out = 0; //counter for creating output/vtk files
@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
 		//cout << "Ti = " << Ti << endl;
 		//Print to dataOutput and VTK files
 
-		if (Ti % 1000 == 0) {
+		if (Ti % 100 == 0) {
 	
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {
@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
 				Number = "0" + to_string(out);
 			}
 
-			Filename = anim_folder + initial + Number + format;
+			Filename = initial + Number + format;
 
 			ofs.open(Filename.c_str());
 			growing_Tissue.print_VTK_File(ofs);
@@ -91,6 +91,8 @@ int main(int argc, char* argv[]) {
 		if (Ti % 500  == 0) {
 			cout << "Find Neighbors" << endl;
 			growing_Tissue.update_Neighbor_Cells();
+		}
+		if (Ti % 100 == 0) {
 			cout << "Make Adhesion" << endl;
 			growing_Tissue.update_Adhesion();
     	}

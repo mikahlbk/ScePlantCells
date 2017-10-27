@@ -13,9 +13,9 @@
 //=====================
 
 // Simulation Constants
-const double dt = 0.0000003;
-const int ADD_WALL_TIMER = 10;
-const int ADD_CYT_TIMER = 1000;
+const double dt = 0.003;
+const int ADD_WALL_TIMER = 2;
+const int ADD_CYT_TIMER = 1500;
 
 const int MAX_NUM_WALL = 200;
 const int MAX_NUM_CYT = 60;
@@ -30,10 +30,10 @@ const double pi = acos(-1.0);
 const double thetaFlat = pi;
 const double thetaCurve = pi * (11.0 / 12.0);
 
-const double kBendHigh = 6;
-const double kBendLow = 6;
+const double kBendHigh = 4;
+const double kBendLow = 2;
 
-const double kLinearHigh = 450;
+const double kLinearHigh = 200;
 const double kLinearLow = 200;
 
 const double K_ADH = 20;
@@ -55,7 +55,7 @@ const double gamma_MM = 1.5625;
 const double U_MI = 0.78125;  
 const double W_MI = 0.00;
 const double xsi_MI = 0.125;
-const double gamma_MI = 0.625;
+const double gamma_MI = 0.425;
 
 ///// Subcellular element parameters for internal - internal interactions
 
