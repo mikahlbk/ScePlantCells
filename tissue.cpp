@@ -151,10 +151,10 @@ void Tissue::cell_Division(const int Ti) {
 	bool divided = false;
 	Cell* new_cell = NULL;
 //	cout << "number cells: " << cells.size()<< endl;
-	for(unsigned int i = 0; i < 1;i++) {
+	for(unsigned int i = 0; i < cells.size();i++) {
 		//cout << "current divide cell: " << i << endl;
 		new_cell = cells.at(i)->divide(Ti);
-		if(new_cell !=NULL) {
+		if (new_cell !=NULL) {
 			divided = true;
 			new_cell->set_Rank(num_cells);
 			num_cells++;

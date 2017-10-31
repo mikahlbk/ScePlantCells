@@ -27,6 +27,7 @@ class Cell {
 		int life_length;
 		int num_cyt_nodes;
 		int layer;
+		int growth_rate;
 		Coord cell_center;
 		vector<Side*> sides;
 		vector<Cyt_Node*> cyt_nodes;
@@ -52,6 +53,8 @@ class Cell {
 		void set_Sides(vector<Side*>& sides);
 		int get_Layer(){return layer;}
 		void set_Layer(int layer);
+		void set_growth_rate(int growth_rate);
+		int get_growth_rate(){return growth_rate;}
 		// Keep track of neighbor cells
 		void update_Neighbor_Cells();
 		void update_adhesion_springs();

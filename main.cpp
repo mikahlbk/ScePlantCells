@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
 		//cout << "Ti = " << Ti << endl;
 		//Print to dataOutput and VTK files
 
-		if (Ti % 600 == 0) {
+		if (Ti % 1000 == 0) {
 	
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
 		
 		
 		// Update Each cell's neighboring cells
-		if (Ti % 400  == 0) {
+		if (Ti % 500  == 0) {
 			cout << "Find Neighbors" << endl;
 			growing_Tissue.update_Neighbor_Cells();
 			cout << "Make Adhesion" << endl;

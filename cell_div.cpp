@@ -34,7 +34,7 @@ Cell* Cell::divide(const int Ti) {
 	y_length = y_vec.length();
 	area = y_length*x_length;
 	if(area > 4) {
-		if(this->layer == 0){
+		if((this->layer == 3)|| (this->layer == 4)|| (this->layer == 5)) {
 			//cout << "cell will divide" << endl;
 			sister = this->divide_width_wise(Ti);		
 		}
@@ -167,7 +167,6 @@ Cell* Cell::divide_length_wise(const int Ti) {
 
 	int layer = this->get_Layer();
 	sister->set_Layer(layer);
-
 	//cout << "updating angles" << endl;
 	//update angles and cell centers for both cells
 	//cout << "cell A update wall angles" << endl;
@@ -177,6 +176,8 @@ Cell* Cell::divide_length_wise(const int Ti) {
 	//cout << "update centers" << endl;
 	this->update_Cell_Center();
 	sister->update_Cell_Center();
+	double rate = (-.25*sister->get_Cell_Center().length() + 11.7)*2000;
+	sister->set_growth_rate(rate);
 	
 	//cout << "Updated Angles and cell centers"<< endl;
 	
@@ -342,7 +343,8 @@ Cell* Cell::divide_width_wise(const int Ti) {
 	//changes sides vector in cell B aka sister
 	sister->set_Sides(sister_sides);
 
-
+	int layer = this->get_Layer();
+	sister->set_Layer(layer);
 	//cout << "updating angles" << endl;
 	//update angles and cell centers for both cells
 	//cout << "cell A update wall angles" << endl;
@@ -353,6 +355,8 @@ Cell* Cell::divide_width_wise(const int Ti) {
 	this->update_Cell_Center();
 	sister->update_Cell_Center();
 	
+	double rate = (-.25*sister->get_Cell_Center().length() + 11.7)*2000;
+	sister->set_growth_rate(rate);
 	//cout << "Updated Angles and cell centers"<< endl;
 	
 	//distribute cyt nodes between sister cells

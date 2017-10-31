@@ -32,9 +32,10 @@ Cell::Cell(int rank, Coord corner, double height, double width, int Ti, Tissue* 
 	num_cyt_nodes = 0;	
 	this->my_tissue = tiss;
 	this->rank = rank;
-
+	this->layer = layer;
 	Coord cell_center = Coord(corner.get_X() + (width / 2), corner.get_Y() + (height / 2));
-	
+	double rate = (-0.25*cell_center.length() + 11.7)*2000;
+	this->set_growth_rate(rate);
 	this->cell_center = cell_center;
 
 	life_length = 0;
@@ -192,6 +193,10 @@ void Cell::set_Sides(vector<Side*>& sides) {
 }
 void Cell::set_Layer(int layer) {
 	this->layer = layer;
+	return;
+}
+void Cell::set_growth_rate(int growth_rate) {
+	this->growth_rate = growth_rate;
 	return;
 }
 void Cell::get_Neighbor_Cells(vector<Cell*>& cells) {
@@ -600,11 +605,11 @@ void Cell::update_Life_Length() {
 
 	//check if cell can add a cyt or wall node
 
-	if (life_length % ADD_WALL_TIMER == ADD_WALL_TIMER - 1) {
+	//if (life_length % ADD_WALL_TIMER == ADD_WALL_TIMER-1) {
 		add_Wall_Node();
-	}
+	//}
 
-	if (life_length % ADD_CYT_TIMER == ADD_CYT_TIMER - 1) {
+	if (life_length % growth_rate == growth_rate-1) {
 		add_Cyt_Node();
 	}
 
