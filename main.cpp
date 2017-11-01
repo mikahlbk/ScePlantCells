@@ -23,13 +23,13 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
 
-	if (argc != 2) {
+/*	if (argc != 2) {
 		cout << "ERROR: Not enough input arguments." << endl;
 		return 1;
 	}
 
 	string anim_folder = argv[1];
-
+*/
 	int start = clock();
 	
 	string init_tissue = "cell_start.txt";
@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
 	int digits;
 	string format = ".vtk";
 	string Number;
-	string initial = "/Plant_Cell_";
+	string initial = "Animation/Plant_Cell_";
 	string Filename;
 	ofstream ofs;
 	int out = 0; //counter for creating output/vtk files
@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
 				Number = "0" + to_string(out);
 			}
 
-			Filename = anim_folder + initial + Number + format;
+			Filename = initial + Number + format;
 
 			ofs.open(Filename.c_str());
 			growing_Tissue.print_VTK_File(ofs);
@@ -88,12 +88,12 @@ int main(int argc, char* argv[]) {
 		
 		
 		// Update Each cell's neighboring cells
-		if (Ti % 500  == 0) {
-			cout << "Find Neighbors" << endl;
-			growing_Tissue.update_Neighbor_Cells();
-			cout << "Make Adhesion" << endl;
-			growing_Tissue.update_Adhesion();
-    	}
+	//	if (Ti % 500  == 0) {
+	//		cout << "Find Neighbors" << endl;
+	//		growing_Tissue.update_Neighbor_Cells();
+	//		cout << "Make Adhesion" << endl;
+	//		growing_Tissue.update_Adhesion();
+   // 	}
 		
 
 		// Tissue Growth
@@ -105,8 +105,8 @@ int main(int argc, char* argv[]) {
 		//Update node positions
 		growing_Tissue.update_Cell_Locations();
 		cout << "updated node positions" << endl;
-		growing_Tissue.cell_Division(Ti);
-		cout << "Division" << endl;	
+	//	growing_Tissue.cell_Division(Ti);
+	//	cout << "Division" << endl;	
 	}
 
 	int stop = clock();
