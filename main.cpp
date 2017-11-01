@@ -104,11 +104,11 @@ int main() {
 		//Calculate new forces on cells and nodes
 		growing_Tissue.calc_New_Forces();
 		cout << "calculated forces" << endl;
-		if((Ti > 750000)) {
+//		if((Ti > 750000)) {
 		//stretch
-		growing_Tissue.stretch(Ti);
-		}
-		cout << "Stretched" << endl;
+//		growing_Tissue.stretch(Ti);
+//		}
+//		cout << "Stretched" << endl;
 		//Update node positions
 		growing_Tissue.update_Cell_Locations();
 		cout << "updated node positions" << endl;
@@ -116,7 +116,7 @@ int main() {
 		//cout << "Division" << endl;	
 	}
 	
-	growing_Tissue.make_Vectors();
+//	growing_Tissue.make_Vectors();
 	
 	int stop = clock();
 

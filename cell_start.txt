@@ -2,5 +2,5 @@ CellRank:0
 Corner:1,1
 Height:2
 Width:1.5
-Layer:3
+Layer:1
 End_Cell
