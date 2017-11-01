@@ -32,7 +32,7 @@ tissue.o: tissue.cpp
 		$(CC) $(CFLAGS) tissue.cpp
 
 clean: wipe
-		rm -rf *o program
+		rm -rf cell_vec.txt side_vecs.txt  *o program
 
 wipe:
 		rm -rf ./Animation ./DataOutput

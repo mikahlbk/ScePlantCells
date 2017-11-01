@@ -24,6 +24,8 @@ class Side {
 		int side_type;
 		double linear_spring;
 		double bending_spring;
+		vector<double>lengths;
+		vector<double>forces;
 	public:
 		//Constructors
 		Side(Coord point_a, Coord point_z, Cell* my_cell, int num_nodes);
@@ -49,8 +51,11 @@ class Side {
 		void set_Side_Type(int type);
 		double get_Linear_Spring() {return linear_spring;}
 		double get_Bending_Spring() {return bending_spring;}
-
-		
+		void get_Lengths(vector<double>& lengths);
+		void get_Forces(vector<double>& forces);
+		void stretching_Test(int Ti, Coord force); 
+		double length();		
+		//double force_Sum();
 		//Force and Positioning
 		
 

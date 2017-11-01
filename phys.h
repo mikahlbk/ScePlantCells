@@ -13,7 +13,7 @@
 //=====================
 
 // Simulation Constants
-const double dt = 0.003;
+const double dt = 0.00003;
 const int ADD_WALL_TIMER = 2;
 const int ADD_CYT_TIMER = 1500;
 
@@ -30,11 +30,11 @@ const double pi = acos(-1.0);
 const double thetaFlat = pi;
 const double thetaCurve = pi * (11.0 / 12.0);
 
-const double kBendHigh = 4;
-const double kBendLow = 2;
+const double kBendHigh = 12;
+const double kBendLow = 12;
 
-const double kLinearHigh = 200;
-const double kLinearLow = 200;
+const double kLinearHigh = 800;
+const double kLinearLow = 800;
 
 const double K_ADH = 20;
 const double MembrEquLen_ADH = 0.4;

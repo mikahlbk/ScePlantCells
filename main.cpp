@@ -39,7 +39,7 @@ int main() {
 
 	cout << "Finished creating Cell" << endl;
 	//parameters for time step
-    double numSteps = 100;
+    double numSteps = 1000000;
 
 	// Variable for dataoutput
 	int digits;
@@ -51,13 +51,13 @@ int main() {
 	int out = 0; //counter for creating output/vtk files
 
 	//loop for time steps
-	for(int Ti = 0; Ti*dt < numSteps; Ti++) {
+	for(int Ti = 0; Ti < numSteps; Ti++) {
 		//loop through all cells
 		//for now only one cell
 		//cout << "Ti = " << Ti << endl;
 		//Print to dataOutput and VTK files
 
-		if (Ti % 100 == 0) {
+		if (Ti % 10000 == 0) {
 	
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {
@@ -88,14 +88,14 @@ int main() {
 		
 		
 		// Update Each cell's neighboring cells
-		if (Ti % 500  == 0) {
+/*		if (Ti % 500  == 0) {
 			cout << "Find Neighbors" << endl;
 			growing_Tissue.update_Neighbor_Cells();
 		}
-		if (Ti % 100 == 0) {
+		if (Ti % 50 == 0) {
 			cout << "Make Adhesion" << endl;
 			growing_Tissue.update_Adhesion();
-    	}
+    	}*/
 		
 
 		// Tissue Growth
@@ -104,13 +104,20 @@ int main() {
 		//Calculate new forces on cells and nodes
 		growing_Tissue.calc_New_Forces();
 		cout << "calculated forces" << endl;
+		if((Ti > 750000)) {
+		//stretch
+		growing_Tissue.stretch(Ti);
+		}
+		cout << "Stretched" << endl;
 		//Update node positions
 		growing_Tissue.update_Cell_Locations();
 		cout << "updated node positions" << endl;
-		growing_Tissue.cell_Division(Ti);
-		cout << "Division" << endl;	
+		//growing_Tissue.cell_Division(Ti);
+		//cout << "Division" << endl;	
 	}
-
+	
+	growing_Tissue.make_Vectors();
+	
 	int stop = clock();
 
 	cout << "Time: " << (stop - start) / double(CLOCKS_PER_SEC) * 1000 << endl;

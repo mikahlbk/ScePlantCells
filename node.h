@@ -92,6 +92,7 @@ class Wall_Node: public Node {
 		Wall_Node* get_Closest() {return closest;}
 		Wall_Node* find_Closest_Node(vector<Side*>& touching_sides);
 		void make_Connection(Wall_Node* curr_Closest);
+		void pull(Coord force);
 		// Force Calculations
 		virtual void calc_Forces();
 		Coord calc_Morse_SC();
