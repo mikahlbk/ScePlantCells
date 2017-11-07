@@ -76,6 +76,8 @@ int main() {
 			Filename = initial + Number + format;
 
 			ofs.open(Filename.c_str());
+			// update indices inside the print file
+			cout << "printing vtk file" << endl;
 			growing_Tissue.print_VTK_File(ofs);
 			ofs.close();
 		

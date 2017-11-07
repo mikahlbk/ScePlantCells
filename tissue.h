@@ -35,6 +35,7 @@ class Tissue {
 		void update_Neighbor_Cells();
 		void cell_Division(const int Ti);
 		void print_Data_Output(ofstream& ofs);
+		int update_VTK_Indices();
 		void print_VTK_File(ofstream& ofs);
 		void update_Adhesion();
 		int get_Num_Cells() {return num_cells;}

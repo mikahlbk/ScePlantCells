@@ -173,7 +173,23 @@ void Tissue::print_Data_Output(ofstream & ofs) {
 	return;
 }
 
+int Tissue::update_VTK_Indices() {
+	
+	int id = 0;
+	int rel_cnt = 0;
+
+	//iterate through cells to reassign vtk id's - starting at 0
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		//iterate through 
+		rel_cnt += cells.at(i)->update_VTK_Indices(id);
+	}
+
+	return rel_cnt;
+}
+
 void Tissue::print_VTK_File(ofstream& ofs) {
+
+	int rel_cnt = update_VTK_Indices();
 		
 	ofs << "# vtk DataFile Version 3.0" << endl;
 	ofs << "Point representing Sub_cellular elem model" << endl;
@@ -197,10 +213,10 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 		cells.at(i)->print_VTK_Points(ofs, count);
 		end_points.push_back(count - 1);
 	}
-
 	ofs << endl;
+	
 	ofs << "CELLS " << cells.size() << ' ' << num_Points + start_points.size() << endl;
-
+	// output list of indices for each our our plant cells
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		ofs << cells.at(i)->get_Node_Count();
 
@@ -209,12 +225,20 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 		}
 		ofs << endl;
 	}
-
+	// output pairs of node indices to draw adh line
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->print_VTK_Adh(ofs);
+	}
 	ofs << endl;
 
 	ofs << "CELL_TYPES " << start_points.size() << endl;
 	for (unsigned int i = 0; i < start_points.size(); i++) {
+		// type for entire cell relationship
 		ofs << 2 << endl;
+	}
+	for (int i = 0; i < rel_cnt; i++) {
+		// type for adh spring relationship
+		ofs << 3 << endl;
 	}
 
 	ofs << endl;
