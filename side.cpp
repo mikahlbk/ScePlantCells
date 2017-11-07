@@ -109,6 +109,16 @@ void Side::get_Touching_Sides(vector<Side*>& touching_sides) {
 	return;
 }
 
+void Side::get_Lengths(vector<double>& lengths) {
+	lengths = this->lengths;
+	return;
+}
+
+void Side::get_Forces(vector<double>& forces) {
+	forces = this->forces;
+	return;
+}
+
 void Side::update_Touching_Sides(vector<Cell*>& neighbor_Cells) {
 	Coord my_Mid_Point = (this->get_End_A()->get_Location() + this->get_End_Z()->get_Location())*0.5;
 	double my_Mid_Point_X = my_Mid_Point.get_X();
@@ -174,6 +184,53 @@ void Side::update_Touching_Sides(vector<Cell*>& neighbor_Cells) {
 	this->touching_Sides = touching_Sides;
 	cout << "With touching sides size: " << touching_Sides.size() << endl;
 	return;
+}
+
+void Side::stretching_Test(int Ti, Coord force) {
+	double length = this->length();
+	lengths.push_back(length);
+	cout << "My current length is" << length << endl;
+//	cout << "My current force is" << Sum_force << endl;
+	Wall_Node* current = NULL;
+	Wall_Node* next = NULL;
+	current = end_A;
+	double sum_force = 0;
+	if(side_type == 3) {
+		force = force*-1;
+	}
+	else if (side_type == 1) {
+		force = force;
+	}
+	do {
+		next = current->get_Left_Neighbor();
+		current->pull(force);
+		sum_force += force.length();
+		current = next;
+	} while(next->get_My_Side() == this);
+
+
+	forces.push_back(sum_force);
+	return;
+}
+
+double Side::length(){
+	Wall_Node* current = NULL;
+	Wall_Node* next = NULL;
+	Coord curr_loc;
+	Coord next_loc;
+	double total= 0;
+	current = end_A;
+	double curr_len;
+	do {
+		next = current->get_Left_Neighbor();
+		curr_loc = current->get_Location();
+		next_loc = next->get_Location();
+		curr_len = (next_loc - curr_loc).length();
+		total += curr_len;
+		current = next;
+	} while(next->get_My_Side() == this);
+
+	return total;
 }
 
 

@@ -38,6 +38,8 @@ class Tissue {
 		int update_VTK_Indices();
 		void print_VTK_File(ofstream& ofs);
 		void update_Adhesion();
+		void stretch(int Ti);
+		void make_Vectors();
 		int get_Num_Cells() {return num_cells;}
 		//void grow_Cells(const int Ti);
 		//Destructor

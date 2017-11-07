@@ -187,6 +187,10 @@ void Cell::get_Sides(vector<Side*>& sides) {
 	return;
 }
 
+void Cell::get_Lengths(vector<double>& lengths) {
+	lengths = this-> lengths;
+	return;
+}
 void Cell::set_Sides(vector<Side*>& sides) {
 	this->sides = sides;
 	return;
@@ -212,7 +216,26 @@ int Cell::get_Node_Count() {
 
 	return (wall_cnt + num_cyt_nodes);
 }
-
+double Cell::length() {
+	double dist = 0;
+	Wall_Node* node_a;
+	Wall_Node* node_b;
+	Coord node_a_loc;
+	Coord node_b_loc;
+	node_a = this->sides.at(1)->get_End_A();
+	node_b = this->sides.at(3)->get_End_A();
+	do {
+		node_a = node_a->get_Left_Neighbor();
+	} while(node_a->get_Location().get_Y() < cell_center.get_Y());
+	do {
+		node_b = node_b->get_Left_Neighbor();
+	} while(node_b->get_Location().get_Y() > cell_center.get_Y());
+	node_a_loc= node_a->get_Location();
+	node_b_loc = node_b->get_Location();
+	dist = (node_a_loc - node_b_loc).length();
+	cout << "current cell distance" << dist << endl;
+	return dist;
+}
 //=============================================================
 //=========================================
 // Keep Track of neighbor cells
@@ -391,6 +414,19 @@ void Cell::update_adhesion_springs() {
 			curr_Node = next_Node;
 		} while(next_Node->get_My_Side() == curr_side);
 	}
+}
+
+void Cell::stretching(int Ti, Coord force) {
+	double curr_len = this->length();
+	lengths.push_back(curr_len);
+	force+= Coord(5,0)*dt;
+	cout << "side 1" << endl;
+	this->sides.at(1)->stretching_Test(Ti, force);
+	cout << "Side 3" << endl;
+	this->sides.at(3)->stretching_Test(Ti, force);
+	cout << "Cell level stretch" << endl;
+	return;
+
 }
 
 /*void Cell::ADH_Check() {
@@ -605,13 +641,13 @@ void Cell::update_Life_Length() {
 
 	//check if cell can add a cyt or wall node
 
-	if (life_length % ADD_WALL_TIMER == ADD_WALL_TIMER-1) {
+/*	if (life_length % ADD_WALL_TIMER == ADD_WALL_TIMER-1) {
 		add_Wall_Node();
 	}
 
 	if (life_length % ADD_CYT_TIMER  == ADD_CYT_TIMER-1) {
 		add_Cyt_Node();
-	}
+	}*/
 
 	return;
 }

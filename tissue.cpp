@@ -12,6 +12,7 @@
 #include "coord.h"
 #include "cell.h"
 #include "tissue.h"
+#include "side.h"
 //=========================
 // Public Member Functions for Tissue.cpp
 
@@ -106,6 +107,15 @@ void Tissue::calc_New_Forces() {
 
 }
 
+void Tissue::stretch(int Ti) {
+	Coord force = Coord(0,0);
+	for (unsigned int i = 0; i< cells.size();i++) {
+		cout << "tissue stretch" << endl;
+		cells.at(i)->stretching(Ti, force);
+	}
+	return;
+}
+
 void Tissue::update_Cell_Locations() {
 	
 	for (unsigned int i = 0; i < cells.size(); i++) {
@@ -169,6 +179,53 @@ void Tissue::cell_Division(const int Ti) {
 	return;
 }
 
+void Tissue::make_Vectors() {
+	Cell* curr= NULL;
+	vector<double>curr_lengths;
+	vector<Side*>sides;
+	vector<double>curr_forces;
+	Side* curr_side = NULL;
+	ofstream myfile1("cell_vec.txt");
+	ofstream myfile2("side_vecs.txt");
+	if(myfile1.is_open()) {
+		for(int i = 0; i < cells.size();i++) {
+			curr = cells.at(i);
+			curr->get_Lengths(curr_lengths);
+			for(int j = 0; j< curr_lengths.size();j++) {
+				myfile1 << curr_lengths.at(j) << endl;
+			}
+
+		}
+		myfile1.close();
+	}
+	else {
+		cout << "unable to open file" << endl;
+	}
+	
+	if(myfile2.is_open()) {
+		for(int i = 0; i < cells.size();i++) {
+			curr = cells.at(i);
+			curr->get_Sides(sides);
+			curr_side = sides.at(3);
+			curr_side->get_Lengths(curr_lengths); 
+			curr_side->get_Forces(curr_forces);
+		//	myfile2<< "First the Lengths" << endl;
+			for(int j = 0; j < curr_lengths.size();j++) {
+				myfile2 << curr_lengths.at(j) << endl;
+			}
+		//	myfile2 << "Now the Forces" << endl;
+			for(int j = 0; j< curr_forces.size();j++) {
+				myfile2 << curr_forces.at(j) << endl;
+			}
+		}
+		myfile2.close();
+	}
+	else {
+		cout << "unable to open file" << endl;
+	}
+	return;
+}
+	
 void Tissue::print_Data_Output(ofstream & ofs) {
 	return;
 }
@@ -214,7 +271,7 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 		end_points.push_back(count - 1);
 	}
 	ofs << endl;
-	
+
 	ofs << "CELLS " << cells.size() << ' ' << num_Points + start_points.size() << endl;
 	// output list of indices for each our our plant cells
 	for (unsigned int i = 0; i < cells.size(); i++) {

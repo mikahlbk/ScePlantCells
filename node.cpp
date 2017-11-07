@@ -531,6 +531,10 @@ Coord Wall_Node::linear_Equation_ADH(Wall_Node* wall) {
 	return F_lin;
 }
 
+void Wall_Node::pull(Coord force) {
+	this->new_force += force;
+	return;
+}
 //======================================
 //Functions not in use
 

@@ -32,6 +32,7 @@ class Cell {
 		vector<Side*> sides;
 		vector<Cyt_Node*> cyt_nodes;
 		vector<Cell*> neigh_cells;
+		vector<double>lengths;
 	public:
 		// Constructors
 		Cell(int rank, Tissue* tissue);
@@ -51,13 +52,16 @@ class Cell {
 		int get_Rank();
 		void set_Rank(const int id);
 		void set_Sides(vector<Side*>& sides);
+		void stretching(int Ti, Coord force);
 		int get_Layer(){return layer;}
 		void set_Layer(int layer);
 		void set_growth_rate(int growth_rate);
 		int get_growth_rate(){return growth_rate;}
+		void get_Lengths (vector<double>& lengths);
 		// Keep track of neighbor cells
 		void update_Neighbor_Cells();
 		void update_adhesion_springs();
+		double length();
 	//	bool get_Reasonable_Bounds(Wall_Node* curr, Wall_Node* & A, Wall_Node* & B);
 
 		// Forces and Positionsing
