@@ -29,7 +29,7 @@ class Node {
         //    all nodes will use the exact same function
         virtual Coord get_Location();
 		virtual Coord get_Force();
-		virtual void update_Location();
+		void update_Location();
         //other functions might be executed differently based on
         //    which node you are. Thus define as "pure virtual" and 
         //    properly define them in a derived class
@@ -44,7 +44,7 @@ class Cyt_Node: public Node {
 		Cell* my_cell;
     public:
         Cyt_Node(Coord loc, Cell* my_cell);
-        virtual void calc_Forces();
+		virtual void calc_Forces();
 		Cell* get_My_Cell(){return my_cell;}
 		Coord calc_Morse_II();
 		Coord calc_Morse_MI(Wall_Node* orig);
@@ -58,48 +58,44 @@ class Wall_Node: public Node {
     //variables that will be shared by all wall nodes
         Wall_Node* left;
         Wall_Node* right;
-        double my_angle;
+		Cell* my_cell;
+		double my_angle;
 		double equi_angle;
 		double cross_Prod;
 		Coord cyt_force;
-		bool on_curve;
-		Side* my_side;
+		//Coord f_EXT;
 		Wall_Node* closest;
     	double closest_len;
 	public:
     //function that you want performed on all wall nodes
 		// Constructors
-        Wall_Node(Coord loc, Side* my_side);
-        Wall_Node(Coord loc, Side* my_side, Wall_Node* left, Wall_Node* right);
-        //maybe could define them here if corner and edge both perform
-        //    these functions identically
-
-		// Getters and Setters
+        Wall_Node(Coord loc, Cell* my_cell);
+        Wall_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right);
+        // Getters and Setters
+		Wall_Node* get_Left_Neighbor() {return left;}
+		Wall_Node* get_Right_Neighbor() {return right;}
 		double get_Angle() {return my_angle;}
 		double get_Equi_Angle() {return equi_angle;}
 		void set_Equi_Angle(double angle);
-		bool is_Curve() {return on_curve;}
-		void set_Closest(Wall_Node* closest, double closest_len);
-		void set_Curve(bool on_curve);
-		Coord get_CytForce() {return cyt_force;}
-        Wall_Node* get_Left_Neighbor() {return left;}
-		Wall_Node* get_Right_Neighbor() {return right;}
-		double get_Linear_Spring();
-		double get_Bending_Spring();
 		void set_Left_Neighbor(Wall_Node* new_Left);
 		void set_Right_Neighbor(Wall_Node* new_Right);
-		Side* get_My_Side() {return my_side;}
+		void update_Angle();
+		void update_Equi_Angle(double new_theta);
 		Wall_Node* get_Closest() {return closest;}
-		Wall_Node* find_Closest_Node(vector<Side*>& touching_sides);
+		Wall_Node* find_Closest_Node(vector<Cell*>& neighbors);
 		void make_Connection(Wall_Node* curr_Closest);
-		// Force Calculations
+		//Coord get_Ext_Force() {return f_EXT;}
+		void set_Closest(Wall_Node* closest, double closest_len);
+		Coord get_CytForce() {return cyt_force;}
+      	
+		//Force Calculations
 		virtual void calc_Forces();
 		Coord calc_Morse_SC();
 		Coord calc_Morse_DC();
 		Coord calc_Bending();
 		Coord calc_Linear();
-		void update_Angle();
-
+		//Coord calc_External();
+		
 		// Mathematical Force Equations
 		Coord morse_Equation(Cyt_Node* cyt);
 		Coord morse_Equation(Wall_Node* wall);

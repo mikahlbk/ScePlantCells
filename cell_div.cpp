@@ -15,11 +15,10 @@
 #include "coord.h"
 #include "node.h"
 #include "cell.h"
-#include "side.h"
 #include "tissue.h"
 //==========================
 
-
+/*
 Cell* Cell::divide(const int Ti) {
 	Cell* sister = NULL;
 	//calculate area
@@ -402,4 +401,4 @@ Cell* Cell::divide_width_wise(const int Ti) {
 }
 
 
-
+*/

@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <iomanip>
 
 #include "phys.h"
 #include "coord.h"
@@ -30,8 +31,8 @@ Tissue::Tissue(string filename) {
 	char trash;
 	int rank;
 	int layer;
-	double height, width;
-	Coord corner;
+	double radius;
+	Coord center;
 	double x, y;
 	Cell* curr;
 
@@ -43,23 +44,20 @@ Tissue::Tissue(string filename) {
 		if (temp == "CellRank") {
 			ss >> rank;
 		}
-		else if (temp == "Corner") {
+		else if (temp == "Center") {
 			ss >> x >> trash >> y;
 			Coord loc(x,y);
-			corner = loc;
+			center = loc;
 		}
-		else if (temp == "Height") {
-			ss >> height;
-		}
-		else if (temp == "Width") {
-			ss >> width;
+		else if (temp == "Radius") {
+			ss >> radius;
 		}
 		else if (temp == "Layer") {
 			ss >> layer;
 		}
 		else if (temp == "End_Cell") {
 			//create new cell with collected data and push onto vector 
-			curr = new Cell(rank, corner, height, width, 0, this, layer);
+			curr = new Cell(rank, center, radius, 0, this, layer);
 			num_cells++;
 			cells.push_back(curr);
 		}
@@ -87,42 +85,49 @@ void Tissue::get_Cells(vector<Cell*>& cells) {
 }
 
 void Tissue::update_Life_Length() {
-//	cout << "tissue life length check" << endl;
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->update_Life_Length();
 	}
 	return;
 }
 
-void Tissue::calc_New_Forces() {
-
+void Tissue::update_Cytoplasm() {
 	for (unsigned int i = 0; i < cells.size(); i++) {
-//		cout << "calc new forces" << endl;
-		cells.at(i)->calc_New_Forces();
+		cells.at(i)->cytoplasm_Check();
+	}
+	return;
+}
+
+void Tissue::update_Wall() {
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->wall_Node_Check();
 	}
 
 	return;
-//	cout<<"calculated forces"<<endl;
+}
+void Tissue::calc_New_Forces() {
+	Cell* curr = NULL;
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		curr = cells.at(i);
+		curr->calc_New_Forces();
+	}
+	return;
+
 
 }
 
 void Tissue::update_Cell_Locations() {
-	
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->update_Node_Locations();
 	}
-
 	return;
-//	cout<<"Updated locations"<<endl;
 }
-	
 
 void Tissue::update_Neighbor_Cells() {
 	//update vectors of neighboring cells
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->update_Neighbor_Cells();
 	}
-	
 	return;
 }
 
@@ -147,7 +152,7 @@ void Tissue::update_Adhesion() {
 	}
 }
 
-void Tissue::cell_Division(const int Ti) {
+/*void Tissue::cell_Division(const int Ti) {
 	bool divided = false;
 	Cell* new_cell = NULL;
 //	cout << "number cells: " << cells.size()<< endl;
@@ -168,6 +173,58 @@ void Tissue::cell_Division(const int Ti) {
 	}
 	return;
 }
+
+void Tissue::make_Vectors() {
+	Cell* curr = NULL;
+	vector<double>curr_lengths;
+	vector<double>curr_lengths_two;
+	vector<Side*>sides;
+	vector<double>curr_forces;
+	vector<double>curr_forces_two;
+	Side* side_one = NULL;
+	Side* side_two = NULL;
+	ofstream myfile1("cell_vec.txt");
+	ofstream myfile2("side_vec.txt");
+	if(myfile1.is_open()){
+		for(int i = 0; i < cells.size();i++) {
+			curr = cells.at(i);
+			curr->get_Lengths(curr_lengths);
+			for(int j= 0; j < curr_lengths.size(); j++) {
+					myfile1 << setprecision(15) << curr_lengths.at(j) << endl;
+			}
+		}
+		myfile1.close();
+	}
+	else {
+		cout << "unable to open file" << endl;
+	}
+	if(myfile2.is_open()){
+		for(int i = 0; i < cells.size(); i++) {
+			curr = cells.at(i);
+			curr->get_Sides(sides);
+			side_one = sides.at(3);
+			side_two = sides.at(1);
+			side_one->get_Lengths(curr_lengths);
+			side_one->get_Forces(curr_forces);
+			side_two->get_Lengths(curr_lengths_two);
+			side_two->get_Forces(curr_forces_two);
+			
+			for(int j = 0;j < curr_lengths.size(); j++) {
+				myfile2 << curr_lengths.at(j) << endl;
+			}
+//			myfile2 << "NEWEST" << endl;
+			for (int j = 0; j < curr_forces.size(); j++) {
+				myfile2 << curr_forces.at(j) << endl;
+			}
+		}
+		myfile2.close();
+	}
+	else {
+		cout << "unable to open file" << endl;
+	}
+	return;
+}*/
+
 
 void Tissue::print_Data_Output(ofstream & ofs) {
 	return;
@@ -219,7 +276,7 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 
 	ofs << endl;
 
-	
+
 	ofs << "POINT_DATA " << num_Points << endl;
 	ofs << "SCALARS magnitude float " << 1 << endl;
 	ofs << "LOOKUP_TABLE default" << endl;
@@ -238,17 +295,7 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 
 	return;
 }
-/*
-void Tissue::grow_Cells(const int Ti) {
-	
-	for (unsigned int i = 0; i < cells.size(); i++) {
-		cells.at(i)->add_Wall_Node(Ti);
-		cells.at(i)->add_Cyt_Node(Ti);
-	}
 
-	return;
-}
-*/
 
 //=========================
 //End of tissue.cpp

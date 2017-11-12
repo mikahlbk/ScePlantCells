@@ -12,7 +12,7 @@
 
 #include "phys.h"
 #include "coord.h"
-//#include "node.h"
+#include "node.h"
 #include "cell.h"
 #include "tissue.h"
 //==============================
@@ -21,25 +21,19 @@ using namespace std;
 
 //============================
 
-int main(int argc, char* argv[]) {
+int main() {
 
-/*	if (argc != 2) {
-		cout << "ERROR: Not enough input arguments." << endl;
-		return 1;
-	}
-
-	string anim_folder = argv[1];
-*/
 	int start = clock();
 	
 	string init_tissue = "cell_start.txt";
-	//make a new cell object
 	
+	//make new cell objects in tissue
 	Tissue growing_Tissue(init_tissue);
 
-	cout << "Finished creating Cell" << endl;
+	cout << "Finished creating Cells" << endl;
+	
 	//parameters for time step
-    double numSteps = 100;
+    double numSteps = 500;
 
 	// Variable for dataoutput
 	int digits;
@@ -51,21 +45,20 @@ int main(int argc, char* argv[]) {
 	int out = 0; //counter for creating output/vtk files
 
 	//loop for time steps
-	for(int Ti = 0; Ti*dt < numSteps; Ti++) {
+	for(int Ti = 0; Ti*dt< numSteps; Ti++) {
 		//loop through all cells
 		//for now only one cell
 		//cout << "Ti = " << Ti << endl;
 		//Print to dataOutput and VTK files
-
-		if (Ti % 1000 == 0) {
-	
+		if (Ti % 100  == 0) {
+			
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {
 				Number = "0000" + to_string(out);
-			}
+			}	
 			else if (digits == 2) {
 				Number = "000" + to_string(out);
-			}
+			}	
 			else if (digits == 3) {
 				Number = "00" + to_string(out);
 			}
@@ -77,36 +70,43 @@ int main(int argc, char* argv[]) {
 
 			ofs.open(Filename.c_str());
 			growing_Tissue.print_VTK_File(ofs);
-			ofs.close();
-		
+			ofs.close();	
 			out++;
 		}
-
+	
 		if (Ti % 1000 == 0) {
 			cout << "Simulation still running. Ti: " << Ti << endl;
-		}
+		}	
 		
 		
 		// Update Each cell's neighboring cells
-	//	if (Ti % 500  == 0) {
-	//		cout << "Find Neighbors" << endl;
-	//		growing_Tissue.update_Neighbor_Cells();
-	//		cout << "Make Adhesion" << endl;
-	//		growing_Tissue.update_Adhesion();
-   // 	}
+		if (Ti % 10  == 0) {
+			//cout << "Find Neighbors" << endl;
+			growing_Tissue.update_Neighbor_Cells();
+			//cout << "Make Adhesion" << endl;
+			growing_Tissue.update_Adhesion();
+    	}
 		
 
 		// Tissue Growth
 		growing_Tissue.update_Life_Length();
-		cout << "updated life length" << endl;
+
+		// Add cyt node/ wall node 
+		if(Ti > 35000) {
+			growing_Tissue.update_Cytoplasm();
+		}
+
+		growing_Tissue.update_Wall();
+//		cout << "updated life length" << endl;
 		//Calculate new forces on cells and nodes
 		growing_Tissue.calc_New_Forces();
-		cout << "calculated forces" << endl;
+//		cout << "calculated forces" << endl;
 		//Update node positions
 		growing_Tissue.update_Cell_Locations();
-		cout << "updated node positions" << endl;
-	//	growing_Tissue.cell_Division(Ti);
-	//	cout << "Division" << endl;	
+//		cout << "updated node positions" << endl;
+		//Division if necessary
+//		growing_Tissue.cell_Division(Ti);
+//		cout << "Division" << endl;	
 	}
 
 	int stop = clock();

@@ -10,37 +10,33 @@
 //====================
 // Include dependencies
 #include <math.h>
+#include "coord.h"
 //=====================
 
 // Simulation Constants
-const double dt = 0.0000003;
-const int ADD_WALL_TIMER = 10;
-const int ADD_CYT_TIMER = 1000;
+const double dt = .001;
+const int ADD_WALL_TIMER = 1000;
+const int ADD_CYT_TIMER = 5000;
 
 const int MAX_NUM_WALL = 200;
 const int MAX_NUM_CYT = 60;
 
+const int Init_Num_Cyt_Nodes = 20;
+const int Init_Wall_Nodes = 100;
 
 // Global Physics Constants
-
 const double pi = acos(-1.0);
 
 ///// Cell wall mechanical parameters
 
-const double thetaFlat = pi;
-const double thetaCurve = pi * (11.0 / 12.0);
+const double K_BEND = .0001;
+const Coord  K_LINEAR = Coord(500,10);
 
-const double kBendHigh = 6;
-const double kBendLow = 6;
-
-const double kLinearHigh = 450;
-const double kLinearLow = 200;
-
-const double K_ADH = 20;
+const double K_ADH = 35;
 const double MembrEquLen_ADH = 0.4;
 //linear spring equilibrium length
 const double MembrEquLen = .0625; 
-const double MEMBR_THRESH_LENGTH = 0.094; 
+const double MEMBR_THRESH_LENGTH = 0.095; 
 const double ADHThresh = .78125;
 const double damping = 1;
 ///// Subcellular element parameters for membrane - membrane interactions

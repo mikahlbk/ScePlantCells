@@ -7,7 +7,6 @@
 #include "phys.h"
 #include "coord.h"
 #include "node.h"
-#include "side.h"
 #include "cell.h"
 //=========================
 
@@ -27,7 +26,7 @@ Coord Node::get_Force() {
 }
 
 void Node::update_Location() {
-    my_loc += new_force * dt;
+	my_loc += new_force * dt;
     return;
 }
 
@@ -40,31 +39,29 @@ Cyt_Node::Cyt_Node(Coord loc, Cell* my_cell) : Node(loc) {
 }
 
 void Cyt_Node::calc_Forces() {
-	//for cyt, just need morse potential for int-int and int-membr
-//	cout << "trying to do the cyt pots" << endl;
+	//for cytoplasm, just need morse potential for int-int and int-membr
 	Coord Fii = calc_Morse_II();
-//	cout << " i did the ii potentials" << endl;
 	Coord Fmi = calc_Morse_MI(my_cell->get_Wall_Nodes());
-//	cout << "i got the wall nodes" << endl;	
     new_force = Fmi + Fii;
-
+	
 	return;
 }
 
 // Needs to have access:
 //		-all the other cyt nodes of cell
 //		-all the membr nodes of cell
+
 Coord Cyt_Node::calc_Morse_II() {
 	//calc force for II
 	Coord Fii; //initialized to zero
 
 	vector<Cyt_Node*>cyts;
-//	cout << "made vector to hold cyt nodes" << endl;
 	if (my_cell==NULL) {
-		cout << "TRUE" << endl;
+		cout << "Error: Trying to access NULL Pointer. Aborting!" << endl;
+		exit(1);
 	}
 	my_cell->get_Cyt_Nodes(cyts);
-//	cout << "filling vector" << endl;
+
 	for (unsigned int j = 0; j < cyts.size(); j++) {
 		//don't calculate yourself
 		if (cyts.at(j) != this) {
@@ -137,206 +134,39 @@ Cyt_Node::~Cyt_Node() {
 /** class Wall Node Functions **/
 
 // Constructors-----------------
-Wall_Node::Wall_Node(Coord loc, Side* my_side) : Node(loc) {
-	this-> my_side = my_side;
-	cyt_force = Coord();
-	equi_angle = thetaFlat;
-	on_curve = false;
-	closest = NULL;
-	closest_len = 100;
+Wall_Node::Wall_Node(Coord loc, Cell* my_cell) : Node(loc) {
+	this->my_cell = my_cell;
 }
 
-Wall_Node::Wall_Node(Coord loc, Side* my_side, Wall_Node* left, Wall_Node* right) 
-	: Node(loc)   {
-
-    this->left = left;
+Wall_Node::Wall_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right) : Node(loc)   {
+	this->left = left;
     this->right = right;
-	this-> my_side = my_side;
-	cyt_force = Coord();
-	equi_angle = thetaFlat;
-	on_curve = false;
-	closest = NULL;
-	closest_len = 100;
+	this-> my_cell = my_cell;
+	
 	update_Angle();
 }
 
 Wall_Node::~Wall_Node() {
-	my_side = NULL;	
+	my_cell = NULL;	
 	left = NULL;
 	right = NULL;
-	closest = NULL;
+	//closest = NULL;
 }
 
 //  Getters and Setters--------------------
-
 void Wall_Node::set_Equi_Angle(double angle) {
 	equi_angle = angle;
 	return;
 }
 
-void Wall_Node::set_Curve(bool on_curve) {
-	this->on_curve = on_curve;
+void Wall_Node::set_Left_Neighbor(Wall_Node* new_Left) {
+	this->left = new_Left;
 	return;
-}
-void Wall_Node::set_Closest(Wall_Node*  closest, double closest_len) {
-	this->closest = closest;
-	this->closest_len = closest_len;
-	return;
-}
-Wall_Node* Wall_Node::find_Closest_Node(vector<Side*>& touching_Sides) {
-	Side* curr_Side = NULL;
-	Wall_Node* curr = NULL;
-	Wall_Node* orig = NULL;
-	Wall_Node* next = NULL;
-	Wall_Node* closest = NULL;
-	double curr_dist = 0;
-	double smallest = 100;
-	for(int i = 0; i < touching_Sides.size(); i++) {
-		curr_Side = touching_Sides.at(i);
-		//find the closest node on curr_Side
-		curr = curr_Side->get_End_A();
-		do{
-			next = curr->get_Left_Neighbor();
-			curr_dist = (this->my_loc - curr->get_Location()).length();
-			if(curr_dist < ADHThresh) {
-				if(curr_dist < smallest) {
-					closest = curr;
-					smallest = curr_dist;
-				}
-			}
-			curr = next;
-		} while (next->get_My_Side() == curr_Side);
-	}
-	return closest;
-}
-void Wall_Node::make_Connection(Wall_Node* curr_Closest) {
-	double curr_dist = 0;
-	if(curr_Closest != NULL) {
-		//cout << "Making connection" << endl;
-		if(curr_Closest->get_Closest() != NULL) {
-			curr_dist = (this->get_Location() - curr_Closest->get_Location()).length();
-			if(curr_dist < this->closest_len) {
-				this->closest_len = curr_dist;
-				this->closest = curr_Closest;
-				curr_Closest->set_Closest(this, curr_dist);
-			}
-			else if (curr_dist > this->closest_len) {
-				//do nothing
-			}
-		}
-	
-		else {
-			this->closest_len = curr_dist;
-			this->closest = curr_Closest;
-			curr_Closest->set_Closest(this, curr_dist);
-		}
-	}
-}
-
-double Wall_Node::get_Linear_Spring() {
-	return my_side->get_Linear_Spring();
-}
-
-double Wall_Node::get_Bending_Spring() {
-	return my_side->get_Bending_Spring();
-}
-
-void Wall_Node::set_Left_Neighbor(Wall_Node* new_Left){
-	this->left = new_Left; 
 }
 
 void Wall_Node::set_Right_Neighbor(Wall_Node* new_Right) {
 	this->right = new_Right;
-}
-
-// Calc Force Functions -----------------------
-void Wall_Node::calc_Forces() {
-	// Initialize force sum to zero by default constructor
-	Coord sum;
-
-	sum += calc_Morse_SC();
-	
-	cyt_force = sum;
-
-	sum += calc_Morse_DC();
-	//cout << "DC" << calc_Morse_DC() << endl;
-	sum += calc_Linear();
-	//cout << "linear" << endl;
-	sum += calc_Bending();
-	//cout << "bending" << endl;
-
-	// Update new_force variable for location updating
-	new_force = sum;
-
 	return;
-}
-
-//morse potential between wall node i and every cyt node in cell
-Coord Wall_Node::calc_Morse_SC() {
-	vector<Cyt_Node*> cyt_nodes;
-	my_side->get_Cyt_Nodes(cyt_nodes);
-
-	Coord Fmi;
-	
-	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
-		Fmi += this->morse_Equation(cyt_nodes.at(i));
-	}
-	//cout << "	morse_sc: " << Fmi << endl;	
-	return Fmi;
-}
-
-
-//morse potential between wall node i and every cyt node in cell
-Coord Wall_Node::calc_Morse_DC() {
-	Coord Fdc;
-	vector<Cell*> cells;
-	my_side->get_My_Cell()->get_Neighbor_Cells(cells);	
-	Wall_Node* curr = NULL;
-	Wall_Node* orig = NULL;
-	for (unsigned int i = 0; i < cells.size(); i++) {
-		curr = cells.at(i)->get_Wall_Nodes();
-		orig = curr;
-		do {
-			Fdc += morse_Equation(curr);
-			curr = curr->get_Left_Neighbor();
-		} while (curr != orig);
-	}
-	//int counter = 0;
-	if(this->closest != NULL){
-		Fdc += linear_Equation_ADH(this->closest);
-		//counter++;
-		//cout << "Counter: "  << counter <<  endl; 
-	}
-	return Fdc;
-}
-
-
-//bending force of node
-Coord Wall_Node::calc_Bending() {
-	Coord F_bend;
-
-	F_bend += bending_Equation_Center();
-	F_bend += bending_Equation_Left();
-	F_bend += bending_Equation_Right();
-	
-	if (cross_Prod < 0.0) {
-		F_bend = F_bend*(-1);
-	}	
-	//cout << "	bending: " << F_bend << endl;
-	return F_bend;
-}
-
-//spring force of neighboring springs
-Coord Wall_Node::calc_Linear() {
-	Coord F_lin;
-
-	//cout << "calc left" << endl;
-	F_lin += linear_Equation(left);
-
-	//cout << "calc right" << endl;
-	F_lin += linear_Equation(right);
-	//cout << "	linear: " << F_lin << endl;
-	return F_lin;
 }
 
 void Wall_Node::update_Angle() {
@@ -361,6 +191,108 @@ void Wall_Node::update_Angle() {
 	cross_Prod = crossProd;
 
 	return;
+}
+
+void Wall_Node::update_Equi_Angle(double new_theta) {
+	equi_angle = new_theta;
+
+	return;
+}
+
+void Wall_Node::set_Closest(Wall_Node*  closest, double closest_len) {
+	this->closest = closest;
+	this->closest_len = closest_len;
+	return;
+}
+
+// Calc Force Functions -----------------------
+void Wall_Node::calc_Forces() {
+	// Initialize force sum to zero by default constructor
+	Coord sum;
+
+	sum += calc_Morse_SC();
+//	cout << "SC success" << endl;	
+	cyt_force = sum;
+
+	sum += calc_Morse_DC();
+	//cout << "DC" << calc_Morse_DC() << endl;
+	sum += calc_Linear();
+//	cout << "linear" << endl;
+	sum += calc_Bending();
+//	cout << "bending" << endl;
+	
+	// Update new_force variable for location updating
+	new_force = sum;
+
+	return;
+}
+
+//morse potential between wall node i and every cyt node in cell
+Coord Wall_Node::calc_Morse_SC() {
+	vector<Cyt_Node*> cyt_nodes;
+	my_cell->get_Cyt_Nodes(cyt_nodes);
+
+	Coord Fmi;
+	
+	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
+		Fmi += this->morse_Equation(cyt_nodes.at(i));
+	}
+	//cout << "	morse_sc: " << Fmi << endl;	
+	return Fmi;
+}
+
+
+//morse potential between wall node i and every cyt node in cell
+Coord Wall_Node::calc_Morse_DC() {
+	Coord Fdc;
+	vector<Cell*> cells;
+	my_cell->get_Neighbor_Cells(cells);	
+	Wall_Node* curr = NULL;
+	Wall_Node* orig = NULL;
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		curr = cells.at(i)->get_Wall_Nodes();
+		orig = curr;
+		do {
+			Fdc += morse_Equation(curr);
+			curr = curr->get_Left_Neighbor();
+		} while (curr != orig);
+	}
+
+	if(this->closest != NULL){
+		Fdc += linear_Equation_ADH(this->closest);
+	}
+	
+	return Fdc;
+}
+
+
+//bending force of node
+Coord Wall_Node::calc_Bending() {
+	Coord F_bend;
+
+	F_bend += bending_Equation_Center();
+	F_bend += bending_Equation_Left();
+	F_bend += bending_Equation_Right();
+	
+	if (cross_Prod < 0.0) {
+		F_bend = F_bend*(-1);
+	}	
+	//cout << "	bending: " << F_bend << endl;
+	return F_bend;
+}
+
+//spring force of neighboring springs
+Coord Wall_Node::calc_Linear() {
+	Coord F_lin;
+
+//	cout << "calc left" << endl;
+	F_lin += linear_Equation(left);
+
+//	cout << "calc right" << endl;
+	F_lin += linear_Equation(right);
+	
+//	cout << "	linear: " << F_lin << endl;
+	return F_lin;
 }
 
 //===========================================================
@@ -404,7 +336,6 @@ Coord Wall_Node::morse_Equation(Wall_Node* wall) {
 
 Coord Wall_Node::bending_Equation_Center() {
 	Coord F_center;
-	double k_bend = get_Bending_Spring();
 	double self_Constant; 
 	
 	double eps = 0.0001;
@@ -413,7 +344,7 @@ Coord Wall_Node::bending_Equation_Center() {
 		return F_center;
 	}
 	else {
-		self_Constant = k_bend*(my_angle - equi_angle)/(sqrt(1-pow(cos(my_angle),2)));
+		self_Constant = K_BEND*(my_angle - equi_angle)/(sqrt(1-pow(cos(my_angle),2)));
 	}
 
 	Coord left_vect = left->get_Location() - my_loc;
@@ -426,14 +357,15 @@ Coord Wall_Node::bending_Equation_Center() {
 	Coord term_r2 = right_vect*cos(my_angle)/pow(right_len,2);
 
 	F_center = (term_l1 + term_l2 + term_r1 + term_r2) * self_Constant;
+	
 	//cout << "Bending center: " << F_center << endl;	
 	return F_center;
 }
 
 Coord Wall_Node::bending_Equation_Left() {
 	Coord F_left;
-	double left_k_bend = left->get_Bending_Spring();
-	double left_equ_angle = left->get_Equi_Angle();
+	//double left_k_bend = left->get_Bending_Spring();
+	double left_equi_angle = left->get_Equi_Angle();
 	double left_angle = left->get_Angle();
 	double left_Constant;
 	
@@ -443,7 +375,7 @@ Coord Wall_Node::bending_Equation_Left() {
 		return F_left;
 	}
 	else {
-		left_Constant = left_k_bend*(left_angle - left_equ_angle)/(sqrt(1-pow(cos(left_angle),2)));
+		left_Constant = K_BEND*(left_angle - left_equi_angle)/(sqrt(1-pow(cos(left_angle),2)));
 	}
 
 	Coord left_vect = left->get_Location() - my_loc;
@@ -454,13 +386,14 @@ Coord Wall_Node::bending_Equation_Left() {
 	Coord left_term2 = left_vect*cos(left_angle)/pow(left_len,2);
 
 	F_left = (left_left_term1 + left_term2) * left_Constant;
+	
 	//cout << "Bending left: " << F_left << endl;
 	return F_left;
 }
 
 Coord Wall_Node::bending_Equation_Right() {
 	Coord F_right;
-	double right_k_bend = right->get_Bending_Spring();
+	//double right_k_bend = right->get_Bending_Spring();
 	double right_equ_angle = right->get_Equi_Angle();
 	double right_angle = right->get_Angle();
 	double right_Constant;
@@ -471,7 +404,7 @@ Coord Wall_Node::bending_Equation_Right() {
 		return F_right;
 	}
 	else {
-		right_Constant = right_k_bend*(right_angle-right_equ_angle)/(sqrt(1-pow(cos(right_angle),2)));
+		right_Constant = K_BEND*(right_angle-right_equ_angle)/(sqrt(1-pow(cos(right_angle),2)));
 	}
 
 	Coord right_vect = right->get_Location() - my_loc;
@@ -482,40 +415,29 @@ Coord Wall_Node::bending_Equation_Right() {
 	Coord right_term2 = right_vect*cos(right_angle)/pow(right_len,2);
 
 	F_right = (right_right_term1 + right_term2)*right_Constant;
+	
 	//cout << "Bending right: " << F_right << endl;
 	return F_right;
 }
 
-
-
 Coord Wall_Node::linear_Equation(Wall_Node* wall) {
 	if (wall == NULL) {
 		cout << "ERROR: Trying to access NULL pointer. Aborting!" << endl;
-		//cout << "This is happening" << endl;
 	}
 	
-	//decide on spring constant
-	double k_linear = 0.0;
-	if (this->left == wall) {
-		k_linear = wall->get_My_Side()->get_Linear_Spring();
-	}
-	else {
-		k_linear = get_Linear_Spring();
-	}
-
 	//use spring constant variables
 	Coord F_lin;
 	Coord diff_vect = wall->get_Location() - my_loc;
 	double diff_len = diff_vect.length();
-	
-	F_lin = (diff_vect/diff_len)*(k_linear * (diff_len - MembrEquLen));
+	Coord scaled_k = K_LINEAR*(diff_len - MembrEquLen);
+	F_lin = (diff_vect/diff_len).distribute(scaled_k);
 
 	return F_lin;	
 }
 
 Coord Wall_Node::linear_Equation_ADH(Wall_Node* wall) {
 	if (wall == NULL) {
-		//cout << "Problems for days" << endl;
+		cout << "Problems for days" << endl;
 	}
 	Coord F_lin;
 	Coord diff_vect = wall->get_Location() - my_loc;
@@ -525,98 +447,59 @@ Coord Wall_Node::linear_Equation_ADH(Wall_Node* wall) {
 	return F_lin;
 }
 
-//======================================
-//Functions not in use
-
-/* Efficient but doesn't work
-Coord Wall_Node::calc_Morse_DC() {
-
-	vector<Cell*> cells;
-	my_cell->get_Neighbor_Cells(cells);
-
-	Coord Fdc;
-	bool close_enough = false;
-	double threshold = 1.0;
-
-	//iterate through each cell
-	for (unsigned int i = 0; i < cells.size(); i++) {
-		//find which nodes from cell.at(i) you will need
-		//at the moment, just the ones that aren't yourself
-		Wall_Node* A = NULL;
-		Wall_Node* B = NULL;
-
-		close_enough = cells.at(i)->get_Reasonable_Bounds(this, A, B);
-		//cout << "Finished gettin reasonable bounds" << endl;
-		
-        if (close_enough) {
-			
-			if (A == B) {
-				//expand outward for calculations
-				Fdc += morse_Equation(A);
-				//expand right
-				Wall_Node* curr = A->get_Right_Neighbor();
-
-				while ( (curr->get_Location() - my_loc).length() < threshold) {
-					Fdc += morse_Equation(curr);
-					curr = curr->get_Right_Neighbor();
+//==========================================================
+//Adhesion functions
+Wall_Node* Wall_Node::find_Closest_Node(vector<Cell*>& neighbors) {
+	Wall_Node* curr = NULL;
+	Wall_Node* orig = NULL;
+	Wall_Node* next = NULL;
+	Cell* curr_cell = NULL;
+	Wall_Node* closest = NULL;
+	double curr_dist = 0;
+	double smallest = 100;
+	for(int i = 0; i < neighbors.size(); i++) {
+		curr_cell = neighbors.at(i);
+		//find the closest node on curr_Side
+		curr = curr_cell->get_Left_Corner();
+		orig = curr;
+		do{
+			next = curr->get_Left_Neighbor();
+			curr_dist = (this->my_loc - curr->get_Location()).length();
+			if(curr_dist < ADHThresh) {
+				if(curr_dist < smallest) {
+					closest = curr;
+					smallest = curr_dist;
 				}
-				//expand left
-				curr = A->get_Left_Neighbor();
-
-				while ( (curr->get_Location() - my_loc).length() < threshold) {
-					Fdc += morse_Equation(curr);
-					curr = curr->get_Left_Neighbor();
-				}
-
 			}
-			else {
-				bool A_good = false;  
-				bool B_good = false;
-				if ( (A->get_Location() - my_loc).length() < threshold) {
-					A_good = true;
-					Fdc += morse_Equation(A);
-				}
-				//expand right side of A
-				Wall_Node* curr = NULL;
-				if (A_good) {
-					curr = A->get_Right_Neighbor();
-					while ( (curr->get_Location() - my_loc).length() < threshold) {
-						Fdc += morse_Equation(curr);
-						curr = curr->get_Right_Neighbor();
-					}
-					curr = A->get_Left_Neighbor();
-					B_good = true;
-				}
-				else {
-					//iterate through left neighbors until find one within range
-					curr = A->get_Left_Neighbor();
-					while( (curr->get_Location() - my_loc).length() > threshold) {
-						if (curr == B) {
-							B_good = false;
-							break;
-						}
-						curr = curr->get_Left_Neighbor();
-					}
-				}
-				
-				//between A and B, and past B
-				// curr is already set by prev if/else statements 
-				if (B_good) {
-					do {
-						Fdc += morse_Equation(curr);
-						curr = curr->get_Left_Neighbor();
-					} while ( (curr->get_Location() - my_loc).length() < threshold);
-				}
+			curr = next;
+		} while (next != orig);
+	}
+	return closest;
+}
 
+void Wall_Node::make_Connection(Wall_Node* curr_Closest) {
+	double curr_dist = 0;
+	if(curr_Closest != NULL) {
+		//cout << "Making connection" << endl;
+		if(curr_Closest->get_Closest() != NULL) {
+			curr_dist = (this->get_Location() - curr_Closest->get_Location()).length();
+			if(curr_dist < this->closest_len) {
+				this->closest_len = curr_dist;
+				this->closest = curr_Closest;
+				curr_Closest->set_Closest(this, curr_dist);
+			}
+			else if (curr_dist > this->closest_len) {
+				//do nothing
 			}
 		}
 
+		else {
+			this->closest_len = curr_dist;
+			this->closest = curr_Closest;
+			curr_Closest->set_Closest(this, curr_dist);
+		}
 	}
-	
-	return Fdc;
 }
-*/
-
 //==========================================================
 // End of node.cpp
 

@@ -84,6 +84,11 @@ double Coord::length() const {
 	return sqrt( (x * x) + (y * y) );
 }
 
+Coord Coord::distribute(const Coord& c) const {
+	Coord q(x*c.get_X(),y*c.get_Y());
+	return q;
+}
+
 // Display Functions
 
 ostream& operator<<(ostream& os, const Coord& c) {
