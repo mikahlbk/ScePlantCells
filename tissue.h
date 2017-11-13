@@ -35,11 +35,15 @@ class Tissue {
 		void calc_New_Forces();
 		void update_Cell_Locations();
 		void update_Neighbor_Cells();
+		void stretching_Test();
 		//void cell_Division(const int Ti);
 		void print_Data_Output(ofstream& ofs);
 		void print_VTK_File(ofstream& ofs);
 		//void make_Vectors();
-		void update_Adhesion();
+		void cell_stress();
+		void cell_strain();
+		void make_Vectors();
+		void update_Adhesion(int Ti);
 		int get_Num_Cells() {return num_cells;}
 		//void grow_Cells(const int Ti);
 		//Destructor

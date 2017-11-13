@@ -168,6 +168,16 @@ void Cell::get_Neighbor_Cells(vector<Cell*>& cells) {
 	return;
 }
 
+void Cell::get_Strain(vector<double>& strain) {
+	strain = this->strain_vec;
+	return;
+}
+
+void Cell::get_Stress(vector<double>& stress) {
+	stress = this->stress_vec;
+	return;
+}
+
 int Cell::get_Node_Count() {
 	int node_count = 0;
 
@@ -219,7 +229,8 @@ void Cell::update_Neighbor_Cells() {
 	return;
 }
 
-void Cell::update_adhesion_springs() {
+void Cell::update_adhesion_springs(int Ti) {
+	int time = Ti;
 	vector<Cell*>neighbors;
 	this->get_Neighbor_Cells(neighbors);
 	Wall_Node* curr_Node = NULL;
@@ -230,7 +241,12 @@ void Cell::update_adhesion_springs() {
 		curr_Node = left_Corner;;
 		do {
 			next_Node = curr_Node->get_Left_Neighbor();
-			curr_Closest = curr_Node->find_Closest_Node(neighbors);
+			if(time < Relaxation_Time) {
+				curr_Closest = curr_Node->find_Closest_Node_Beg(neighbors);
+			}
+			else {
+				curr_Closest = curr_Node->find_Closest_Node(neighbors);
+			}
 			//if(curr_Closest == NULL) {
 				//cout << "Did not find a curr closest" << endl;
 			//}
@@ -354,6 +370,23 @@ void Cell::cytoplasm_Check() {
 	return;
 }
 
+void Cell::stretch() {
+	//stretch the cell
+	Wall_Node* curr = left_Corner;
+	Wall_Node* next = NULL;
+	Wall_Node* orig = curr;
+	double y_coord = cell_center.get_Y();
+	double curr_coord;
+	do {
+		curr_coord = curr->get_Location().get_Y();
+		next = curr->get_Left_Neighbor();
+		curr->pull_node();
+	//	cout << "pulling" << endl;
+		curr = next;
+			
+	} while (next != orig);
+	return;
+}
 //===========================================================
 //==================================
 // Output Functions
@@ -477,7 +510,7 @@ void Cell::add_Wall_Node() {
 	Coord location;
 	Wall_Node* added_node = NULL;
 	if(right != NULL) {
-		//cout << "wasnt null" << endl;
+	//	cout << "wasnt null" << endl;
 		left = right->get_Left_Neighbor();
 		location  = (right->get_Location() + left->get_Location())*0.5;
 		added_node = new Wall_Node(location, this, left, right);
@@ -526,6 +559,104 @@ void Cell::add_Cyt_Node() {
 	num_cyt_nodes++;
 	return;
 }*/
+
+
+double Cell::extensional_Length() {
+	double x_Coord = cell_center.get_X();
+
+	Wall_Node* curr = left_Corner;
+	Wall_Node* next = NULL;
+	Wall_Node* orig = curr;
+	Wall_Node* most_right = NULL;
+	Wall_Node* most_left = NULL;
+
+	double curr_Coord;
+	double length;
+
+	do {
+		curr_Coord = curr->get_Location().get_X();
+		next = curr->get_Left_Neighbor();
+		if(curr_Coord > x_Coord) {
+			most_right = curr;
+		}
+		else if(curr_Coord < x_Coord) {
+			most_left = curr;
+		}
+		curr = next;
+	} while (next != orig);
+	 
+	length = (most_right->get_Location() - most_left->get_Location()).length();
+
+	return length;
+}
+
+double Cell::tensile_Length() {
+	double y_Coord = cell_center.get_Y();
+
+	Wall_Node* curr = left_Corner;
+	Wall_Node* next = NULL;
+	Wall_Node* orig = curr;
+	Wall_Node* most_up = NULL;
+	Wall_Node* most_down = NULL;
+
+	double curr_Coord;
+	double length = 0;
+	
+
+	do {
+		curr_Coord = curr->get_Location().get_Y();
+		next = curr->get_Left_Neighbor();
+		if(curr_Coord > y_Coord) {
+			most_up = curr;
+		}
+		else if(curr_Coord < y_Coord) {
+			most_down = curr;
+		}
+		curr = next;
+	} while (next != orig);
+
+	curr = most_up;
+	do {
+
+		next = curr->get_Left_Neighbor();
+		length += (next->get_Location()-curr->get_Location()).length();
+		curr = next;
+	} while (next != most_down);
+	
+	return length;
+}
+
+double Cell::total_Force() {
+	Wall_Node* curr = left_Corner;
+	Wall_Node* next = NULL;
+	Wall_Node* orig = curr;
+	Coord force_sum;
+	double force;
+
+	do {
+		force_sum += curr->get_f_EXT();
+		next = curr->get_Left_Neighbor();
+		curr = next;
+	} while (next != curr);
+
+	force = force_sum.length();
+
+	return force;
+}
+
+void Cell::add_strain(double& new_length) {
+	strain_vec.push_back(new_length);
+	return;
+}
+
+void Cell::add_stress(double& new_length, double& new_force) {
+	double curr_stress = new_force/new_length;
+	stress_vec.push_back(curr_stress);
+	return;
+}
+
+
+	
 
 
 

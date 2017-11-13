@@ -131,7 +131,40 @@ void Tissue::update_Neighbor_Cells() {
 	return;
 }
 
-void Tissue::update_Adhesion() {
+void Tissue::stretching_Test() {
+	//stretch the cell
+	for(unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->stretch();
+	}
+	return;
+}
+
+void Tissue::cell_strain() {
+	double curr_length;
+	Cell* curr_cell;
+	for(unsigned int i = 0; i < cells.size(); i++) {
+		curr_cell = cells.at(i);
+		curr_length = curr_cell->extensional_Length();
+		curr_cell->add_strain(curr_length);
+	}
+	return;
+}
+
+void Tissue::cell_stress() {
+	double curr_length;
+	double curr_force;
+	Cell* curr_cell;
+	for(unsigned int i = 0; i < cells.size(); i ++) {
+		curr_cell = cells.at(i);
+		curr_length = curr_cell->tensile_Length();
+		curr_force = curr_cell->total_Force();
+		curr_cell->add_stress(curr_length, curr_force);
+	}
+	return;
+}
+
+void Tissue::update_Adhesion(int Ti) {
+	int time = Ti;
 	Wall_Node* curr = NULL;
 	Wall_Node* orig = NULL;
 	Wall_Node* next = NULL;
@@ -148,7 +181,7 @@ void Tissue::update_Adhesion() {
 	
 	for(unsigned int i=0;i<cells.size();i++) {
 		//cout << "Updating adhesion for cell" << endl;
-		cells.at(i)->update_adhesion_springs();
+		cells.at(i)->update_adhesion_springs(time);
 	}
 }
 
@@ -172,25 +205,20 @@ void Tissue::update_Adhesion() {
 		this->update_Adhesion();
 	}
 	return;
-}
+}*/
 
 void Tissue::make_Vectors() {
 	Cell* curr = NULL;
-	vector<double>curr_lengths;
-	vector<double>curr_lengths_two;
-	vector<Side*>sides;
-	vector<double>curr_forces;
-	vector<double>curr_forces_two;
-	Side* side_one = NULL;
-	Side* side_two = NULL;
-	ofstream myfile1("cell_vec.txt");
-	ofstream myfile2("side_vec.txt");
+	vector<double> strain;
+	vector<double> stress;
+	ofstream myfile1("strain_vec.txt");
+	ofstream myfile2("stress_vec.txt");
 	if(myfile1.is_open()){
 		for(int i = 0; i < cells.size();i++) {
 			curr = cells.at(i);
-			curr->get_Lengths(curr_lengths);
-			for(int j= 0; j < curr_lengths.size(); j++) {
-					myfile1 << setprecision(15) << curr_lengths.at(j) << endl;
+			curr->get_Strain(strain);
+			for(int j= 0; j < strain.size(); j++) {
+					myfile1 << strain.at(j) << endl;
 			}
 		}
 		myfile1.close();
@@ -201,20 +229,9 @@ void Tissue::make_Vectors() {
 	if(myfile2.is_open()){
 		for(int i = 0; i < cells.size(); i++) {
 			curr = cells.at(i);
-			curr->get_Sides(sides);
-			side_one = sides.at(3);
-			side_two = sides.at(1);
-			side_one->get_Lengths(curr_lengths);
-			side_one->get_Forces(curr_forces);
-			side_two->get_Lengths(curr_lengths_two);
-			side_two->get_Forces(curr_forces_two);
-			
-			for(int j = 0;j < curr_lengths.size(); j++) {
-				myfile2 << curr_lengths.at(j) << endl;
-			}
-//			myfile2 << "NEWEST" << endl;
-			for (int j = 0; j < curr_forces.size(); j++) {
-				myfile2 << curr_forces.at(j) << endl;
+			curr->get_Stress(stress);
+			for(int j = 0;j < stress.size(); j++) {
+				myfile2 << stress.at(j) << endl;
 			}
 		}
 		myfile2.close();
@@ -223,8 +240,7 @@ void Tissue::make_Vectors() {
 		cout << "unable to open file" << endl;
 	}
 	return;
-}*/
-
+}
 
 void Tissue::print_Data_Output(ofstream & ofs) {
 	return;

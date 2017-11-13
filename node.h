@@ -63,7 +63,8 @@ class Wall_Node: public Node {
 		double equi_angle;
 		double cross_Prod;
 		Coord cyt_force;
-		//Coord f_EXT;
+		bool pull;
+		Coord F_ext;
 		Wall_Node* closest;
     	double closest_len;
 	public:
@@ -83,18 +84,20 @@ class Wall_Node: public Node {
 		void update_Equi_Angle(double new_theta);
 		Wall_Node* get_Closest() {return closest;}
 		Wall_Node* find_Closest_Node(vector<Cell*>& neighbors);
+		Wall_Node* find_Closest_Node_Beg(vector<Cell*>& neighbors);
 		void make_Connection(Wall_Node* curr_Closest);
 		//Coord get_Ext_Force() {return f_EXT;}
 		void set_Closest(Wall_Node* closest, double closest_len);
 		Coord get_CytForce() {return cyt_force;}
-      	
+      	Coord get_f_EXT() {return F_ext;}	
 		//Force Calculations
 		virtual void calc_Forces();
 		Coord calc_Morse_SC();
 		Coord calc_Morse_DC();
 		Coord calc_Bending();
 		Coord calc_Linear();
-		//Coord calc_External();
+		void pull_node();
+		Coord calc_External();
 		
 		// Mathematical Force Equations
 		Coord morse_Equation(Cyt_Node* cyt);

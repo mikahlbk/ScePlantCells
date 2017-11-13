@@ -30,6 +30,8 @@ class Cell {
 		int growth_rate;
 		Coord cell_center;
 		int num_wall_nodes;
+		vector<double> strain_vec;
+		vector<double> stress_vec;
 		vector<Cyt_Node*> cyt_nodes;
 		vector<Cell*> neigh_cells;
 		Wall_Node* left_Corner;	
@@ -57,12 +59,14 @@ class Cell {
 		void set_Layer(int layer);
 		void set_growth_rate(double rate);
 		void get_Neighbor_Cells(vector<Cell*>& cells);
+		void get_Strain(vector<double>& strain);
+		void get_Stress(vector<double>& stress);
 		Wall_Node* get_Left_Corner() {return left_Corner;}
 
 		// Keep track of neighbor cells
 		void update_Neighbor_Cells();
-		void update_adhesion_springs();
-		
+		void update_adhesion_springs(int Ti);
+	
 		// Forces and Positionsing
 		void calc_New_Forces();
 		void update_Node_Locations();
@@ -72,6 +76,7 @@ class Cell {
 		void update_Life_Length();
 		void wall_Node_Check();
 		void cytoplasm_Check();
+		void stretch();
 		//Output Functions
 		void print_Data_Output(ofstream& ofs);
 		void print_VTK_Points(ofstream& ofs, int& count);
@@ -82,7 +87,12 @@ class Cell {
 		Wall_Node* find_Largest_Length();
 		void add_Wall_Node();
 		void add_Cyt_Node();
-	
+		
+		double total_Force();
+		double tensile_Length();
+		double extensional_Length();
+		void add_stress(double& new_length, double& new_force);
+		void add_strain(double& new_length);
 		//Division 
 		//Cell* divide(const int Ti);
 		//Cell* divide_length_wise(const int Ti);

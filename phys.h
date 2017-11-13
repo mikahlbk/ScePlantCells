@@ -14,9 +14,10 @@
 //=====================
 
 // Simulation Constants
-const double dt = .001;
-const int ADD_WALL_TIMER = 1000;
-const int ADD_CYT_TIMER = 5000;
+const double dt = .00075;
+const int Relaxation_Time = 3000;
+const int ADD_WALL_TIMER = 1500;
+const int ADD_CYT_TIMER = 1500;
 
 const int MAX_NUM_WALL = 200;
 const int MAX_NUM_CYT = 60;
@@ -29,14 +30,17 @@ const double pi = acos(-1.0);
 
 ///// Cell wall mechanical parameters
 
-const double K_BEND = .0001;
-const Coord  K_LINEAR = Coord(500,10);
+const double K_BEND = .001;
+const Coord  K_LINEAR = Coord(450,100);
 
-const double K_ADH = 35;
+const double K_ADH = 20;
 const double MembrEquLen_ADH = 0.4;
+
+const double EXTERNAL_FORCE = 2;
 //linear spring equilibrium length
 const double MembrEquLen = .0625; 
-const double MEMBR_THRESH_LENGTH = 0.095; 
+const double MEMBR_THRESH_LENGTH = 0.1; 
+const double ADHThreshBeg = .78125;
 const double ADHThresh = .78125;
 const double damping = 1;
 ///// Subcellular element parameters for membrane - membrane interactions

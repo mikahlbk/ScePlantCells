@@ -142,7 +142,8 @@ Wall_Node::Wall_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right
 	this->left = left;
     this->right = right;
 	this-> my_cell = my_cell;
-	
+	this-> pull = false;
+	this->F_ext = Coord(0,0);
 	update_Angle();
 }
 
@@ -209,7 +210,7 @@ void Wall_Node::set_Closest(Wall_Node*  closest, double closest_len) {
 void Wall_Node::calc_Forces() {
 	// Initialize force sum to zero by default constructor
 	Coord sum;
-
+	
 	sum += calc_Morse_SC();
 //	cout << "SC success" << endl;	
 	cyt_force = sum;
@@ -221,6 +222,11 @@ void Wall_Node::calc_Forces() {
 	sum += calc_Bending();
 //	cout << "bending" << endl;
 	
+	if(pull == true) {
+		//cout << "External Force is" << calc_External() << endl;
+		sum+= calc_External();
+		pull = false;
+	}
 	// Update new_force variable for location updating
 	new_force = sum;
 
@@ -294,6 +300,24 @@ Coord Wall_Node::calc_Linear() {
 //	cout << "	linear: " << F_lin << endl;
 	return F_lin;
 }
+
+Coord Wall_Node::calc_External() {
+
+	F_ext += Coord(EXTERNAL_FORCE*dt,0);
+	
+	if(this->get_Location().get_X() > my_cell->get_Cell_Center().get_X()) {
+		return F_ext;
+	}
+	else if(this->get_Location().get_X() < my_cell->get_Cell_Center().get_X()) {
+		return F_ext*-1;
+	}
+}
+
+void Wall_Node::pull_node() {
+	this->pull = true;
+	return;
+}
+
 
 //===========================================================
 // Mathematical force calculations
@@ -466,6 +490,34 @@ Wall_Node* Wall_Node::find_Closest_Node(vector<Cell*>& neighbors) {
 			next = curr->get_Left_Neighbor();
 			curr_dist = (this->my_loc - curr->get_Location()).length();
 			if(curr_dist < ADHThresh) {
+				if(curr_dist < smallest) {
+					closest = curr;
+					smallest = curr_dist;
+				}
+			}
+			curr = next;
+		} while (next != orig);
+	}
+	return closest;
+}
+
+Wall_Node* Wall_Node::find_Closest_Node_Beg(vector<Cell*>& neighbors) {
+	Wall_Node* curr = NULL;
+	Wall_Node* orig = NULL;
+	Wall_Node* next = NULL;
+	Cell* curr_cell = NULL;
+	Wall_Node* closest = NULL;
+	double curr_dist = 0;
+	double smallest = 100;
+	for(int i = 0; i < neighbors.size(); i++) {
+		curr_cell = neighbors.at(i);
+		//find the closest node on curr_Side
+		curr = curr_cell->get_Left_Corner();
+		orig = curr;
+		do{
+			next = curr->get_Left_Neighbor();
+			curr_dist = (this->my_loc - curr->get_Location()).length();
+			if(curr_dist < ADHThreshBeg) {
 				if(curr_dist < smallest) {
 					closest = curr;
 					smallest = curr_dist;
