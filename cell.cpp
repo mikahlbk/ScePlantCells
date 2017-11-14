@@ -666,6 +666,7 @@ void Cell::print_Data_Output(ofstream& ofs) {
 }
 
 int Cell::update_VTK_Indices(int& id) {
+	cout << "ID before: " << id << endl;
 	int rel_cnt = 0;
 
 	Wall_Node* curr_wall = sides.at(0)->get_Wall_Nodes();
@@ -675,14 +676,14 @@ int Cell::update_VTK_Indices(int& id) {
 		if (curr_wall->get_Closest() != NULL) {
 			rel_cnt++;
 		}
-
+		curr_wall = curr_wall->get_Left_Neighbor();
 	} while(curr_wall != sides.at(0)->get_Wall_Nodes());
 
 	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
 		cyt_nodes.at(i)->update_VTK_Id(id);
 		id++;
 	}
-
+	cout << "ID after: " << id << endl;
 	return rel_cnt;
 }
 

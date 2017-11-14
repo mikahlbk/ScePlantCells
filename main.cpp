@@ -90,14 +90,14 @@ int main() {
 		
 		
 		// Update Each cell's neighboring cells
-/*		if (Ti % 500  == 0) {
+		if (Ti % 500  == 0) {
 			cout << "Find Neighbors" << endl;
 			growing_Tissue.update_Neighbor_Cells();
 		}
 		if (Ti % 50 == 0) {
 			cout << "Make Adhesion" << endl;
 			growing_Tissue.update_Adhesion();
-    	}*/
+    	}
 		
 
 		// Tissue Growth

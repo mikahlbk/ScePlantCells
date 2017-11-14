@@ -241,6 +241,9 @@ int Tissue::update_VTK_Indices() {
 		rel_cnt += cells.at(i)->update_VTK_Indices(id);
 	}
 
+	cout << "final ID: " << id << endl;
+	cout << "rel_cnt: " << rel_cnt << endl;
+
 	return rel_cnt;
 }
 
@@ -272,7 +275,8 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 	}
 	ofs << endl;
 
-	ofs << "CELLS " << cells.size() << ' ' << num_Points + start_points.size() << endl;
+	ofs << "CELLS " << cells.size() + rel_cnt << ' ' 
+		<< (num_Points + start_points.size()) + (rel_cnt * 3) << endl;
 	// output list of indices for each our our plant cells
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		ofs << cells.at(i)->get_Node_Count();
@@ -288,7 +292,7 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 	}
 	ofs << endl;
 
-	ofs << "CELL_TYPES " << start_points.size() << endl;
+	ofs << "CELL_TYPES " << start_points.size() + rel_cnt << endl;
 	for (unsigned int i = 0; i < start_points.size(); i++) {
 		// type for entire cell relationship
 		ofs << 2 << endl;
