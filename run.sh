@@ -1,8 +1,9 @@
 #!/bin/csh
 
-#$ -q  debug 				# Specify queue
-#$ -N  run_Oct25   		 	# Specify job name
+#$ -M mbkuhn@math.ucr.edu
+#$ -m abe
+#$ -q  long 				# Specify queue
+#$ -N  run_NOV13   		 	# Specify job name
 
-#setenv PATH /afs/crc.nd.edu/user/a/awhitake/PlantCells/ScePlantCells:$PATH
-mkdir Animate_debug
-./program Animate_debug
+mkdir Animate2
+./program Animate2

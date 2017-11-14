@@ -21,33 +21,40 @@
 // Cell Class Member functions
 
 // Constructors
-Cell::Cell(int rank, Tissue* tissue) {
-	this->rank = rank;
+Cell::Cell(Tissue* tissue) {
 	my_tissue = tissue;
-	num_cyt_nodes = 0;
-	//radius decided
-	//layer inherited?
-	//growth rate inherited?
-	//cell center computed?
-	num_wall_nodes = 0;
+	//rank assigned in tissue class
+	//num_cyt_nodes assigned
+	most_up = NULL;
+	most_down = NULL;
+	most_left = NULL;
+	most_right = NULL;
+	//layer inherited
+	//growth rate inherited
+	//cell center computed
+	//num_wall nodes computer
+	//left_Corner assigned
 	life_length = 0;
 }
 
 
-Cell::Cell(int rank, Coord center, double radius, int Ti, Tissue* tiss, int layer)    {
+Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer)    {
 
 	this->rank = rank;
 	this->my_tissue = tiss;
 	num_cyt_nodes = 0;
 	this->layer = layer;
-	int init_radius = radius;
+//	int init_radius = radius;
 	this->cell_center = center;
 	double rate = (-0.25*cell_center.length() + 11.7)*2000;
 	this->set_growth_rate(rate);
 	num_wall_nodes = 0;
 	
 	life_length = 0;
-
+	most_up = NULL;
+	most_down = NULL;
+	most_left = NULL;
+	most_right = NULL;
 	//rough estimates for cell sizing
 	int num_Init_Wall_Nodes = Init_Wall_Nodes;
 	double angle_increment = (2*pi)/num_Init_Wall_Nodes;
@@ -186,6 +193,15 @@ int Cell::get_Node_Count() {
 	return node_count;
 }
 
+void Cell::set_Left_Corner(Wall_Node*& new_left_corner) {
+	this->left_Corner = new_left_corner;
+	return;
+}
+
+void Cell::set_Wall_Count(int& number_nodes) {
+	this->num_wall_nodes = number_nodes;
+	return;
+}
 //=============================================================
 //=========================================
 // Keep Track of neighbor cells
@@ -204,7 +220,7 @@ void Cell::update_Neighbor_Cells() {
 	Coord curr_Cent;
 	Coord distance;
 	
-	double prelim_threshold = 8.0;
+	double prelim_threshold = 8;
 	//double sec_threshold = 1;
 
 	// iterate through all cells
@@ -537,85 +553,105 @@ void Cell::add_Cyt_Node() {
 	return;
 }
 
-/*void Cell::add_Cyt_Node_Div() {
-	Side* s0 = sides.at(0);
-	Side* s1 = sides.at(1);
-	double x_length = s0->get_End_Z()->get_Location().get_X()-s0->get_End_A()->get_Location().get_X();
-	double y_length = s1->get_End_Z()->get_Location().get_Y()-s1->get_End_A()->get_Location().get_Y();
-	Coord init_off(x_length*0.05, y_length*0.05);
-	Coord min_corner(s0->get_End_A()->get_Location().get_X(),s0->get_End_A()->get_Location().get_Y());
-
-	double x_coord_offset = 0.9;
-	double y_coord_offset = 0.9;
-	double x_coord_scaled = (static_cast<double>(rand())/RAND_MAX)*x_coord_offset*x_length;
-	double y_coord_scaled = (static_cast<double>(rand())/RAND_MAX)*y_coord_offset*y_length;
-	Coord scal(x_coord_scaled, y_coord_scaled); 
+void Cell::add_Cyt_Node_Div(double& radius_x, double& radius_y) {
+	//USING POSITIONS OF CELL CENTER FOR CYT NODE ALLOCATION
+	// ---distributes more evenly throughout start cell
+	double offset = 0.8;
+	Coord location;
+	Cyt_Node* cyt;
+	double x;
+	double y;
 	
-	Coord rand_Coord = (min_corner+init_off + scal);
-		
-	Cyt_Node* cyt = new Cyt_Node(rand_Coord,this);
+	double rand_radius_x = (static_cast<double>(rand()) / RAND_MAX)*offset*radius_x;
+	double rand_radius_y = (static_cast<double>(rand()) / RAND_MAX)*offset*radius_y;
+	double rand_angle = (static_cast<double>(rand()) / RAND_MAX)*2*pi;
+	x = cell_center.get_X()+ rand_radius_x*cos(rand_angle);
+	y = cell_center.get_Y()+ rand_radius_y*sin(rand_angle);
+	location = Coord(x,y);
+	cyt = new Cyt_Node(location,this);
 	cyt_nodes.push_back(cyt);
-
 	num_cyt_nodes++;
 	return;
-}*/
+}
 
-
-double Cell::extensional_Length() {
-	double x_Coord = cell_center.get_X();
-
+void Cell::most_Left_Right() {
 	Wall_Node* curr = left_Corner;
 	Wall_Node* next = NULL;
 	Wall_Node* orig = curr;
-	Wall_Node* most_right = NULL;
-	Wall_Node* most_left = NULL;
-
+	Wall_Node* right = NULL;
+	Wall_Node* left = NULL;
+	
+	double x_Coord = cell_center.get_X();
 	double curr_Coord;
-	double length;
-
+	double x_max = x_Coord;
+	double x_min = x_Coord;
+	
 	do {
 		curr_Coord = curr->get_Location().get_X();
 		next = curr->get_Left_Neighbor();
-		if(curr_Coord > x_Coord) {
-			most_right = curr;
+		if(curr_Coord > x_max) {
+			x_max = curr_Coord;
+			right = curr;
+
 		}
-		else if(curr_Coord < x_Coord) {
-			most_left = curr;
+		else if(curr_Coord < x_min) {
+			x_min = curr_Coord;
+			left = curr;
+
 		}
 		curr = next;
 	} while (next != orig);
-	 
-	length = (most_right->get_Location() - most_left->get_Location()).length();
+
+	this->most_right = right;
+	this->most_left = left;
+
+	return;
+}
+
+	
+double Cell::extensional_Length() {
+ 
+	double length = (most_right->get_Location() - most_left->get_Location()).length();
 
 	return length;
 }
 
-double Cell::tensile_Length() {
+void Cell::most_Up_Down() {
 	double y_Coord = cell_center.get_Y();
 
 	Wall_Node* curr = left_Corner;
 	Wall_Node* next = NULL;
 	Wall_Node* orig = curr;
-	Wall_Node* most_up = NULL;
-	Wall_Node* most_down = NULL;
-
+	Wall_Node* up = NULL;
+	Wall_Node* down = NULL;
+	double y_max = y_Coord;
+	double y_min = y_Coord;
 	double curr_Coord;
-	double length = 0;
 	
-
 	do {
 		curr_Coord = curr->get_Location().get_Y();
 		next = curr->get_Left_Neighbor();
-		if(curr_Coord > y_Coord) {
-			most_up = curr;
+		if(curr_Coord > y_max) {
+			y_max = curr_Coord;
+			up = curr;
 		}
-		else if(curr_Coord < y_Coord) {
-			most_down = curr;
+		else if(curr_Coord < y_min) {
+			y_min = curr_Coord;
+			down = curr;
 		}
 		curr = next;
 	} while (next != orig);
+	
+	this->most_up = up;
+	this->most_down = down;
 
-	curr = most_up;
+	return;
+}
+
+double Cell::tensile_Length() {
+	double length = 0;
+	Wall_Node* curr = most_up;
+	Wall_Node* next = NULL;
 	do {
 
 		next = curr->get_Left_Neighbor();
@@ -654,6 +690,19 @@ void Cell::add_stress(double& new_length, double& new_force) {
 	stress_vec.push_back(curr_stress);
 	return;
 }
+
+double Cell::calc_Area() {
+	this->most_Up_Down();
+	this->most_Left_Right();
+
+	double width = (most_right->get_Location() - most_left->get_Location()).length();
+	double length = (most_up->get_Location() - most_down->get_Location()).length();
+
+	double area = width*length;
+
+	return area;
+}
+
 
 
 	

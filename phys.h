@@ -17,14 +17,14 @@
 const double dt = .00075;
 const int Relaxation_Time = 3000;
 const int ADD_WALL_TIMER = 1500;
-const int ADD_CYT_TIMER = 1500;
+const int ADD_CYT_TIMER = 1000;
 
 const int MAX_NUM_WALL = 200;
 const int MAX_NUM_CYT = 60;
 
 const int Init_Num_Cyt_Nodes = 20;
 const int Init_Wall_Nodes = 100;
-
+const double AREA_DOUBLED = 2;
 // Global Physics Constants
 const double pi = acos(-1.0);
 
@@ -40,8 +40,8 @@ const double EXTERNAL_FORCE = 2;
 //linear spring equilibrium length
 const double MembrEquLen = .0625; 
 const double MEMBR_THRESH_LENGTH = 0.1; 
-const double ADHThreshBeg = .78125;
-const double ADHThresh = .78125;
+const double ADHThreshBeg = .58125;
+const double ADHThresh = .58125;
 const double damping = 1;
 ///// Subcellular element parameters for membrane - membrane interactions
 

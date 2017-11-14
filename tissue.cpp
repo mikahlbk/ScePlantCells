@@ -57,7 +57,7 @@ Tissue::Tissue(string filename) {
 		}
 		else if (temp == "End_Cell") {
 			//create new cell with collected data and push onto vector 
-			curr = new Cell(rank, center, radius, 0, this, layer);
+			curr = new Cell(rank, center, radius, this, layer);
 			num_cells++;
 			cells.push_back(curr);
 		}
@@ -66,7 +66,6 @@ Tissue::Tissue(string filename) {
 	}
 
 	ifs.close();
-	this->num_cells = num_cells;
 }
 
 Tissue::~Tissue() {
@@ -185,27 +184,30 @@ void Tissue::update_Adhesion(int Ti) {
 	}
 }
 
-/*void Tissue::cell_Division(const int Ti) {
+void Tissue::cell_Division(int Ti) {
 	bool divided = false;
 	Cell* new_cell = NULL;
 //	cout << "number cells: " << cells.size()<< endl;
-	for(unsigned int i = 0; i < cells.size();i++) {
-		//cout << "current divide cell: " << i << endl;
-		new_cell = cells.at(i)->divide(Ti);
+	int number_cells = cells.size();
+	for(unsigned int i = 0; i < number_cells;i++) {
+//		cout << "current divide cell: " << i << endl;
+		new_cell = cells.at(i)->divide();
 		if (new_cell !=NULL) {
 			divided = true;
+			//cout << "new cell not null setting rank" << endl;
 			new_cell->set_Rank(num_cells);
 			num_cells++;
 			cells.push_back(new_cell);
 		}
-
-	}
+		//cout << "i is what: " << i << endl;
+	}	
 	if(divided) {
+		//cells.push_back(new_cell);
 		this->update_Neighbor_Cells();
-		this->update_Adhesion();
+		this->update_Adhesion(Ti);
 	}
 	return;
-}*/
+}
 
 void Tissue::make_Vectors() {
 	Cell* curr = NULL;

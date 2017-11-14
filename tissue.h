@@ -36,7 +36,7 @@ class Tissue {
 		void update_Cell_Locations();
 		void update_Neighbor_Cells();
 		void stretching_Test();
-		//void cell_Division(const int Ti);
+		void cell_Division(int Ti);
 		void print_Data_Output(ofstream& ofs);
 		void print_VTK_File(ofstream& ofs);
 		//void make_Vectors();

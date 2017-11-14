@@ -34,12 +34,15 @@ class Cell {
 		vector<double> stress_vec;
 		vector<Cyt_Node*> cyt_nodes;
 		vector<Cell*> neigh_cells;
+		Wall_Node* most_up;
+		Wall_Node* most_down;
+		Wall_Node* most_right;
+		Wall_Node* most_left;
 		Wall_Node* left_Corner;	
 	public:
-		// Constructors
-		Cell(int rank, Tissue* tissue);
-		Cell(int rank, Coord center, double radius, 
-			 int Ti, Tissue* tiss, int layer);
+		
+		Cell(Tissue* tissue);
+		Cell(int rank, Coord center, double radius, Tissue* tiss, int layer);
 
 		// Destructor
 		~Cell();
@@ -62,7 +65,12 @@ class Cell {
 		void get_Strain(vector<double>& strain);
 		void get_Stress(vector<double>& stress);
 		Wall_Node* get_Left_Corner() {return left_Corner;}
-
+		void set_Left_Corner(Wall_Node*& new_left_corner);
+		void set_Wall_Count(int& number_nodes);
+		Wall_Node* get_most_right() {return most_right;}
+		Wall_Node* get_most_left() {return most_left;}
+		Wall_Node* get_most_up() {return most_up;}
+		Wall_Node* get_most_down() {return most_down;}
 		// Keep track of neighbor cells
 		void update_Neighbor_Cells();
 		void update_adhesion_springs(int Ti);
@@ -87,17 +95,19 @@ class Cell {
 		Wall_Node* find_Largest_Length();
 		void add_Wall_Node();
 		void add_Cyt_Node();
-		
 		double total_Force();
+		void most_Left_Right();
 		double tensile_Length();
 		double extensional_Length();
+		void most_Up_Down();
 		void add_stress(double& new_length, double& new_force);
 		void add_strain(double& new_length);
+		double calc_Area();
 		//Division 
-		//Cell* divide(const int Ti);
-		//Cell* divide_length_wise(const int Ti);
+		Cell* divide();
+		Cell* divide_length_wise();
 		//Cell* divide_width_wise(const int Ti);
-		//void add_Cyt_Node_Div();
+		void add_Cyt_Node_Div(double& radius_x, double& radius_y);
 		
 };
 

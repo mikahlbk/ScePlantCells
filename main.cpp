@@ -22,7 +22,6 @@ using namespace std;
 //============================
 
 int main() {
-
 	int start = clock();
 	
 	string init_tissue = "cell_start.txt";
@@ -33,7 +32,7 @@ int main() {
 	cout << "Finished creating Cells" << endl;
 	
 	//parameters for time step
-    double numSteps = 150;
+    double numSteps = 1;
 
 	// Variable for dataoutput
 	int digits;
@@ -50,7 +49,7 @@ int main() {
 		//for now only one cell
 		//cout << "Ti = " << Ti << endl;
 		//Print to dataOutput and VTK files
-		if (Ti % 10  == 0) {
+		if (Ti % 1  == 0) {
 			
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {
@@ -75,8 +74,10 @@ int main() {
 		}
 		if (Ti % 100 == 0) {
 			cout << "Simulation still running. Ti: " << Ti << endl;
-		}	
-		
+		}
+	//	cout<< "tissue number cells " << growing_Tissue.get_Num_Cells() << endl;
+			
+
 		
 		// Update Each cell's neighboring cells
 //		if((Ti > 1000)) {
@@ -116,8 +117,10 @@ int main() {
 		growing_Tissue.update_Cell_Locations();
 //		cout << "updated node positions" << endl;
 		//Division if necessary
-//		growing_Tissue.cell_Division(Ti);
-//		cout << "Division" << endl;	
+		if(Ti == 100) {
+		growing_Tissue.cell_Division(Ti);
+		cout << "Division" << endl;
+		}
 	}
 	//growing_Tissue.make_Vectors();
 	int stop = clock();
