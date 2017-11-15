@@ -243,7 +243,7 @@ Coord Wall_Node::calc_Morse_SC() {
 	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
 		Fmi += this->morse_Equation(cyt_nodes.at(i));
 	}
-	cout << "	morse_sc: " << Fmi << endl;	
+//	cout << "	morse_sc: " << Fmi << endl;	
 	return Fmi;
 }
 
@@ -267,7 +267,7 @@ Coord Wall_Node::calc_Morse_DC() {
 	if(this->closest != NULL){
 		Fdc += linear_Equation_ADH(this->closest);
 	}
-	cout << " morse_DC: " << Fdc << endl;
+//	cout << " morse_DC: " << Fdc << endl;
 	return Fdc;
 }
 
@@ -283,7 +283,7 @@ Coord Wall_Node::calc_Bending() {
 	if (cross_Prod < 0.0) {
 		F_bend = F_bend*(-1);
 	}	
-	cout << "	bending: " << F_bend << endl;
+//	cout << "	bending: " << F_bend << endl;
 	return F_bend;
 }
 
@@ -297,7 +297,7 @@ Coord Wall_Node::calc_Linear() {
 //	cout << "calc right" << endl;
 	F_lin += linear_Equation(right);
 	
-	cout << "	linear: " << F_lin << endl;
+//	cout << "	linear: " << F_lin << endl;
 	return F_lin;
 }
 

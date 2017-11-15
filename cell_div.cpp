@@ -41,90 +41,118 @@ Cell* Cell::divide_length_wise() {
 	//	-"this" will keep its entity as the left sister
 	//	this functoin will create a sister cell to the right
 	//	and return it to the tissue
-	//cout << "Made new cell pointer" << endl;
+	cout << "Made new cell pointer" << endl;
 	Cell* sister = new Cell(my_tissue);
 	this->most_Up_Down();
-	double length = (most_up->get_Location() - most_down->get_Location()).length();
-	double space = length/MembrEquLen;
-	int total_num = 15;
-	//cout << "Total num:" << total_num << endl;
-	Coord increment = Coord(0,space);
-	Wall_Node* curr_left = NULL;
-	Wall_Node* curr_right = NULL;
-	Coord curr_coord_left = most_down->get_Right_Neighbor()->get_Location();
-	Coord curr_coord_right = most_down->get_Left_Neighbor()->get_Location();
-	Wall_Node* prev_left = most_down->get_Right_Neighbor();
-	Wall_Node* prev_right = most_down->get_Left_Neighbor();
-	//int num_added = 0;
+	Wall_Node* left_start = most_down->get_Right_Neighbor()->get_Right_Neighbor();
+	Wall_Node* right_start = most_down->get_Left_Neighbor()->get_Left_Neighbor();
+
+	delete  most_down->get_Right_Neighbor();
+	delete 	most_down->get_Left_Neighbor();
+	delete most_down;
+
+	Wall_Node* left_end = most_up->get_Left_Neighbor()->get_Left_Neighbor();
+	Wall_Node* right_end = most_up->get_Right_Neighbor()->get_Right_Neighbor();
+
+	delete most_up->get_Left_Neighbor();
+	delete most_up->get_Right_Neighbor();
+	delete most_up;
+
+	double left_length = (left_end->get_Location() - left_start->get_Location()).length();
+	double right_length = (right_end->get_Location() - right_start->get_Location()).length();
+
+	double left_space = left_length/MembrEquLen;
+	double right_space = right_length/MembrEquLen;
+	int total_num = 20;
+	cout << "Total num:" << total_num << endl;
+	Coord left_increment = Coord(0,left_space);
+	Coord right_increment = Coord(0, right_space);
+
+	cout << "make left side" << endl;
+	Wall_Node* curr = NULL;
+	Coord curr_coord = left_start->get_Location();
+	Wall_Node* prev = left_start;
 
 	for(int i = 0; i< total_num; i++) {
-		curr_coord_left = curr_coord_left + increment;
-		curr_coord_right = curr_coord_right + increment;
-		curr_left = new Wall_Node(curr_coord_left, this);
-		curr_right = new Wall_Node(curr_coord_right, sister);
-	//	num_added++;
-	//	cout << "Setting neighbors" << endl;
-		prev_left->set_Left_Neighbor(curr_left);
-		curr_left->set_Right_Neighbor(prev_left);
-		prev_right->set_Right_Neighbor(curr_right);
-		curr_right->set_Left_Neighbor(prev_right);
-		
-		prev_left = curr_left;
-		prev_right = curr_right;
+		curr_coord = curr_coord + left_increment;
+		curr = new Wall_Node(curr_coord, this);
+		cout << "Setting neighbors" << endl;
+		prev->set_Left_Neighbor(curr);
+		curr->set_Right_Neighbor(prev);
+		prev = curr;
 	}
-	//cout << "Out of Loop" << endl;
-	curr_left->set_Left_Neighbor(most_up->get_Left_Neighbor());
-	most_up->get_Left_Neighbor()->set_Right_Neighbor(curr_left);
-	curr_right->set_Right_Neighbor(most_up->get_Right_Neighbor());
-	most_up->get_Right_Neighbor()->set_Left_Neighbor(curr_right);
-	delete most_up;
-	delete most_down;
-	this->left_Corner = curr_left;
-	sister->set_Left_Corner(curr_right);
+	curr->set_Left_Neighbor(left_end);
+	left_end->set_Right_Neighbor(curr);
+	this->left_Corner = left_start;
+
+	cout << "make right side" << endl;
+	curr_coord = right_start->get_Location();
+	prev = right_start;
+
+	for(int i = 0; i< total_num; i++) {
+		curr_coord = curr_coord + right_increment;
+		curr = new Wall_Node(curr_coord, sister);
+		cout << "Setting neighbors" << endl;
+		prev->set_Right_Neighbor(curr);
+		curr->set_Left_Neighbor(prev);
+		prev = curr;
+	}
+	curr->set_Right_Neighbor(left_end);
+	left_end->set_Left_Neighbor(curr);
+	sister->set_Left_Corner(right_start);
+
 	//count wall nodes
-	//cout << "begin count wall nodes" << endl;
-	Wall_Node* curr = this->left_Corner;
+	cout << "begin count wall nodes" << endl;
+	curr = this->left_Corner;
 	Wall_Node* next = NULL;
 	Wall_Node* orig = curr;
 	int number_nodes_A = 0;
+	cout << "cell a counting" << endl;
 	do {
 		number_nodes_A++;
 		next = curr->get_Left_Neighbor();
+		cout << number_nodes_A++ << endl;
+		if(next == NULL) {
+			cout << "notlinked" << endl;
+			exit(1);
+		}
 		curr = next;
 	} while(next != orig);
-	
+	cout << "done cell a counting" << endl;	
 	this->set_Wall_Count(number_nodes_A);
+	
 	curr = sister->get_Left_Corner();
 	orig = curr;
 	int number_nodes_B = 0;
-
+	cout << "Cell b counting" << endl;
 	do {
 		number_nodes_B++;
 		next = curr->get_Left_Neighbor();
 		curr = next;
 	} while (next != orig);
+	
 	sister->set_Wall_Count(number_nodes_B);
 	
-	//cout << "updating angles" << endl;
+	cout << "updating angles" << endl;
 	//update wall angles
 	this->update_Wall_Angles();
 	sister->update_Wall_Angles();
 	
-	//cout << "updating center" << endl;
+	cout << "updating center" << endl;
 	//update cell center
 	this->update_Cell_Center();
 	sister->update_Cell_Center();
 
-	//cout << "update layer" << endl;
+	cout << "update layer" << endl;
 	//update layer information
 	sister->set_Layer(this->layer);
 	
 	sister->set_growth_rate(this->growth_rate);
 		
-	//cout << "Updated Angles and cell centers"<< endl;
+	cout << "Updated Angles and cell centers"<< endl;
 	
 	//distribute cyt nodes between sister cells
-	//cout << "deleting cyt nodes" << endl;
+	cout << "deleting cyt nodes" << endl;
 	int new_cyt_cnt = 20;
 	//delete all old cyt nodes
 	Cyt_Node* c = NULL;
@@ -135,9 +163,9 @@ Cell* Cell::divide_length_wise() {
 		num_cyt_nodes--;
 	}	
 	
-	//cout << "Finished deleting old cyt nodes" << endl;
+	cout << "Finished deleting old cyt nodes" << endl;
 	
-//	cout << "get most up/down and left/right for radius" << endl;
+	cout << "get most up/down and left/right for radius" << endl;
 	this->most_Up_Down();
 	sister->most_Up_Down();
 	this->most_Left_Right();
@@ -152,26 +180,26 @@ Cell* Cell::divide_length_wise() {
 		this->add_Cyt_Node_Div(radius_x, radius_y);
 		sister->add_Cyt_Node_Div(radius_x_s, radius_y_s);
 	}
-//	cout << "Cell A" << endl;
-	vector<Cyt_Node*>CellA;
+	cout << "Cell A" << endl;
+	/*vector<Cyt_Node*>CellA;
 	this->get_Cyt_Nodes(CellA);
 	int counter = 0;
 	for(int i = 0;i<CellA.size();i++) {
 		if(CellA.at(i)->get_My_Cell() == this) {
 			counter++;
 		}
-	}
+	}*/
 	//cout << "Number cyt nodes assigned to Cell A is: " << counter << endl;
 	
 	//cout << "Cell B" << endl;
-	vector<Cyt_Node*>CellB;
+/*	vector<Cyt_Node*>CellB;
 	sister->get_Cyt_Nodes(CellB);
 	counter = 0;
 	for(int i = 0;i<CellB.size();i++) {
 		if(CellB.at(i)->get_My_Cell() == sister) {
 			counter++;
 		}
-	}
+	}*/
 	//cout << "Number cyt nodes assigned to Cell B is: " << counter << endl;
 		
 	return sister;
