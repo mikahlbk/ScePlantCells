@@ -82,6 +82,7 @@ class Wall_Node: public Node {
 		void set_Right_Neighbor(Wall_Node* new_Right);
 		void update_Angle();
 		void update_Equi_Angle(double new_theta);
+		void update_Cell(Cell* new_cell);
 		Wall_Node* get_Closest() {return closest;}
 		Wall_Node* find_Closest_Node(vector<Cell*>& neighbors);
 		Wall_Node* find_Closest_Node_Beg(vector<Cell*>& neighbors);

@@ -57,6 +57,7 @@ class Cell {
 		int get_Wall_Count() {return num_wall_nodes;}
 		int get_Node_Count();
 		void get_Cyt_Nodes(vector<Cyt_Node*>& cyts);
+		Tissue* get_Tissue() {return my_tissue;}
 		Wall_Node* get_Wall_Nodes() {return left_Corner;}
 		void set_Rank(const int id);
 		void set_Layer(int layer);
@@ -67,10 +68,10 @@ class Cell {
 		Wall_Node* get_Left_Corner() {return left_Corner;}
 		void set_Left_Corner(Wall_Node*& new_left_corner);
 		void set_Wall_Count(int& number_nodes);
-		Wall_Node* get_most_right() {return most_right;}
-		Wall_Node* get_most_left() {return most_left;}
-		Wall_Node* get_most_up() {return most_up;}
-		Wall_Node* get_most_down() {return most_down;}
+		//Wall_Node* get_most_right() {return most_right;}
+		//Wall_Node* get_most_left() {return most_left;}
+		//Wall_Node* get_most_up() {return most_up;}
+		//Wall_Node* get_most_down() {return most_down;}
 		// Keep track of neighbor cells
 		void update_Neighbor_Cells();
 		void update_adhesion_springs(int Ti);
@@ -96,15 +97,15 @@ class Cell {
 		void add_Wall_Node();
 		void add_Cyt_Node();
 		double total_Force();
-		void most_Left_Right();
+		void most_Left_Right(Wall_Node*& left, Wall_Node*& right);
 		double tensile_Length();
 		double extensional_Length();
-		void most_Up_Down();
+		void most_Up_Down(Wall_Node*& up, Wall_Node*& down);
 		void add_stress(double& new_length, double& new_force);
 		void add_strain(double& new_length);
 		double calc_Area();
 		//Division 
-		Cell* divide();
+		Cell* divide(int Ti);
 		Cell* divide_length_wise();
 		//Cell* divide_width_wise(const int Ti);
 		void add_Cyt_Node_Div(double& radius_x, double& radius_y);

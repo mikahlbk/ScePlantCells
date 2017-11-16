@@ -32,7 +32,7 @@ int main() {
 	cout << "Finished creating Cells" << endl;
 	
 	//parameters for time step
-    double numSteps = 10;
+    double numSteps = 500;
 
 	// Variable for dataoutput
 	int digits;
@@ -49,6 +49,7 @@ int main() {
 		//for now only one cell
 		//cout << "Ti = " << Ti << endl;
 		//Print to dataOutput and VTK files
+	//if((Ti > 28000)&&(Ti < 30000)){
 		if (Ti % 100  == 0) {
 			
 			digits = ceil(log10(out + 1));
@@ -72,28 +73,30 @@ int main() {
 			ofs.close();	
 			out++;
 		}
+//}
+
 		if (Ti % 100 == 0) {
 			cout << "Simulation still running. Ti: " << Ti << endl;
 		}
-	//	cout<< "tissue number cells " << growing_Tissue.get_Num_Cells() << endl;
-			
-
 		
 		// Update Each cell's neighboring cells
-//		if((Ti > 1000)) {
-		if (Ti% 100  == 0 ) {
+		if((Ti > 1000)) {
+			if (Ti% 100  == 0 ) {
 				//cout << "Find Neighbors" << endl;
 				growing_Tissue.update_Neighbor_Cells();
-				cout << "Make Adhesion" << endl;
+				//cout << "Make Adhesion" << endl;
 				growing_Tissue.update_Adhesion(Ti);
+			}
 		}
-//		}
 		
 		// Tissue Growth
-		growing_Tissue.update_Life_Length();
+		//cout << "update life length" << endl;
 
-		// Add cyt node/ wall node 
+		growing_Tissue.update_Life_Length();
+	
+		//Add cyt node/ wall node 
 		if(Ti > 3000) {
+			//cout << "update cytoplasm" << endl;
 			growing_Tissue.update_Cytoplasm();
 		}
 
@@ -101,29 +104,33 @@ int main() {
 			//cout << "Updated Wall" << endl;
 			growing_Tissue.update_Wall();
 		}
-		
+
+		//Division if necessary
+		if(Ti > 10000) {
+		//	cout << "Check if cells need to divide" << endl;
+			growing_Tissue.cell_Division(Ti);
+		}
 		/*if((Ti > 268583)) {
 			growing_Tissue.stretching_Test();
 			growing_Tissue.cell_stress();
-		}*/
-		/*if((Ti > 268582)) {
+		}
+		if((Ti > 268582)) {
 			growing_Tissue.cell_strain();
 		}*/
-//		cout << "updated life length" << endl;
+
 		//Calculate new forces on cells and nodes
 		growing_Tissue.calc_New_Forces();
-//		cout << "calculated forces" << endl;
+		//cout << "calculated forces" << endl;
 		//Update node positions
 		growing_Tissue.update_Cell_Locations();
-//		cout << "updated node positions" << endl;
-		//Division if necessary
-//		if(Ti == 100) {
-//			cout << "Division Division Division Division Division" << endl;
-
-//			growing_Tissue.cell_Division(Ti);
-//		}
+		//updates cell centers
+		//cout << "updated node positions" << endl;
+		
 	}
+
+	//for calibration of elastic modulus
 	//growing_Tissue.make_Vectors();
+	
 	int stop = clock();
 
 	cout << "Time: " << (stop - start) / double(CLOCKS_PER_SEC) * 1000 << endl;

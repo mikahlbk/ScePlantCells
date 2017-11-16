@@ -220,7 +220,7 @@ void Cell::update_Neighbor_Cells() {
 	Coord curr_Cent;
 	Coord distance;
 	
-	double prelim_threshold = 8;
+	double prelim_threshold = 3;
 	//double sec_threshold = 1;
 
 	// iterate through all cells
@@ -233,14 +233,14 @@ void Cell::update_Neighbor_Cells() {
 			//cout << "Distance = " << distance << endl;
 			if ( distance.length() < prelim_threshold ) {
 				neigh_cells.push_back(curr);
-			//	cout << rank << "has neighbor" << curr->get_Rank() << endl;
+				//cout << rank << "has neighbor" << curr->get_Rank() << endl;
 			}
 			
 		}
 		//else you're pointing at yourself and shouldnt do anything
 	}	
 	
-	//cout << "Cell: " << rank << " -- neighbors: " << neigh_cells.size() << endl;
+	cout << "Cell: " << rank << " -- neighbors: " << neigh_cells.size() << endl;
 
 	return;
 }
@@ -288,8 +288,10 @@ void Cell::calc_New_Forces() {
 	//calc forces on wall nodes
 	Wall_Node* curr = left_Corner; 
 	Wall_Node* orig = curr;
-
+	//int counter = 0;
 	do {
+		//counter++;
+		//cout << "Wall node number: " << counter << endl;
 		curr->calc_Forces();
 		curr = curr->get_Left_Neighbor();
 	
@@ -378,7 +380,7 @@ void Cell::wall_Node_Check() {
 }
 void Cell::cytoplasm_Check() {
 
-	if (life_length % ADD_CYT_TIMER == ADD_CYT_TIMER-1) {
+	if (life_length % growth_rate == growth_rate-1) {
 		//cout << "adding cyt node" << endl;
 		add_Cyt_Node();
 	}
@@ -556,7 +558,7 @@ void Cell::add_Cyt_Node() {
 void Cell::add_Cyt_Node_Div(double& radius_x, double& radius_y) {
 	//USING POSITIONS OF CELL CENTER FOR CYT NODE ALLOCATION
 	// ---distributes more evenly throughout start cell
-	double offset = 0.8;
+	double offset = 0.5;
 	Coord location;
 	Cyt_Node* cyt;
 	double x;
@@ -574,12 +576,10 @@ void Cell::add_Cyt_Node_Div(double& radius_x, double& radius_y) {
 	return;
 }
 
-void Cell::most_Left_Right() {
+void Cell::most_Left_Right(Wall_Node*& left, Wall_Node*& right) {
 	Wall_Node* curr = left_Corner;
 	Wall_Node* next = NULL;
 	Wall_Node* orig = curr;
-	Wall_Node* right = NULL;
-	Wall_Node* left = NULL;
 	
 	double x_Coord = cell_center.get_X();
 	double curr_Coord;
@@ -588,10 +588,12 @@ void Cell::most_Left_Right() {
 	
 	do {
 		curr_Coord = curr->get_Location().get_X();
+		//cout << curr_Coord << "is curr coord" << endl;
 		next = curr->get_Left_Neighbor();
 		if(curr_Coord > x_max) {
 			x_max = curr_Coord;
 			right = curr;
+			//cout << "right is: " << right << endl;
 
 		}
 		else if(curr_Coord < x_min) {
@@ -601,10 +603,6 @@ void Cell::most_Left_Right() {
 		}
 		curr = next;
 	} while (next != orig);
-
-	this->most_right = right;
-	this->most_left = left;
-
 	return;
 }
 
@@ -616,14 +614,13 @@ double Cell::extensional_Length() {
 	return length;
 }
 
-void Cell::most_Up_Down() {
+void Cell::most_Up_Down(Wall_Node*& up, Wall_Node*& down) {
+	update_Cell_Center();
+	
 	double y_Coord = cell_center.get_Y();
-
 	Wall_Node* curr = left_Corner;
 	Wall_Node* next = NULL;
 	Wall_Node* orig = curr;
-	Wall_Node* up = NULL;
-	Wall_Node* down = NULL;
 	double y_max = y_Coord;
 	double y_min = y_Coord;
 	double curr_Coord;
@@ -642,9 +639,6 @@ void Cell::most_Up_Down() {
 		curr = next;
 	} while (next != orig);
 	
-	this->most_up = up;
-	this->most_down = down;
-
 	return;
 }
 
@@ -692,13 +686,26 @@ void Cell::add_stress(double& new_length, double& new_force) {
 }
 
 double Cell::calc_Area() {
-	this->most_Up_Down();
-	this->most_Left_Right();
-
-	double width = (most_right->get_Location() - most_left->get_Location()).length();
-	double length = (most_up->get_Location() - most_down->get_Location()).length();
-
-	double area = width*length;
+	Wall_Node* left = NULL;
+	Wall_Node* right = NULL;
+	Wall_Node* up = NULL;
+	Wall_Node* down = NULL;
+	this->most_Up_Down(up, down);
+	//cout << "got up down" << endl;
+	this->most_Left_Right(left, right);
+	//cout << "got left right" << endl;
+	//cout << "right " << right << endl;
+	//cout << "left " << left << endl;
+	//cout << "up" << up << endl;
+	//cout << "down " << down << endl;
+	//if(right == NULL) {
+		//exit(1);
+	//}
+	double width = (right->get_Location() - left->get_Location()).length();
+	//cout << "width computed" << endl;
+	double length = (up->get_Location() - down->get_Location()).length();
+	//cout << "length computed" << endl;
+	double area = pi*width*length;
 
 	return area;
 }

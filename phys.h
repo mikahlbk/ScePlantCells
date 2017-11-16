@@ -24,24 +24,24 @@ const int MAX_NUM_CYT = 60;
 
 const int Init_Num_Cyt_Nodes = 20;
 const int Init_Wall_Nodes = 100;
-const double AREA_DOUBLED = 2;
+const double AREA_DOUBLED = 15;
 // Global Physics Constants
 const double pi = acos(-1.0);
 
 ///// Cell wall mechanical parameters
 
 const double K_BEND = .001;
-const Coord  K_LINEAR = Coord(450,100);
+const Coord  K_LINEAR = Coord(100,450);
 
-const double K_ADH = 20;
+const double K_ADH = 15;
 const double MembrEquLen_ADH = 0.4;
 
 const double EXTERNAL_FORCE = 2;
 //linear spring equilibrium length
 const double MembrEquLen = .0625; 
 const double MEMBR_THRESH_LENGTH = 0.1; 
-const double ADHThreshBeg = .58125;
-const double ADHThresh = .58125;
+const double ADHThreshBeg = .78125;
+const double ADHThresh = .78125;
 const double damping = 1;
 ///// Subcellular element parameters for membrane - membrane interactions
 

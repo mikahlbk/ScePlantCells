@@ -18,20 +18,14 @@
 #include "tissue.h"
 //==========================
 
-Cell* Cell::divide() {
+Cell* Cell::divide(int Ti) {
 	Cell* sister = NULL;
 	//calculate area
 	double area = this->calc_Area();
+	//cout << "area calculated" << endl;
 	if(area > AREA_DOUBLED) {
-	//	if((this->layer == 3)|| (this->layer == 4)|| (this->layer == 5)) {
-			//ut << "cell will divide" << endl;
-			//sister = this->divide_width_wise(Ti);		
-	//	}
-	//	else {
-	//	cout << "Will Divide" << endl;	
+		//cout << "Cell passed area threshold for division" << endl;
 		sister = this->divide_length_wise();
-		//}
-		//cout <<  "Divided" << endl;
 	}
 	return sister;
 }
@@ -41,118 +35,131 @@ Cell* Cell::divide_length_wise() {
 	//	-"this" will keep its entity as the left sister
 	//	this functoin will create a sister cell to the right
 	//	and return it to the tissue
-	cout << "Made new cell pointer" << endl;
+	//	cout << "Made new cell pointer" << endl;
 	Cell* sister = new Cell(my_tissue);
-	this->most_Up_Down();
-	Wall_Node* left_start = most_down->get_Right_Neighbor()->get_Right_Neighbor();
-	Wall_Node* right_start = most_down->get_Left_Neighbor()->get_Left_Neighbor();
+	Wall_Node* up = NULL;
+	Wall_Node* down = NULL;
+	Wall_Node* left = NULL;
+	Wall_Node* right = NULL;
+	this->most_Up_Down(up, down);
+	Wall_Node* left_start = down->get_Right_Neighbor()->get_Right_Neighbor();
+	Wall_Node* right_start = down->get_Left_Neighbor()->get_Left_Neighbor();
 
-	delete  most_down->get_Right_Neighbor();
-	delete 	most_down->get_Left_Neighbor();
-	delete most_down;
+	delete  down->get_Right_Neighbor();
+	delete 	down->get_Left_Neighbor();
+	delete  down;
 
-	Wall_Node* left_end = most_up->get_Left_Neighbor()->get_Left_Neighbor();
-	Wall_Node* right_end = most_up->get_Right_Neighbor()->get_Right_Neighbor();
+	Wall_Node* left_end = up->get_Left_Neighbor()->get_Left_Neighbor();
+	Wall_Node* right_end = up->get_Right_Neighbor()->get_Right_Neighbor();
 
-	delete most_up->get_Left_Neighbor();
-	delete most_up->get_Right_Neighbor();
-	delete most_up;
+	delete up->get_Left_Neighbor();
+	delete up->get_Right_Neighbor();
+	delete up;
 
 	double left_length = (left_end->get_Location() - left_start->get_Location()).length();
 	double right_length = (right_end->get_Location() - right_start->get_Location()).length();
 
-	double left_space = left_length/MembrEquLen;
-	double right_space = right_length/MembrEquLen;
-	int total_num = 20;
-	cout << "Total num:" << total_num << endl;
+	double left_space = left_length/10;
+	double right_space = right_length/10;
+	int total_num = 9;
+	//cout << "Total num:" << total_num << endl;
 	Coord left_increment = Coord(0,left_space);
 	Coord right_increment = Coord(0, right_space);
 
-	cout << "make left side" << endl;
+	//cout << "make left side" << endl;
 	Wall_Node* curr = NULL;
-	Coord curr_coord = left_start->get_Location();
+	Coord curr_coord = left_start->get_Location()+ Coord(0.05, 0);
 	Wall_Node* prev = left_start;
 
 	for(int i = 0; i< total_num; i++) {
 		curr_coord = curr_coord + left_increment;
 		curr = new Wall_Node(curr_coord, this);
-		cout << "Setting neighbors" << endl;
+		//cout << "Setting neighbors: " << i << endl;
 		prev->set_Left_Neighbor(curr);
 		curr->set_Right_Neighbor(prev);
 		prev = curr;
 	}
 	curr->set_Left_Neighbor(left_end);
 	left_end->set_Right_Neighbor(curr);
-	this->left_Corner = left_start;
+	left_Corner = left_start;
 
-	cout << "make right side" << endl;
-	curr_coord = right_start->get_Location();
+	//cout << "make right side" << endl;;
+	curr_coord = right_start->get_Location()- Coord(0.05, 0);
 	prev = right_start;
 
 	for(int i = 0; i< total_num; i++) {
 		curr_coord = curr_coord + right_increment;
 		curr = new Wall_Node(curr_coord, sister);
-		cout << "Setting neighbors" << endl;
+		//cout << "Setting neighbors: " << i << endl;
 		prev->set_Right_Neighbor(curr);
 		curr->set_Left_Neighbor(prev);
 		prev = curr;
 	}
-	curr->set_Right_Neighbor(left_end);
-	left_end->set_Left_Neighbor(curr);
+	curr->set_Right_Neighbor(right_end);
+	right_end->set_Left_Neighbor(curr);
 	sister->set_Left_Corner(right_start);
 
 	//count wall nodes
-	cout << "begin count wall nodes" << endl;
+	//cout << "begin count wall nodes" << endl;
 	curr = this->left_Corner;
 	Wall_Node* next = NULL;
 	Wall_Node* orig = curr;
 	int number_nodes_A = 0;
-	cout << "cell a counting" << endl;
+	//cout << "cell a counting" << endl;
 	do {
 		number_nodes_A++;
+		curr->update_Cell(this);
 		next = curr->get_Left_Neighbor();
-		cout << number_nodes_A++ << endl;
+		//cout << number_nodes_A << endl;
 		if(next == NULL) {
 			cout << "notlinked" << endl;
 			exit(1);
 		}
 		curr = next;
 	} while(next != orig);
-	cout << "done cell a counting" << endl;	
+	//cout << "done cell a counting" << endl;	
 	this->set_Wall_Count(number_nodes_A);
 	
 	curr = sister->get_Left_Corner();
+	next = NULL;
 	orig = curr;
 	int number_nodes_B = 0;
-	cout << "Cell b counting" << endl;
+	//cout << "Cell b counting" << endl;
 	do {
 		number_nodes_B++;
+		curr->update_Cell(sister);
 		next = curr->get_Left_Neighbor();
+		//cout << number_nodes_B << endl;
+		if(next == NULL) {
+			cout << "notlinked" << endl;
+			exit(1);
+		}
 		curr = next;
 	} while (next != orig);
-	
+	//cout << "done counting cell b" << endl;
 	sister->set_Wall_Count(number_nodes_B);
 	
-	cout << "updating angles" << endl;
+	//cout << "updating angles" << endl;
 	//update wall angles
 	this->update_Wall_Angles();
 	sister->update_Wall_Angles();
-	
-	cout << "updating center" << endl;
+	this->update_Wall_Equi_Angles();
+	sister->update_Wall_Equi_Angles();
+	//cout << "updating center" << endl;
 	//update cell center
 	this->update_Cell_Center();
 	sister->update_Cell_Center();
 
-	cout << "update layer" << endl;
+	//cout << "update layer" << endl;
 	//update layer information
 	sister->set_Layer(this->layer);
-	
+	//cout << "update growth rate" << endl;
 	sister->set_growth_rate(this->growth_rate);
 		
-	cout << "Updated Angles and cell centers"<< endl;
+	//cout << "Updated Angles and cell centers"<< endl;
 	
 	//distribute cyt nodes between sister cells
-	cout << "deleting cyt nodes" << endl;
+	//cout << "deleting cyt nodes" << endl;
 	int new_cyt_cnt = 20;
 	//delete all old cyt nodes
 	Cyt_Node* c = NULL;
@@ -163,45 +170,28 @@ Cell* Cell::divide_length_wise() {
 		num_cyt_nodes--;
 	}	
 	
-	cout << "Finished deleting old cyt nodes" << endl;
+	//cout << "Finished deleting old cyt nodes" << endl;
 	
-	cout << "get most up/down and left/right for radius" << endl;
-	this->most_Up_Down();
-	sister->most_Up_Down();
-	this->most_Left_Right();
-	sister->most_Left_Right();
+	//cout << "get most up/down and left/right for radius" << endl;
+	Wall_Node* up_sis = NULL;
+	Wall_Node* down_sis = NULL;
+	Wall_Node* left_sis= NULL;
+	Wall_Node* right_sis = NULL;
+	
+	this->most_Up_Down(up, down);
+	sister->most_Up_Down(up_sis, down_sis);
+	this->most_Left_Right(left, right);
+	sister->most_Left_Right(left_sis, right_sis);
 
-	double radius_x = ((most_right->get_Location() - most_left->get_Location()).length())*0.5;
-	double radius_x_s = ((sister->get_most_right()->get_Location() - sister->get_most_left()->get_Location()).length())*0.5;
-	double radius_y = ((most_up->get_Location() - most_down->get_Location()).length())*0.5;
-	double radius_y_s = ((sister->get_most_up()->get_Location() - sister->get_most_down()->get_Location()).length())*0.5;
+	double radius_x = ((right->get_Location() - left->get_Location()).length())*0.5;
+	double radius_x_s = ((right_sis->get_Location() - left_sis->get_Location()).length())*0.5;
+	double radius_y = ((up->get_Location() - down->get_Location()).length())*0.5;
+	double radius_y_s = ((up_sis->get_Location() - down_sis->get_Location()).length())*0.5;
 	//create new ones for each cell
 	for(int i = 0; i < new_cyt_cnt; i++) {
 		this->add_Cyt_Node_Div(radius_x, radius_y);
 		sister->add_Cyt_Node_Div(radius_x_s, radius_y_s);
 	}
-	cout << "Cell A" << endl;
-	/*vector<Cyt_Node*>CellA;
-	this->get_Cyt_Nodes(CellA);
-	int counter = 0;
-	for(int i = 0;i<CellA.size();i++) {
-		if(CellA.at(i)->get_My_Cell() == this) {
-			counter++;
-		}
-	}*/
-	//cout << "Number cyt nodes assigned to Cell A is: " << counter << endl;
-	
-	//cout << "Cell B" << endl;
-/*	vector<Cyt_Node*>CellB;
-	sister->get_Cyt_Nodes(CellB);
-	counter = 0;
-	for(int i = 0;i<CellB.size();i++) {
-		if(CellB.at(i)->get_My_Cell() == sister) {
-			counter++;
-		}
-	}*/
-	//cout << "Number cyt nodes assigned to Cell B is: " << counter << endl;
-		
 	return sister;
 }
 
@@ -379,10 +369,10 @@ Cell* Cell::divide_width_wise(const int Ti) {
 			counter++;
 		}
 	}
-	//cout << "Number cyt nodes assigned to Cell B is: " << counter << endl;
+	//cout << "Number cyt nodes assigned to Cell B is: " << counter << endl;*/
 		
-	return sister;
-}
+//	return sister;
+//}
 
 
-*/
+

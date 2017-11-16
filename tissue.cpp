@@ -108,6 +108,7 @@ void Tissue::calc_New_Forces() {
 	Cell* curr = NULL;
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		curr = cells.at(i);
+	//	cout << "calc forces for cell: " << i << endl;
 		curr->calc_New_Forces();
 	}
 	return;
@@ -118,6 +119,7 @@ void Tissue::calc_New_Forces() {
 void Tissue::update_Cell_Locations() {
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->update_Node_Locations();
+		//updates cell centers
 	}
 	return;
 }
@@ -185,27 +187,24 @@ void Tissue::update_Adhesion(int Ti) {
 }
 
 void Tissue::cell_Division(int Ti) {
-	bool divided = false;
 	Cell* new_cell = NULL;
-//	cout << "number cells: " << cells.size()<< endl;
+//	cout << "number cells in tissue is: " << cells.size()<< endl;
 	int number_cells = cells.size();
 	for(unsigned int i = 0; i < number_cells;i++) {
-//		cout << "current divide cell: " << i << endl;
-		new_cell = cells.at(i)->divide();
+		//cout << "current divide cell: " << i << endl;
+		new_cell = cells.at(i)->divide(Ti);
+		//cout << "went into division check" << endl;
 		if (new_cell !=NULL) {
-			divided = true;
 			//cout << "new cell not null setting rank" << endl;
 			new_cell->set_Rank(num_cells);
 			num_cells++;
 			cells.push_back(new_cell);
+			this->update_Neighbor_Cells();
+			this->update_Adhesion(Ti);
+			//cout<< "done with division" << endl;	
 		}
 		//cout << "i is what: " << i << endl;
 	}	
-	if(divided) {
-		//cells.push_back(new_cell);
-		this->update_Neighbor_Cells();
-		this->update_Adhesion(Ti);
-	}
 	return;
 }
 

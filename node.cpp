@@ -136,6 +136,9 @@ Cyt_Node::~Cyt_Node() {
 // Constructors-----------------
 Wall_Node::Wall_Node(Coord loc, Cell* my_cell) : Node(loc) {
 	this->my_cell = my_cell;
+	this-> pull = false;
+	this->F_ext = Coord(0,0);
+	
 }
 
 Wall_Node::Wall_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right) : Node(loc)   {
@@ -193,7 +196,9 @@ void Wall_Node::update_Angle() {
 
 	return;
 }
-
+void Wall_Node::update_Cell(Cell* new_cell) {
+	this->my_cell = new_cell;
+}
 void Wall_Node::update_Equi_Angle(double new_theta) {
 	equi_angle = new_theta;
 
@@ -267,7 +272,7 @@ Coord Wall_Node::calc_Morse_DC() {
 	if(this->closest != NULL){
 		Fdc += linear_Equation_ADH(this->closest);
 	}
-//	cout << " morse_DC: " << Fdc << endl;
+	//cout << " morse_DC: " << Fdc << endl;
 	return Fdc;
 }
 
