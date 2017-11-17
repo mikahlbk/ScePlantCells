@@ -23,9 +23,11 @@ Cell* Cell::divide(int Ti) {
 	//calculate area
 	double area = this->calc_Area();
 	//cout << "area calculated" << endl;
+	if(rank == 2) {
 	if(area > AREA_DOUBLED) {
 		//cout << "Cell passed area threshold for division" << endl;
 		sister = this->divide_length_wise();
+	}
 	}
 	return sister;
 }
@@ -160,7 +162,7 @@ Cell* Cell::divide_length_wise() {
 	
 	//distribute cyt nodes between sister cells
 	//cout << "deleting cyt nodes" << endl;
-	int new_cyt_cnt = 20;
+	int new_cyt_cnt = 10;
 	//delete all old cyt nodes
 	Cyt_Node* c = NULL;
 	while(!cyt_nodes.empty()) {

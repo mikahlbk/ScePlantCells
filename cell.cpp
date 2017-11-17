@@ -558,7 +558,7 @@ void Cell::add_Cyt_Node() {
 void Cell::add_Cyt_Node_Div(double& radius_x, double& radius_y) {
 	//USING POSITIONS OF CELL CENTER FOR CYT NODE ALLOCATION
 	// ---distributes more evenly throughout start cell
-	double offset = 0.5;
+	double offset = 0.3;
 	Coord location;
 	Cyt_Node* cyt;
 	double x;

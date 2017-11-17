@@ -106,10 +106,10 @@ int main() {
 		}
 
 		//Division if necessary
-		if(Ti > 10000) {
+//		if(Ti > 10000) {
 		//	cout << "Check if cells need to divide" << endl;
-			growing_Tissue.cell_Division(Ti);
-		}
+//			growing_Tissue.cell_Division(Ti);
+//		}
 		/*if((Ti > 268583)) {
 			growing_Tissue.stretching_Test();
 			growing_Tissue.cell_stress();

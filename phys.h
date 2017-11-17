@@ -31,10 +31,10 @@ const double pi = acos(-1.0);
 ///// Cell wall mechanical parameters
 
 const double K_BEND = .001;
-const Coord  K_LINEAR = Coord(100,450);
+const Coord  K_LINEAR = Coord(450,100);
 
-const double K_ADH = 15;
-const double MembrEquLen_ADH = 0.4;
+const double K_ADH = 45;
+const double MembrEquLen_ADH = 0.6;
 
 const double EXTERNAL_FORCE = 2;
 //linear spring equilibrium length
