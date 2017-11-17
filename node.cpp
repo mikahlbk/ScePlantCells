@@ -24,7 +24,10 @@ Coord Node::get_Location() {
 Coord Node::get_Force() {
 	return new_force;
 }
-
+void Node::update_VTK_Id(int id) {
+	vtk_id = id;
+	return;
+}
 void Node::update_Location() {
 	my_loc += new_force * dt;
     return;

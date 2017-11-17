@@ -257,12 +257,12 @@ void Cell::update_adhesion_springs(int Ti) {
 		curr_Node = left_Corner;;
 		do {
 			next_Node = curr_Node->get_Left_Neighbor();
-			if(time < Relaxation_Time) {
-				curr_Closest = curr_Node->find_Closest_Node_Beg(neighbors);
-			}
-			else {
+//			if(time < Relaxation_Time) {
+//				curr_Closest = curr_Node->find_Closest_Node_Beg(neighbors);
+//			}
+//			else {
 				curr_Closest = curr_Node->find_Closest_Node(neighbors);
-			}
+//			}
 			//if(curr_Closest == NULL) {
 				//cout << "Did not find a curr closest" << endl;
 			//}
@@ -418,6 +418,44 @@ void Cell::print_Data_Output(ofstream& ofs) {
 	return;
 }
 
+int Cell::update_VTK_Indices(int& id) {
+	cout << "ID before: " << id << endl;
+	int rel_cnt = 0;
+
+	Wall_Node* curr_wall = left_Corner;
+	do { 
+		curr_wall->update_VTK_Id(id);
+		id++;
+		if(curr_wall->get_Closest()!= NULL) {
+			rel_cnt++;
+		}
+		curr_wall = curr_wall->get_Left_Neighbor();
+	} while (curr_wall != left_Corner);
+	
+	for(unsigned int i = 0; i < cyt_nodes.size(); i++) {
+			cyt_nodes.at(i)->update_VTK_Id(id);
+			id++;
+	}
+	cout << "ID after: " << id << endl;
+	return rel_cnt;
+}
+void Cell::print_VTK_Adh(ofstream& ofs) {
+
+	int my_id, nei_id;
+	Wall_Node* neighbor = NULL;
+	Wall_Node* curr_wall = left_Corner;
+
+	do {
+		neighbor = curr_wall->get_Closest();
+		if(neighbor != NULL) {
+			my_id = curr_wall->get_VTK_Id();
+			nei_id = neighbor->get_VTK_Id();
+			ofs << 2 << ' ' << my_id << ' ' << nei_id << endl;
+		}
+		curr_wall = curr_wall->get_Left_Neighbor();
+	} while(curr_wall != left_Corner);
+	return;
+}
 void Cell::print_VTK_Points(ofstream& ofs, int& count) {
 
 	Wall_Node* curr_wall = left_Corner;

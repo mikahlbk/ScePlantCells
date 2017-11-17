@@ -33,7 +33,7 @@ const double pi = acos(-1.0);
 const double K_BEND = .001;
 const Coord  K_LINEAR = Coord(450,100);
 
-const double K_ADH = 45;
+const double K_ADH = 20;
 const double MembrEquLen_ADH = 0.6;
 
 const double EXTERNAL_FORCE = 2;

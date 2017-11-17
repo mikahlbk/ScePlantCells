@@ -88,6 +88,8 @@ class Cell {
 		void stretch();
 		//Output Functions
 		void print_Data_Output(ofstream& ofs);
+		int update_VTK_Indices(int& id);
+		void print_VTK_Adh(ofstream& ofs);
 		void print_VTK_Points(ofstream& ofs, int& count);
 		void print_VTK_Scalars(ofstream& ofs);
 		void print_VTK_Vectors(ofstream& ofs);
