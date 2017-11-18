@@ -23,12 +23,12 @@ Cell* Cell::divide(int Ti) {
 	//calculate area
 	double area = this->calc_Area();
 	//cout << "area calculated" << endl;
-	if(rank == 2) {
+//	if(rank == 0) {
 	if(area > AREA_DOUBLED) {
 		//cout << "Cell passed area threshold for division" << endl;
 		sister = this->divide_length_wise();
 	}
-	}
+//	}
 	return sister;
 }
 
@@ -43,7 +43,15 @@ Cell* Cell::divide_length_wise() {
 	Wall_Node* down = NULL;
 	Wall_Node* left = NULL;
 	Wall_Node* right = NULL;
-	this->most_Up_Down(up, down);
+	this->closest_node_top(up);
+	if(up == NULL) {
+		exit(1);
+	}
+	this->closest_node_bottom(down);
+	if(down == NULL) {
+		exit(1);
+	}
+	//	this->most_Up_Down(up, down);
 	Wall_Node* left_start = down->get_Right_Neighbor()->get_Right_Neighbor();
 	Wall_Node* right_start = down->get_Left_Neighbor()->get_Left_Neighbor();
 
@@ -70,7 +78,7 @@ Cell* Cell::divide_length_wise() {
 
 	//cout << "make left side" << endl;
 	Wall_Node* curr = NULL;
-	Coord curr_coord = left_start->get_Location()+ Coord(0.05, 0);
+	Coord curr_coord = left_start->get_Location()+ Coord(0.06, 0);
 	Wall_Node* prev = left_start;
 
 	for(int i = 0; i< total_num; i++) {
@@ -86,7 +94,7 @@ Cell* Cell::divide_length_wise() {
 	left_Corner = left_start;
 
 	//cout << "make right side" << endl;;
-	curr_coord = right_start->get_Location()- Coord(0.05, 0);
+	curr_coord = right_start->get_Location()- Coord(0.06, 0);
 	prev = right_start;
 
 	for(int i = 0; i< total_num; i++) {
@@ -180,10 +188,14 @@ Cell* Cell::divide_length_wise() {
 	Wall_Node* left_sis= NULL;
 	Wall_Node* right_sis = NULL;
 	
-	this->most_Up_Down(up, down);
-	sister->most_Up_Down(up_sis, down_sis);
-	this->most_Left_Right(left, right);
-	sister->most_Left_Right(left_sis, right_sis);
+	this->closest_node_top(up);
+	this->closest_node_bottom(down);
+	sister->closest_node_top(up_sis);
+	sister->closest_node_bottom(down_sis);
+	this->closest_node_left(left);
+	this->closest_node_right(right);
+	sister->closest_node_left(left_sis);
+	sister->closest_node_right(right_sis);
 
 	double radius_x = ((right->get_Location() - left->get_Location()).length())*0.5;
 	double radius_x_s = ((right_sis->get_Location() - left_sis->get_Location()).length())*0.5;

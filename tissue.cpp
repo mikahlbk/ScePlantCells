@@ -188,12 +188,13 @@ void Tissue::update_Adhesion(int Ti) {
 
 void Tissue::cell_Division(int Ti) {
 	Cell* new_cell = NULL;
-//	cout << "number cells in tissue is: " << cells.size()<< endl;
 	int number_cells = cells.size();
+//	cout << "number cells in tissue is: " << number_cells<< endl;
+	
 	if(number_cells > 8) {
 		exit(1);
 	}
-	for(unsigned int i = 0; i < number_cells;i++) {
+	for(unsigned int i = 0; i < 1;i++) {
 //		cout << "current divide cell: " << i << endl;
 		new_cell = cells.at(i)->divide(Ti);
 //		cout << "went into division check" << endl;
@@ -207,7 +208,7 @@ void Tissue::cell_Division(int Ti) {
 			this->update_Adhesion(Ti);
 //			cout<< "done with division" << endl;	
 		}
-		//cout << "i is what: " << i << endl;
+//		cout << "i is what: " << i << endl;
 	}	
 	return;
 }
@@ -262,8 +263,8 @@ int Tissue::update_VTK_Indices() {
 		rel_cnt += cells.at(i)->update_VTK_Indices(id);
 	}
 
-	cout << "final ID: " << id << endl;
-	cout << "rel_cnt: " << rel_cnt << endl;
+//	cout << "final ID: " << id << endl;
+//	cout << "rel_cnt: " << rel_cnt << endl;
 
 	return rel_cnt;
 }

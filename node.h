@@ -110,7 +110,7 @@ class Wall_Node: public Node {
 		Coord bending_Equation_Left();
 		Coord bending_Equation_Right();
 		Coord linear_Equation(Wall_Node* wall);
-		Coord linear_Equation_ADH(Wall_Node* wall);
+		Coord linear_Equation_ADH(Wall_Node*& wall);
 		~Wall_Node();
 
 };

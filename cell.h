@@ -102,6 +102,10 @@ class Cell {
 		void most_Left_Right(Wall_Node*& left, Wall_Node*& right);
 		double tensile_Length();
 		double extensional_Length();
+		void closest_node_top(Wall_Node*& up);
+		void closest_node_bottom(Wall_Node*& down);
+		void closest_node_left(Wall_Node*& left);
+		void closest_node_right(Wall_Node*& right);
 		void most_Up_Down(Wall_Node*& up, Wall_Node*& down);
 		void add_stress(double& new_length, double& new_force);
 		void add_strain(double& new_length);

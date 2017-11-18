@@ -25,10 +25,10 @@ Cell::Cell(Tissue* tissue) {
 	my_tissue = tissue;
 	//rank assigned in tissue class
 	//num_cyt_nodes assigned
-	most_up = NULL;
-	most_down = NULL;
-	most_left = NULL;
-	most_right = NULL;
+//	most_up = NULL;
+//	most_down = NULL;
+//	most_left = NULL;
+//	most_right = NULL;
 	//layer inherited
 	//growth rate inherited
 	//cell center computed
@@ -51,10 +51,10 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer)    {
 	num_wall_nodes = 0;
 	
 	life_length = 0;
-	most_up = NULL;
-	most_down = NULL;
-	most_left = NULL;
-	most_right = NULL;
+//	most_up = NULL;
+//	most_down = NULL;
+//	most_left = NULL;
+//	most_right = NULL;
 	//rough estimates for cell sizing
 	int num_Init_Wall_Nodes = Init_Wall_Nodes;
 	double angle_increment = (2*pi)/num_Init_Wall_Nodes;
@@ -240,7 +240,7 @@ void Cell::update_Neighbor_Cells() {
 		//else you're pointing at yourself and shouldnt do anything
 	}	
 	
-	cout << "Cell: " << rank << " -- neighbors: " << neigh_cells.size() << endl;
+//	cout << "Cell: " << rank << " -- neighbors: " << neigh_cells.size() << endl;
 
 	return;
 }
@@ -254,14 +254,14 @@ void Cell::update_adhesion_springs(int Ti) {
 	Wall_Node* curr_Closest = NULL;
 	double curr_len = 0;
 	for(int i = 0; i<num_wall_nodes;i++) {
-		curr_Node = left_Corner;;
+		curr_Node = left_Corner;
 		do {
 			next_Node = curr_Node->get_Left_Neighbor();
 //			if(time < Relaxation_Time) {
 //				curr_Closest = curr_Node->find_Closest_Node_Beg(neighbors);
 //			}
 //			else {
-				curr_Closest = curr_Node->find_Closest_Node(neighbors);
+			curr_Closest = curr_Node->find_Closest_Node(neighbors);
 //			}
 			//if(curr_Closest == NULL) {
 				//cout << "Did not find a curr closest" << endl;
@@ -288,10 +288,10 @@ void Cell::calc_New_Forces() {
 	//calc forces on wall nodes
 	Wall_Node* curr = left_Corner; 
 	Wall_Node* orig = curr;
-	//int counter = 0;
+	int counter = 0;
 	do {
-		//counter++;
-		//cout << "Wall node number: " << counter << endl;
+		counter++;
+//		cout << "Wall node number: " << counter << endl;
 		curr->calc_Forces();
 		curr = curr->get_Left_Neighbor();
 	
@@ -419,7 +419,7 @@ void Cell::print_Data_Output(ofstream& ofs) {
 }
 
 int Cell::update_VTK_Indices(int& id) {
-	cout << "ID before: " << id << endl;
+//	cout << "ID before: " << id << endl;
 	int rel_cnt = 0;
 
 	Wall_Node* curr_wall = left_Corner;
@@ -436,7 +436,7 @@ int Cell::update_VTK_Indices(int& id) {
 			cyt_nodes.at(i)->update_VTK_Id(id);
 			id++;
 	}
-	cout << "ID after: " << id << endl;
+//	cout << "ID after: " << id << endl;
 	return rel_cnt;
 }
 void Cell::print_VTK_Adh(ofstream& ofs) {
@@ -652,6 +652,149 @@ double Cell::extensional_Length() {
 	return length;
 }
 
+void Cell::closest_node_top(Wall_Node*& up) {
+	double y_coord = cell_center.get_Y();
+	double x_coord = cell_center.get_X();
+
+	Wall_Node* curr = left_Corner;
+	Wall_Node* next = NULL;
+	Wall_Node* orig = curr;
+
+	double curr_dist;
+	double curr_y;
+	double curr_x;
+	double window = .15;
+	double smallest_dist = 100;
+	Coord curr_coord;
+	Wall_Node* closest = NULL;
+	do {
+		curr_coord = curr->get_Location();
+		next = curr->get_Left_Neighbor();
+		curr_y = curr_coord.get_Y();
+		curr_x = curr_coord.get_X();
+		if((curr_x < x_coord + window) && (curr_x > x_coord - window)) {
+			if(curr_y > y_coord) {
+				curr_dist = (cell_center - curr_coord).length();
+				if(curr_dist < smallest_dist) {
+					smallest_dist = curr_dist;
+					closest = curr;
+				}
+			}
+		}
+		curr = next;
+	} while (next != orig);
+
+	up = closest;
+	return;
+}
+
+void Cell::closest_node_bottom(Wall_Node*& down) {
+	double y_coord = cell_center.get_Y();
+	double x_coord = cell_center.get_X();
+
+	Wall_Node* curr = left_Corner;
+	Wall_Node* next = NULL;
+	Wall_Node* orig = curr;
+
+	double curr_dist;
+	double curr_y;
+	double curr_x;
+	double window = .15;
+	double smallest_dist = 100;
+	Coord curr_coord;
+	Wall_Node* closest = NULL;
+	do {
+		curr_coord = curr->get_Location();
+		next = curr->get_Left_Neighbor();
+		curr_y = curr_coord.get_Y();
+		curr_x = curr_coord.get_X();
+		if((curr_x < x_coord + window) && (curr_x > x_coord - window)) {
+			if(curr_y < y_coord) {
+				curr_dist = (cell_center - curr_coord).length();
+				if(curr_dist < smallest_dist) {
+					smallest_dist = curr_dist;
+					closest = curr;
+				}
+			}
+		}
+		curr = next;
+	} while (next != orig);
+
+	down = closest;
+	return;
+}
+
+void Cell::closest_node_left(Wall_Node*& left) {
+	double y_coord = cell_center.get_Y();
+	double x_coord = cell_center.get_X();
+
+	Wall_Node* curr = left_Corner;
+	Wall_Node* next = NULL;
+	Wall_Node* orig = curr;
+
+	double curr_dist;
+	double curr_y;
+	double curr_x;
+	double window = .15;
+	double smallest_dist = 100;
+	Coord curr_coord;
+	Wall_Node* closest = NULL;
+	do {
+		curr_coord = curr->get_Location();
+		next = curr->get_Left_Neighbor();
+		curr_y = curr_coord.get_Y();
+		curr_x = curr_coord.get_X();
+		if((curr_y < y_coord + window) && (curr_y > y_coord - window)) {
+			if(curr_x < x_coord) {
+				curr_dist = (cell_center - curr_coord).length();
+				if(curr_dist < smallest_dist) {
+					smallest_dist = curr_dist;
+					closest = curr;
+				}
+			}
+		}
+		curr = next;
+	} while (next != orig);
+
+	left = closest;
+	return;
+}
+
+void Cell::closest_node_right(Wall_Node*& right) {
+	double y_coord = cell_center.get_Y();
+	double x_coord = cell_center.get_X();
+
+	Wall_Node* curr = left_Corner;
+	Wall_Node* next = NULL;
+	Wall_Node* orig = curr;
+
+	double curr_dist;
+	double curr_y;
+	double curr_x;
+	double window = .15;
+	double smallest_dist = 100;
+	Coord curr_coord;
+	Wall_Node* closest = NULL;
+	do {
+		curr_coord = curr->get_Location();
+		next = curr->get_Left_Neighbor();
+		curr_y = curr_coord.get_Y();
+		curr_x = curr_coord.get_X();
+		if((curr_y < y_coord + window) && (curr_y > y_coord - window)) {
+			if(curr_x > x_coord) {
+				curr_dist = (cell_center - curr_coord).length();
+				if(curr_dist < smallest_dist) {
+					smallest_dist = curr_dist;
+					closest = curr;
+				}
+			}
+		}
+		curr = next;
+	} while (next != orig);
+
+	right = closest;
+	return;
+}
 void Cell::most_Up_Down(Wall_Node*& up, Wall_Node*& down) {
 	update_Cell_Center();
 	
@@ -728,9 +871,11 @@ double Cell::calc_Area() {
 	Wall_Node* right = NULL;
 	Wall_Node* up = NULL;
 	Wall_Node* down = NULL;
-	this->most_Up_Down(up, down);
+	this->closest_node_top(up);
+	this->closest_node_bottom(down);
 	//cout << "got up down" << endl;
-	this->most_Left_Right(left, right);
+	this->closest_node_left(left);
+	this->closest_node_right(right);
 	//cout << "got left right" << endl;
 	//cout << "right " << right << endl;
 	//cout << "left " << left << endl;

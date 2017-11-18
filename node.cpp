@@ -224,14 +224,14 @@ void Wall_Node::calc_Forces() {
 	cyt_force = sum;
 
 	sum += calc_Morse_DC();
-	//cout << "DC" << calc_Morse_DC() << endl;
+//	cout << "DC" << calc_Morse_DC() << endl;
 	sum += calc_Linear();
 //	cout << "linear" << endl;
 	sum += calc_Bending();
 //	cout << "bending" << endl;
 	
 	if(pull == true) {
-		//cout << "External Force is" << calc_External() << endl;
+//		cout << "External Force is" << calc_External() << endl;
 		sum+= calc_External();
 		pull = false;
 	}
@@ -261,19 +261,28 @@ Coord Wall_Node::calc_Morse_DC() {
 	Coord Fdc;
 	vector<Cell*> cells;
 	my_cell->get_Neighbor_Cells(cells);	
+//	cout << "getting neighbors" << endl;
 	Wall_Node* curr = NULL;
 	Wall_Node* orig = NULL;
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		curr = cells.at(i)->get_Wall_Nodes();
+	//	cout << "getting wall nodes" << endl;
 		orig = curr;
 		do {
 			Fdc += morse_Equation(curr);
+		//	cout << "morse" << endl;
 			curr = curr->get_Left_Neighbor();
+		//	cout << "left neighbor" << endl;
 		} while (curr != orig);
 	}
-
+	//cout << "made it out of loop" << endl;
+	cout << closest << endl;
 	if(this->closest != NULL){
+		//cout << "closest not null" << endl;
+		closest->get_Location();
+		//cout << "got location" << endl;
 		Fdc += linear_Equation_ADH(this->closest);
+		//cout << "computer adh successfully" << endl;
 	}
 	//cout << " morse_DC: " << Fdc << endl;
 	return Fdc;
@@ -468,12 +477,19 @@ Coord Wall_Node::linear_Equation(Wall_Node* wall) {
 	return F_lin;	
 }
 
-Coord Wall_Node::linear_Equation_ADH(Wall_Node* wall) {
+Coord Wall_Node::linear_Equation_ADH(Wall_Node*& wall) {
+	//cout << "wall node is: " << wall << endl;
 	if (wall == NULL) {
 		cout << "Problems for days" << endl;
 	}
 	Coord F_lin;
+	//cout << "compute diff vec" << endl;
+	Coord wall_loc = wall->get_Location();
+//	cout << "wall loc"  << endl;
+	Coord loc = my_loc;
+//	cout << "my loc " << endl;
 	Coord diff_vect = wall->get_Location() - my_loc;
+//	cout << "coord diff is : " << diff_vect << endl;
 	double diff_len = diff_vect.length();
 	F_lin = (diff_vect/diff_len)*(K_ADH*(diff_len - MembrEquLen_ADH));
 
@@ -547,6 +563,7 @@ void Wall_Node::make_Connection(Wall_Node* curr_Closest) {
 			if(curr_dist < this->closest_len) {
 				this->closest_len = curr_dist;
 				this->closest = curr_Closest;
+				curr_Closest->get_Closest()->set_Closest(NULL,100);
 				curr_Closest->set_Closest(this, curr_dist);
 			}
 			else if (curr_dist > this->closest_len) {
