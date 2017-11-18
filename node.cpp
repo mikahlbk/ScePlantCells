@@ -141,6 +141,8 @@ Wall_Node::Wall_Node(Coord loc, Cell* my_cell) : Node(loc) {
 	this->my_cell = my_cell;
 	this-> pull = false;
 	this->F_ext = Coord(0,0);
+//	this->closest = NULL;
+//	this->closest_len = 100;
 	
 }
 
@@ -150,6 +152,8 @@ Wall_Node::Wall_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right
 	this-> my_cell = my_cell;
 	this-> pull = false;
 	this->F_ext = Coord(0,0);
+	this->closest = NULL;
+	this->closest_len = 100;
 	update_Angle();
 }
 
@@ -157,7 +161,7 @@ Wall_Node::~Wall_Node() {
 	my_cell = NULL;	
 	left = NULL;
 	right = NULL;
-	//closest = NULL;
+	closest = NULL;
 }
 
 //  Getters and Setters--------------------
@@ -276,7 +280,7 @@ Coord Wall_Node::calc_Morse_DC() {
 		} while (curr != orig);
 	}
 	//cout << "made it out of loop" << endl;
-	cout << closest << endl;
+//	cout << closest << endl;
 	if(this->closest != NULL){
 		//cout << "closest not null" << endl;
 		closest->get_Location();
@@ -563,7 +567,7 @@ void Wall_Node::make_Connection(Wall_Node* curr_Closest) {
 			if(curr_dist < this->closest_len) {
 				this->closest_len = curr_dist;
 				this->closest = curr_Closest;
-				curr_Closest->get_Closest()->set_Closest(NULL,100);
+			//	curr_Closest->get_Closest()->set_Closest(NULL,100);
 				curr_Closest->set_Closest(this, curr_dist);
 			}
 			else if (curr_dist > this->closest_len) {

@@ -296,7 +296,7 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 	}
 
 	ofs << endl;
-	ofs << "CELLS " << cells.size() + rel_cnt << ' ' << (num_Points + start_points.size()) + (rel_cnt*3) << endl;
+	ofs << "CELLS " << cells.size() + rel_cnt << ' ' << (num_Points + start_points.size()) + rel_cnt*3 << endl;
 
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		ofs << cells.at(i)->get_Node_Count();

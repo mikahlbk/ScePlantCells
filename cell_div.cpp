@@ -25,8 +25,11 @@ Cell* Cell::divide(int Ti) {
 	//cout << "area calculated" << endl;
 //	if(rank == 0) {
 	if(area > AREA_DOUBLED) {
+		if(this->rank == 0) {
 		//cout << "Cell passed area threshold for division" << endl;
 		sister = this->divide_length_wise();
+		cout << "divided" << endl;
+		}
 	}
 //	}
 	return sister;

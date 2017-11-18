@@ -220,7 +220,7 @@ void Cell::update_Neighbor_Cells() {
 	Coord curr_Cent;
 	Coord distance;
 	
-	double prelim_threshold = 3;
+	double prelim_threshold = 10;
 	//double sec_threshold = 1;
 
 	// iterate through all cells
@@ -373,14 +373,14 @@ void Cell::wall_Node_Check() {
 	//check if cell can add a cyt or wall node
 
 	if (life_length % ADD_WALL_TIMER == ADD_WALL_TIMER-1) {
-		//cout << "adding a wall node" << endl;
+	//	cout << "adding a wall node" << endl;
 		add_Wall_Node();
 	}
 	return;
 }
 void Cell::cytoplasm_Check() {
 
-	if (life_length % growth_rate == growth_rate-1) {
+	if (life_length % ADD_CYT_TIMER == ADD_CYT_TIMER-1) {
 		//cout << "adding cyt node" << endl;
 		add_Cyt_Node();
 	}

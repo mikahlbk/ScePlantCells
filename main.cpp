@@ -49,7 +49,7 @@ int main() {
 		//for now only one cell
 		//cout << "Ti = " << Ti << endl;
 		//Print to dataOutput and VTK files
-	//if((Ti > 28000)&&(Ti < 30000)){
+//	if(Ti > 115000){
 		if (Ti % 100  == 0) {
 			
 			digits = ceil(log10(out + 1));
@@ -73,22 +73,13 @@ int main() {
 			ofs.close();	
 			out++;
 		}
-//}
+//	}
 
 		if (Ti % 100 == 0) {
 			cout << "Simulation still running. Ti: " << Ti << endl;
 		}
 		
-		// Update Each cell's neighboring cells
-		if((Ti > 1000)) {
-			if (Ti% 100  == 0 ) {
-				//cout << "Find Neighbors" << endl;
-				growing_Tissue.update_Neighbor_Cells();
-				//cout << "Make Adhesion" << endl;
-				growing_Tissue.update_Adhesion(Ti);
-			}
-		}
-		
+	
 		// Tissue Growth
 		//cout << "update life length" << endl;
 
@@ -104,12 +95,25 @@ int main() {
 			//cout << "Updated Wall" << endl;
 			growing_Tissue.update_Wall();
 		}
-
+		
+		if((Ti > 1000)) {
+			if (Ti% 100  == 0 ) {
+			//	cout << "Find Neighbors" << endl;
+				growing_Tissue.update_Neighbor_Cells();
+			}
+			if(Ti%10 == 0) {
+				//	cout << "Make Adhesion" << endl;
+				growing_Tissue.update_Adhesion(Ti);
+			}
+		}
 		//Division if necessary
-//		if(Ti > 10000) {
-		//	cout << "Check if cells need to divide" << endl;
-//			growing_Tissue.cell_Division(Ti);
+//		if(Ti > 3500) {
+		//	if(Ti% 10 == 0) {
+//				cout << "Check if cells need to divide" << endl;
+//				growing_Tissue.cell_Division(Ti);
+			//}
 //		}
+//		cout << "division success" << endl;
 		/*if((Ti > 268583)) {
 			growing_Tissue.stretching_Test();
 			growing_Tissue.cell_stress();
@@ -117,10 +121,12 @@ int main() {
 		if((Ti > 268582)) {
 			growing_Tissue.cell_strain();
 		}*/
-
+		// Update Each cell's neighboring cells
+		
+	//	cout << "do forces" << endl;
 		//Calculate new forces on cells and nodes
 		growing_Tissue.calc_New_Forces();
-		//cout << "calculated forces" << endl;
+//	cout << "calculated forces" << endl;
 		//Update node positions
 		growing_Tissue.update_Cell_Locations();
 		//updates cell centers
