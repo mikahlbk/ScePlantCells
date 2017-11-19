@@ -366,6 +366,7 @@ void Cell::update_Cell_Center() {
 
 void Cell::update_Life_Length() {
 	life_length++;
+//	cout << life_length << endl;
 	return;
 }
 void Cell::wall_Node_Check() {
@@ -380,7 +381,7 @@ void Cell::wall_Node_Check() {
 }
 void Cell::cytoplasm_Check() {
 
-	if (life_length % ADD_CYT_TIMER == ADD_CYT_TIMER-1) {
+	if (life_length % growth_rate == growth_rate-1) {
 		//cout << "adding cyt node" << endl;
 		add_Cyt_Node();
 	}
@@ -418,11 +419,11 @@ void Cell::print_Data_Output(ofstream& ofs) {
 	return;
 }
 
-int Cell::update_VTK_Indices(int& id) {
+//int Cell::update_VTK_Indices(int& id) {
 //	cout << "ID before: " << id << endl;
-	int rel_cnt = 0;
+//	int rel_cnt = 0;
 
-	Wall_Node* curr_wall = left_Corner;
+/*	Wall_Node* curr_wall = left_Corner;
 	do { 
 		curr_wall->update_VTK_Id(id);
 		id++;
@@ -455,7 +456,7 @@ void Cell::print_VTK_Adh(ofstream& ofs) {
 		curr_wall = curr_wall->get_Left_Neighbor();
 	} while(curr_wall != left_Corner);
 	return;
-}
+}*/
 void Cell::print_VTK_Points(ofstream& ofs, int& count) {
 
 	Wall_Node* curr_wall = left_Corner;
@@ -663,7 +664,7 @@ void Cell::closest_node_top(Wall_Node*& up) {
 	double curr_dist;
 	double curr_y;
 	double curr_x;
-	double window = .15;
+	double window = .2;
 	double smallest_dist = 100;
 	Coord curr_coord;
 	Wall_Node* closest = NULL;
@@ -699,7 +700,7 @@ void Cell::closest_node_bottom(Wall_Node*& down) {
 	double curr_dist;
 	double curr_y;
 	double curr_x;
-	double window = .15;
+	double window = .2;
 	double smallest_dist = 100;
 	Coord curr_coord;
 	Wall_Node* closest = NULL;
@@ -735,7 +736,7 @@ void Cell::closest_node_left(Wall_Node*& left) {
 	double curr_dist;
 	double curr_y;
 	double curr_x;
-	double window = .15;
+	double window = .2;
 	double smallest_dist = 100;
 	Coord curr_coord;
 	Wall_Node* closest = NULL;
@@ -771,7 +772,7 @@ void Cell::closest_node_right(Wall_Node*& right) {
 	double curr_dist;
 	double curr_y;
 	double curr_x;
-	double window = .15;
+	double window = .2;
 	double smallest_dist = 100;
 	Coord curr_coord;
 	Wall_Node* closest = NULL;
@@ -873,21 +874,21 @@ double Cell::calc_Area() {
 	Wall_Node* down = NULL;
 	this->closest_node_top(up);
 	this->closest_node_bottom(down);
-	//cout << "got up down" << endl;
+//	cout << "got up down" << endl;
 	this->closest_node_left(left);
 	this->closest_node_right(right);
-	//cout << "got left right" << endl;
-	//cout << "right " << right << endl;
-	//cout << "left " << left << endl;
-	//cout << "up" << up << endl;
-	//cout << "down " << down << endl;
-	//if(right == NULL) {
-		//exit(1);
-	//}
+//	cout << "got left right" << endl;
+//	cout << "right " << right << endl;
+//	cout << "left " << left << endl;
+//	cout << "up" << up << endl;
+//	cout << "down " << down << endl;
+	if(down == NULL) {
+		exit(1);
+	}
 	double width = (right->get_Location() - left->get_Location()).length();
-	//cout << "width computed" << endl;
+//	cout << "width computed" << endl;
 	double length = (up->get_Location() - down->get_Location()).length();
-	//cout << "length computed" << endl;
+//	cout << "length computed" << endl;
 	double area = pi*width*length;
 
 	return area;

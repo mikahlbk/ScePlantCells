@@ -38,7 +38,7 @@ class Tissue {
 		void stretching_Test();
 		void cell_Division(int Ti);
 		void print_Data_Output(ofstream& ofs);
-		int update_VTK_Indices();
+//		int update_VTK_Indices();
 		void print_VTK_File(ofstream& ofs);
 		//void make_Vectors();
 		void cell_stress();

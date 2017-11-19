@@ -21,7 +21,7 @@ class Node {
     //variables that will be shared by all nodes
 		Coord my_loc;
 		Coord new_force;
-		int vtk_id;
+//		int vtk_id;
     public:
     //functions that you will want performed on all nodes
         //Constructor
@@ -31,8 +31,8 @@ class Node {
         virtual Coord get_Location();
 		virtual Coord get_Force();
 		virtual void update_Location();
-       	virtual void update_VTK_Id(int id);
-		virtual int get_VTK_Id() {return vtk_id;}
+       //	virtual void update_VTK_Id(int id);
+	//	virtual int get_VTK_Id() {return vtk_id;}
 		//other functions might be executed differently based on
         //    which node you are. Thus define as "pure virtual" and 
         //    properly define them in a derived class
@@ -83,6 +83,7 @@ class Wall_Node: public Node {
 		void set_Equi_Angle(double angle);
 		void set_Left_Neighbor(Wall_Node* new_Left);
 		void set_Right_Neighbor(Wall_Node* new_Right);
+		Cell* get_My_Cell() {return my_cell;}
 		void update_Angle();
 		void update_Equi_Angle(double new_theta);
 		void update_Cell(Cell* new_cell);

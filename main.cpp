@@ -50,7 +50,7 @@ int main() {
 		//cout << "Ti = " << Ti << endl;
 		//Print to dataOutput and VTK files
 //	if(Ti > 115000){
-		if (Ti % 100  == 0) {
+		if (Ti % 1  == 0) {
 			
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {
@@ -81,39 +81,39 @@ int main() {
 		
 	
 		// Tissue Growth
-		//cout << "update life length" << endl;
+		cout << "update life length" << endl;
 
 		growing_Tissue.update_Life_Length();
-	
+		cout << "life length updated" << endl;	
 		//Add cyt node/ wall node 
 		if(Ti > 3000) {
-			//cout << "update cytoplasm" << endl;
+			cout << "update cytoplasm" << endl;
 			growing_Tissue.update_Cytoplasm();
 		}
 
 		if(Ti > 3000) {
-			//cout << "Updated Wall" << endl;
+			cout << "Updated Wall" << endl;
 			growing_Tissue.update_Wall();
 		}
 		
 		if((Ti > 1000)) {
 			if (Ti% 100  == 0 ) {
-			//	cout << "Find Neighbors" << endl;
+				cout << "Find Neighbors" << endl;
 				growing_Tissue.update_Neighbor_Cells();
-			}
-			if(Ti%10 == 0) {
-				//	cout << "Make Adhesion" << endl;
+		//	}
+		//	if(Ti%10 == 0) {
+				cout << "Make Adhesion" << endl;
 				growing_Tissue.update_Adhesion(Ti);
 			}
 		}
 		//Division if necessary
-//		if(Ti > 3500) {
+		if(Ti > 3000) {
 		//	if(Ti% 10 == 0) {
-//				cout << "Check if cells need to divide" << endl;
-//				growing_Tissue.cell_Division(Ti);
+				cout << "Check if cells need to divide" << endl;
+				growing_Tissue.cell_Division(Ti);
 			//}
-//		}
-//		cout << "division success" << endl;
+		}
+		cout << "division success" << endl;
 		/*if((Ti > 268583)) {
 			growing_Tissue.stretching_Test();
 			growing_Tissue.cell_stress();
@@ -123,14 +123,14 @@ int main() {
 		}*/
 		// Update Each cell's neighboring cells
 		
-	//	cout << "do forces" << endl;
+		cout << "do forces" << endl;
 		//Calculate new forces on cells and nodes
 		growing_Tissue.calc_New_Forces();
-//	cout << "calculated forces" << endl;
+		cout << "calculated forces" << endl;
 		//Update node positions
 		growing_Tissue.update_Cell_Locations();
 		//updates cell centers
-		//cout << "updated node positions" << endl;
+		cout << "updated node positions" << endl;
 		
 	}
 

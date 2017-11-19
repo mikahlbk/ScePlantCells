@@ -85,6 +85,7 @@ void Tissue::get_Cells(vector<Cell*>& cells) {
 
 void Tissue::update_Life_Length() {
 	for (unsigned int i = 0; i < cells.size(); i++) {
+		cout << "updating cell i" << endl;
 		cells.at(i)->update_Life_Length();
 	}
 	return;
@@ -189,26 +190,26 @@ void Tissue::update_Adhesion(int Ti) {
 void Tissue::cell_Division(int Ti) {
 	Cell* new_cell = NULL;
 	int number_cells = cells.size();
-//	cout << "number cells in tissue is: " << number_cells<< endl;
+	cout << "number cells in tissue is: " << number_cells<< endl;
 	
 	if(number_cells > 8) {
 		exit(1);
 	}
 	for(unsigned int i = 0; i < 1;i++) {
-//		cout << "current divide cell: " << i << endl;
+		cout << "current divide cell: " << i << endl;
 		new_cell = cells.at(i)->divide(Ti);
-//		cout << "went into division check" << endl;
+		cout << "went into division check" << endl;
 		if (new_cell !=NULL) {
-//			cout << "new cell not null setting rank" << endl;
+			cout << "new cell not null setting rank" << endl;
 			new_cell->set_Rank(num_cells);
 			num_cells++;
 			cells.push_back(new_cell);
-//			cout << "updating neighbors on tissue level" << endl;
+			cout << "updating neighbors on tissue level" << endl;
 			this->update_Neighbor_Cells();
 			this->update_Adhesion(Ti);
-//			cout<< "done with division" << endl;	
+			cout<< "done with division" << endl;	
 		}
-//		cout << "i is what: " << i << endl;
+	cout << "i is what: " << i << endl;
 	}	
 	return;
 }
@@ -252,7 +253,7 @@ void Tissue::print_Data_Output(ofstream & ofs) {
 	return;
 }
 
-int Tissue::update_VTK_Indices() {
+/*int Tissue::update_VTK_Indices() {
 
 	int id = 0;
 	int rel_cnt = 0;
@@ -267,10 +268,11 @@ int Tissue::update_VTK_Indices() {
 //	cout << "rel_cnt: " << rel_cnt << endl;
 
 	return rel_cnt;
-}
+}*/
 
 void Tissue::print_VTK_File(ofstream& ofs) {
-	int rel_cnt = update_VTK_Indices();
+//	int rel_cnt = update_VTK_Indices();
+
 
 	ofs << "# vtk DataFile Version 3.0" << endl;
 	ofs << "Point representing Sub_cellular elem model" << endl;
@@ -296,7 +298,7 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 	}
 
 	ofs << endl;
-	ofs << "CELLS " << cells.size() + rel_cnt << ' ' << (num_Points + start_points.size()) + rel_cnt*3 << endl;
+	ofs << "CELLS " << cells.size() << ' ' << num_Points + start_points.size() << endl;
 
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		ofs << cells.at(i)->get_Node_Count();
@@ -307,22 +309,22 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 		ofs << endl;
 	}
 	
-	//output pairs of node indices to draw adh line
-	for(unsigned int i = 0; i < cells.size(); i++) {
-		cells.at(i)->print_VTK_Adh(ofs);
-	}
+//	//output pairs of node indices to draw adh line
+//	for(unsigned int i = 0; i < cells.size(); i++) {
+//		cells.at(i)->print_VTK_Adh(ofs);
+//	}
 
 	ofs << endl;
 
-	ofs << "CELL_TYPES " << start_points.size() + rel_cnt << endl;
+	ofs << "CELL_TYPES " << start_points.size() << endl;
 	for (unsigned int i = 0; i < start_points.size(); i++) {
 		ofs << 2 << endl;
 	}
 
-	for(unsigned int i = 0; i < rel_cnt; i++) {
-		//type for adh relationship
-		ofs << 3 << endl;
-	}
+//	for(unsigned int i = 0; i < rel_cnt; i++) {
+//		//type for adh relationship
+//		ofs << 3 << endl;
+//	}
 
 	ofs << endl;
 
