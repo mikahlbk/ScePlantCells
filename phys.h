@@ -24,7 +24,7 @@ const int MAX_NUM_CYT = 60;
 
 const int Init_Num_Cyt_Nodes = 20;
 const int Init_Wall_Nodes = 100;
-const double AREA_DOUBLED = 8;
+const double AREA_DOUBLED = 3;
 // Global Physics Constants
 const double pi = acos(-1.0);
 

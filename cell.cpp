@@ -603,11 +603,11 @@ void Cell::add_Cyt_Node_Div(double& radius_x, double& radius_y) {
 	double x;
 	double y;
 	
-	double rand_radius_x = (static_cast<double>(rand()) / RAND_MAX)*offset*radius_x;
+	double rand_radius = (static_cast<double>(rand()) / RAND_MAX)*offset*radius_x;
 	double rand_radius_y = (static_cast<double>(rand()) / RAND_MAX)*offset*radius_y;
 	double rand_angle = (static_cast<double>(rand()) / RAND_MAX)*2*pi;
-	x = cell_center.get_X()+ rand_radius_x*cos(rand_angle);
-	y = cell_center.get_Y()+ rand_radius_y*sin(rand_angle);
+	x = cell_center.get_X()+ rand_radius*cos(rand_angle);
+	y = cell_center.get_Y()+ rand_radius*sin(rand_angle);
 	location = Coord(x,y);
 	cyt = new Cyt_Node(location,this);
 	cyt_nodes.push_back(cyt);
@@ -674,18 +674,56 @@ void Cell::closest_node_top(Wall_Node*& up) {
 		curr_y = curr_coord.get_Y();
 		curr_x = curr_coord.get_X();
 		if((curr_x < x_coord + window) && (curr_x > x_coord - window)) {
+		//	cout << "passed window check" << endl;
 			if(curr_y > y_coord) {
+				//cout << "passed y coord check" << endl;
 				curr_dist = (cell_center - curr_coord).length();
 				if(curr_dist < smallest_dist) {
+					//cout << "passed smallest check" << endl;
 					smallest_dist = curr_dist;
+					//cout << "curr " << curr << endl;
 					closest = curr;
 				}
 			}
 		}
 		curr = next;
 	} while (next != orig);
-
+	//cout << "closest" << closest << endl;
 	up = closest;
+	//cout << "up in function" << up << endl;
+	return;
+}
+void Cell::closest_node(Wall_Node*& closest) {
+	double y_coord = cell_center.get_Y();
+	double x_coord = cell_center.get_X();
+
+	Wall_Node* curr = left_Corner;
+	Wall_Node* next = NULL;
+	Wall_Node* orig = curr;
+
+	double curr_dist;
+	//double curr_y;
+	//double curr_x;
+	//double window = .8;
+	double smallest_dist = (curr->get_Location() -cell_center).length();
+	Coord curr_coord;
+	//Wall_Node* closest = NULL;
+	do {
+		curr_coord = curr->get_Location();
+		next = curr->get_Left_Neighbor();
+		//curr_y = curr_coord.get_Y();
+		//curr_x = curr_coord.get_X();
+		//if((curr_x < x_coord + window) && (curr_x > x_coord - window)) {
+		//if(curr_y < y_coord) {
+		curr_dist = (cell_center - curr_coord).length();
+			if(curr_dist < smallest_dist) {
+					smallest_dist = curr_dist;
+					closest = curr;
+			}
+		curr = next;
+	} while (next != orig);
+
+	//down = closest;
 	return;
 }
 
@@ -883,6 +921,7 @@ double Cell::calc_Area() {
 //	cout << "up" << up << endl;
 //	cout << "down " << down << endl;
 	if(down == NULL) {
+		cout << "Down is null" << endl;
 		exit(1);
 	}
 	double width = (right->get_Location() - left->get_Location()).length();

@@ -106,6 +106,7 @@ class Cell {
 		void closest_node_bottom(Wall_Node*& down);
 		void closest_node_left(Wall_Node*& left);
 		void closest_node_right(Wall_Node*& right);
+		void closest_node(Wall_Node*& closest);
 		void most_Up_Down(Wall_Node*& up, Wall_Node*& down);
 		void add_stress(double& new_length, double& new_force);
 		void add_strain(double& new_length);
