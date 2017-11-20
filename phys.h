@@ -14,9 +14,9 @@
 //=====================
 
 // Simulation Constants
-const double dt = .00075;
+const double dt = .001;
 const int Relaxation_Time = 3000;
-const int ADD_WALL_TIMER = 1500;
+const int ADD_WALL_TIMER = 100;
 const int ADD_CYT_TIMER = 500;
 
 const int MAX_NUM_WALL = 200;
@@ -24,16 +24,16 @@ const int MAX_NUM_CYT = 60;
 
 const int Init_Num_Cyt_Nodes = 20;
 const int Init_Wall_Nodes = 100;
-const double AREA_DOUBLED = 10;
+const double AREA_DOUBLED = 8;
 // Global Physics Constants
 const double pi = acos(-1.0);
 
 ///// Cell wall mechanical parameters
 
 const double K_BEND = .001;
-const Coord K_LINEAR_LONG = Coord(450,100);
-const Coord K_LINEAR_WIDE = Coord(450, 100);
-const double K_ADH = 25;
+const Coord K_LINEAR_LONG = Coord(450, 100);
+const Coord K_LINEAR_WIDE = Coord(100, 450);
+const double K_ADH = 20;
 const double MembrEquLen_ADH = 0.6;
 
 const double EXTERNAL_FORCE = 2;

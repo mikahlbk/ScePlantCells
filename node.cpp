@@ -478,7 +478,7 @@ Coord Wall_Node::linear_Equation(Wall_Node* wall) {
 		K_LINEAR = K_LINEAR_WIDE;
 	}
 	else {
-		K_LINEAR + K_LINEAR_LONG;
+		K_LINEAR = K_LINEAR_LONG;
 	}
 	Coord diff_vect = wall->get_Location() - my_loc;
 	double diff_len = diff_vect.length();

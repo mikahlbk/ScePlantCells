@@ -21,23 +21,21 @@
 Cell* Cell::divide(int Ti) {
 	Cell* sister = NULL;
 	//calculate area
-	cout << "in division" << endl;
+//	cout << "in division" << endl;
 	double area = this->calc_Area();
-	cout << "area calculated" << endl;
-//	if(this->rank==0){
+//	cout << "area calculated " << area << endl;
 	if(area > AREA_DOUBLED) {
-		//if(this->layer == 1) { // || (this->layer == 1)) {
-		//	cout << "Cell " << this->rank << "  passed area threshold for division" << endl;
-		//	sister = this->divide_length_wise();
-		//	cout << "divided" << endl;
-		//}
-		//else if(this->layer == 3) {
-			cout << "Cell " << this->rank << " passed area threshold for division" << endl;
+		if(this->layer == 1) { 
+			cout << "Cell " << this->rank << "  passed area threshold for division" << endl;
 			sister = this->divide_length_wise();
 			cout << "divided" << endl;
 		}
-//	}
-//	}
+		if(this->layer == 3) {
+			cout << "Cell " << this->rank << " passed area threshold for division" << endl;
+			sister = this->divide_width_wise();
+			cout << "divided" << endl;
+		}
+	}
 	return sister;
 }
 
@@ -79,16 +77,16 @@ Cell* Cell::divide_length_wise() {
 	double left_length = (left_end->get_Location() - left_start->get_Location()).length();
 	double right_length = (right_end->get_Location() - right_start->get_Location()).length();
 
-	double left_space = left_length/9;
-	double right_space = right_length/9;
-	int total_num = 8;
+	double left_space = left_length/8;
+	double right_space = right_length/8;
+	int total_num = 7;
 	//cout << "Total num:" << total_num << endl;
 	Coord left_increment = Coord(0,left_space);
 	Coord right_increment = Coord(0, right_space);
 
 	//cout << "make left side" << endl;
 	Wall_Node* curr = NULL;
-	Coord curr_coord = left_start->get_Location()+ Coord(0.015, 0);
+	Coord curr_coord= left_start->get_Location()+ Coord(0.015, 0);
 	Wall_Node* prev = left_start;
 
 	for(int i = 0; i< total_num; i++) {

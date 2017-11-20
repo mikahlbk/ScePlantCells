@@ -46,7 +46,7 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer)    {
 	this->layer = layer;
 //	int init_radius = radius;
 	this->cell_center = center;
-	double rate = (-0.25*cell_center.length() + 11.7)*2000;
+	double rate = (-0.25*cell_center.length() + 11.7)*100;
 	this->set_growth_rate(rate);
 	num_wall_nodes = 0;
 	
@@ -374,7 +374,7 @@ void Cell::wall_Node_Check() {
 	//check if cell can add a cyt or wall node
 
 	if (life_length % ADD_WALL_TIMER == ADD_WALL_TIMER-1) {
-	//	cout << "adding a wall node" << endl;
+		cout << "adding a wall node" << endl;
 		add_Wall_Node();
 	}
 	return;
@@ -382,7 +382,7 @@ void Cell::wall_Node_Check() {
 void Cell::cytoplasm_Check() {
 
 	if (life_length % growth_rate == growth_rate-1) {
-		//cout << "adding cyt node" << endl;
+		cout << "adding cyt node" << endl;
 		add_Cyt_Node();
 	}
 
@@ -886,10 +886,10 @@ double Cell::calc_Area() {
 		exit(1);
 	}
 	double width = (right->get_Location() - left->get_Location()).length();
-//	cout << "width computed" << endl;
+//	cout << "width computed " << width <<  endl;
 	double length = (up->get_Location() - down->get_Location()).length();
-//	cout << "length computed" << endl;
-	double area = pi*width*length;
+//	cout << "length computed" << length << endl;
+	double area = width*length;
 
 	return area;
 }
