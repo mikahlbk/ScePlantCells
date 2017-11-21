@@ -48,7 +48,7 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer)    {
 	this->layer = layer;
 //	int init_radius = radius;
 	this->cell_center = center;
-	double rate = (-0.25*cell_center.length() + 11.7)*10;
+	double rate = (-0.25*cell_center.length() + 11.7)*100;
 	this->set_growth_rate(rate);
 	num_wall_nodes = 0;
 	
@@ -699,7 +699,7 @@ void Cell::closest_node_top(Wall_Node*& up) {
 		curr_x = curr_coord.get_X();
 		if((curr_x < (x_coord + window)) && (curr_x > (x_coord - window))) {
 			//cout << "passed window check" << endl;
-			if(curr_y >= y_coord) {
+			if(curr_y > y_coord) {
 				//cout << "passed y coord check" << endl;
 				curr_dist = (cell_center - curr_coord).length();
 				if(curr_dist < smallest_dist) {
@@ -739,7 +739,7 @@ void Cell::closest_node_bottom(Wall_Node*& down) {
 		curr_y = curr_coord.get_Y();
 		curr_x = curr_coord.get_X();
 		if((curr_x < (x_coord + window)) && (curr_x > (x_coord - window))) {
-			if(curr_y <= y_coord) {
+			if(curr_y < y_coord) {
 				curr_dist = (cell_center - curr_coord).length();
 				if(curr_dist < smallest_dist) {
 					smallest_dist = curr_dist;
@@ -775,9 +775,12 @@ void Cell::closest_node_left(Wall_Node*& left) {
 		curr_y = curr_coord.get_Y();
 		curr_x = curr_coord.get_X();
 		if((curr_y < (y_coord + window)) && (curr_y > (y_coord - window))) {
-			if(curr_x <= x_coord) {
+			//cout << "passed window check" << endl;
+			if(curr_x < x_coord) {
+				//cout << "passed left side check" << endl;
 				curr_dist = (cell_center - curr_coord).length();
 				if(curr_dist < smallest_dist) {
+					//cout << "smallest dist" << endl;
 					smallest_dist = curr_dist;
 					closest = curr;
 				}
@@ -810,7 +813,7 @@ void Cell::closest_node_right(Wall_Node*& right) {
 		curr_y = curr_coord.get_Y();
 		curr_x = curr_coord.get_X();
 		if((curr_y < (y_coord + window)) && (curr_y > (y_coord - window))) {
-			if(curr_x >= x_coord) {
+			if(curr_x > x_coord) {
 				curr_dist = (cell_center - curr_coord).length();
 				if(curr_dist < smallest_dist) {
 					smallest_dist = curr_dist;

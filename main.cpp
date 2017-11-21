@@ -49,7 +49,7 @@ int main() {
 		//for now only one cell
 		//cout << "Ti = " << Ti << endl;
 		//Print to dataOutput and VTK files
-		if (Ti % 1  == 0) {
+		if (Ti % 100  == 0) {
 			
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {
@@ -86,7 +86,7 @@ int main() {
 		//Add cyt node/ wall node 
 		if(Ti > 1500) {
 		//	cout << "update cytoplasm" << endl;
-			//growing_Tissue.update_Cytoplasm();
+			growing_Tissue.update_Cytoplasm();
 		}
 
 		if(Ti > 1500) {

@@ -25,13 +25,13 @@ Cell* Cell::divide(int Ti) {
 	double area = this->calc_Area();
 //	cout << "area calculated " << area << endl;
 	if(area > AREA_DOUBLED) {
-		if(this->layer == 4) { 
-			cout << "Cell " << this->rank << "  passed area threshold for division" << endl;
+		if(this->layer == 1) { 
+			cout << "Cell " << this->rank << "  passed area threshold for division lengthwise" << endl;
 			sister = this->divide_length_wise();
 			cout << "divided" << endl;
 		}
-		if(this->rank == 1) {
-			cout << "Cell " << this->rank << " passed area threshold for division" << endl;
+		if(this->layer == 3) {
+			cout << "Cell " << this->rank << " passed area threshold for division widthwise" << endl;
 			sister = this->divide_width_wise();
 			cout << "divided" << endl;
 		}
@@ -46,7 +46,7 @@ Cell* Cell::divide_length_wise() {
 	//	this functoin will create a sister cell to the right
 	//	and return it to the tissue
 	bool islength = true;
-	cout << "Made new cell pointer" << endl;
+//	cout << "Made new cell pointer" << endl;
 	Cell* sister = new Cell(my_tissue);
 	Wall_Node* up = NULL;
 	Wall_Node* down = NULL;
@@ -100,7 +100,7 @@ Cell* Cell::divide_length_wise() {
 	double start_x_left = left_start->get_Location().get_X();
 	double start_x_right = right_start->get_Location().get_X();
 	
-	cout << "make left side" << endl;
+//	cout << "make left side" << endl;
 	Wall_Node* curr = NULL;
 	Coord curr_coord;
 	Wall_Node* prev = left_start;
@@ -118,7 +118,7 @@ Cell* Cell::divide_length_wise() {
 	left_end->set_Right_Neighbor(curr);
 	left_Corner = left_start;
 
-	cout << "make right side" << endl;;
+//	cout << "make right side" << endl;;
 	prev = right_start;
 	curr_x = start_x_right;
 
@@ -210,28 +210,57 @@ Cell* Cell::divide_length_wise() {
 	
 	//cout << "Finished deleting old cyt nodes" << endl;
 	
-	cout << "get most up/down and left/right for radius" << endl;
+//	cout << "get most up/down and left/right for radius" << endl;
 	Wall_Node* up_sis = NULL;
 	Wall_Node* down_sis = NULL;
 	Wall_Node* left_sis = NULL;
 	Wall_Node* right_sis = NULL;
 	this->closest_node_top(up);
 	this->closest_node_bottom(down);
+	if(up == NULL) {
+
+	cout << "this up null" << endl;
+	}
+	if(down == NULL) {
+		cout << "this down null" << endl;
+	}
 	sister->closest_node_top(up_sis);
 	sister->closest_node_bottom(down_sis);
+	if(up_sis == NULL) {
+		cout << "up sis null" << endl;
+	}
+	if(down_sis == NULL) {
+		cout << "down sis null" << endl;
+	}
 	this->closest_node_left(left);
 	this->closest_node_right(right);
+	if(left == NULL) {
+		cout << "left null" << endl;
+	}
+	if(right==NULL) {
+		cout << "right null" << endl;
+	}
 	sister->closest_node_left(left_sis);
 	sister->closest_node_right(right_sis);
+	if(left_sis == NULL) {
+
+	cout << "left sis null" << endl;
+	}
+	if(right_sis == NULL) {
+		cout << "right sis null" << endl;
+	}
+
 
 	double radius_x = ((left->get_Location() - right->get_Location()).length())*0.5;
 	double radius_y = ((up->get_Location() - down->get_Location()).length())*0.5;
+//	cout << "first radius" << endl;
 	double radius_x_s = ((left_sis->get_Location() - right_sis->get_Location()).length())*0.5;
 	double radius_y_s = ((up_sis->get_Location() - down_sis->get_Location()).length())*0.5;
+//	cout << "second radius" << endl;
 	//create new ones for each cell
 	for(int i = 0; i < new_cyt_cnt; i++) {
 		this->add_Cyt_Node_Div(radius_x, radius_y,islength);
-		sister->add_Cyt_Node_Div(radius_x_s, radius_y_s, islength);
+		sister->add_Cyt_Node_Div(radius_x_s, radius_y_s,islength);
 	}
 	return sister;
 }
@@ -242,7 +271,7 @@ Cell* Cell::divide_width_wise() {
 	//	this functoin will create a sister cell to the right
 	//	and return it to the tissue
 	bool islength = false;
-	cout << "Made new cell pointer" << endl;
+//	cout << "Made new cell pointer" << endl;
 	Cell* sister = new Cell(my_tissue);
 	Wall_Node* up = NULL;
 	Wall_Node* down = NULL;
@@ -298,7 +327,7 @@ Cell* Cell::divide_width_wise() {
 	double start_x_top = top_start->get_Location().get_X();
 	double start_x_bottom = bottom_start->get_Location().get_X();
 	
-	cout << "make left side" << endl;
+//	cout << "make left side" << endl;
 	Wall_Node* curr = NULL;
 	Coord curr_coord;
 	Wall_Node* prev = top_start;
@@ -316,7 +345,7 @@ Cell* Cell::divide_width_wise() {
 	top_end->set_Right_Neighbor(curr);
 	left_Corner = top_start;
 
-	cout << "make right side" << endl;;
+//	cout << "make right side" << endl;;
 	prev = bottom_start;
 	curr_x = start_x_bottom;
 
@@ -408,7 +437,7 @@ Cell* Cell::divide_width_wise() {
 	
 	//cout << "Finished deleting old cyt nodes" << endl;
 	
-	cout << "get most up/down and left/right for radius" << endl;
+//	cout << "get most up/down and left/right for radius" << endl;
 	Wall_Node* up_sis = NULL;
 	Wall_Node* down_sis = NULL;
 	Wall_Node* left_sis = NULL;
