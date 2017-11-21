@@ -116,9 +116,8 @@ class Cell {
 		Cell* divide_length_wise();
 		Cell* divide_width_wise();
 		//Cell* divide_width_wise(const int Ti);
-		void add_Cyt_Node_Div(double& radius_x, double& radius_y);
-		
-};
+		void add_Cyt_Node_Div(double& radius_x, double& radius_y, bool islength);
+	};
 
 
 // End Cell Class

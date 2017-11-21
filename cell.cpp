@@ -204,7 +204,7 @@ void Cell::set_Wall_Count(int& number_nodes) {
 }
 //=============================================================
 //=========================================
-// Keep Track of neighbor cells
+// Keep Track of neighbor cells and Adhesion springs
 //=========================================
 //=============================================================
 void Cell::update_Neighbor_Cells() {
@@ -246,7 +246,7 @@ void Cell::update_Neighbor_Cells() {
 }
 
 void Cell::update_adhesion_springs(int Ti) {
-	int time = Ti;
+//	int time = Ti;
 	vector<Cell*>neighbors;
 	this->get_Neighbor_Cells(neighbors);
 	Wall_Node* curr_Node = NULL;
@@ -257,18 +257,7 @@ void Cell::update_adhesion_springs(int Ti) {
 		curr_Node = left_Corner;
 		do {
 			next_Node = curr_Node->get_Left_Neighbor();
-//			if(time < Relaxation_Time) {
-//				curr_Closest = curr_Node->find_Closest_Node_Beg(neighbors);
-//			}
-//			else {
 			curr_Closest = curr_Node->find_Closest_Node(neighbors);
-//			}
-			//if(curr_Closest == NULL) {
-				//cout << "Did not find a curr closest" << endl;
-			//}
-			//else {
-				//cout << curr_Closest << endl;
-			//}
 			curr_Node->make_Connection(curr_Closest);
 			curr_Node = next_Node;
 		} while(next_Node != left_Corner);
@@ -381,6 +370,8 @@ void Cell::wall_Node_Check() {
 }
 void Cell::cytoplasm_Check() {
 
+	//check if cel should add cytoplasm node
+
 	if (life_length % growth_rate == growth_rate-1) {
 		cout << "adding cyt node" << endl;
 		add_Cyt_Node();
@@ -388,7 +379,11 @@ void Cell::cytoplasm_Check() {
 
 	return;
 }
-
+//======================================================
+//==================================
+//Functions for calibration
+//==================================
+//======================================================
 void Cell::stretch() {
 	//stretch the cell
 	Wall_Node* curr = left_Corner;
@@ -406,6 +401,57 @@ void Cell::stretch() {
 	} while (next != orig);
 	return;
 }
+
+double Cell::extensional_Length() {
+ 
+	double length = (most_right->get_Location() - most_left->get_Location()).length();
+
+	return length;
+}
+
+double Cell::tensile_Length() {
+	double length = 0;
+	Wall_Node* curr = most_up;
+	Wall_Node* next = NULL;
+	do {
+
+		next = curr->get_Left_Neighbor();
+		length += (next->get_Location()-curr->get_Location()).length();
+		curr = next;
+	} while (next != most_down);
+	
+	return length;
+}
+
+double Cell::total_Force() {
+	Wall_Node* curr = left_Corner;
+	Wall_Node* next = NULL;
+	Wall_Node* orig = curr;
+	Coord force_sum;
+	double force;
+
+	do {
+		force_sum += curr->get_f_EXT();
+		next = curr->get_Left_Neighbor();
+		curr = next;
+	} while (next != curr);
+
+	force = force_sum.length();
+
+	return force;
+}
+
+void Cell::add_strain(double& new_length) {
+	strain_vec.push_back(new_length);
+	return;
+}
+
+void Cell::add_stress(double& new_length, double& new_force) {
+	double curr_stress = new_force/new_length;
+	stress_vec.push_back(curr_stress);
+	return;
+}
+
 //===========================================================
 //==================================
 // Output Functions
@@ -594,20 +640,29 @@ void Cell::add_Cyt_Node() {
 	return;
 }
 
-void Cell::add_Cyt_Node_Div(double& radius_x, double& radius_y) {
+void Cell::add_Cyt_Node_Div(double& radius_x, double& radius_y, bool islength) {
 	//USING POSITIONS OF CELL CENTER FOR CYT NODE ALLOCATION
 	// ---distributes more evenly throughout start cell
-	double offset = 0.3;
+	double offsetx = 0;
+	double offsety = 0;
+	if(islength) {
+		offsetx = 0.4;
+		offsety = 0.8;
+	}
+	else {
+		offsetx = 0.8;
+		offsety = 0.4;
+	}
+	
 	Coord location;
 	Cyt_Node* cyt;
 	double x;
 	double y;
-	
-	double rand_radius = (static_cast<double>(rand()) / RAND_MAX)*offset*radius_x;
-	double rand_radius_y = (static_cast<double>(rand()) / RAND_MAX)*offset*radius_y;
+	double rand_radius_x = (static_cast<double>(rand()) / RAND_MAX)*offsetx*radius_x;
+	double rand_radius_y = (static_cast<double>(rand())/ RAND_MAX)*offsety*radius_y; 
 	double rand_angle = (static_cast<double>(rand()) / RAND_MAX)*2*pi;
-	x = cell_center.get_X()+ rand_radius*cos(rand_angle);
-	y = cell_center.get_Y()+ rand_radius*sin(rand_angle);
+	x = cell_center.get_X()+ rand_radius_x*cos(rand_angle);
+	y = cell_center.get_Y()+ rand_radius_y*sin(rand_angle);
 	location = Coord(x,y);
 	cyt = new Cyt_Node(location,this);
 	cyt_nodes.push_back(cyt);
@@ -615,45 +670,9 @@ void Cell::add_Cyt_Node_Div(double& radius_x, double& radius_y) {
 	return;
 }
 
-void Cell::most_Left_Right(Wall_Node*& left, Wall_Node*& right) {
-	Wall_Node* curr = left_Corner;
-	Wall_Node* next = NULL;
-	Wall_Node* orig = curr;
-	
-	double x_Coord = cell_center.get_X();
-	double curr_Coord;
-	double x_max = x_Coord;
-	double x_min = x_Coord;
-	
-	do {
-		curr_Coord = curr->get_Location().get_X();
-		//cout << curr_Coord << "is curr coord" << endl;
-		next = curr->get_Left_Neighbor();
-		if(curr_Coord > x_max) {
-			x_max = curr_Coord;
-			right = curr;
-			//cout << "right is: " << right << endl;
-
-		}
-		else if(curr_Coord < x_min) {
-			x_min = curr_Coord;
-			left = curr;
-
-		}
-		curr = next;
-	} while (next != orig);
-	return;
-}
-
-	
-double Cell::extensional_Length() {
- 
-	double length = (most_right->get_Location() - most_left->get_Location()).length();
-
-	return length;
-}
-
 void Cell::closest_node_top(Wall_Node*& up) {
+	//finds node with highest y value that is
+	//in a certain window around x value of center
 	double y_coord = cell_center.get_Y();
 	double x_coord = cell_center.get_X();
 
@@ -664,22 +683,22 @@ void Cell::closest_node_top(Wall_Node*& up) {
 	double curr_dist;
 	double curr_y;
 	double curr_x;
-	double window = .2;
-	double smallest_dist = 100;
+	double smallest_dist = 500;
 	Coord curr_coord;
 	Wall_Node* closest = NULL;
+
 	do {
 		curr_coord = curr->get_Location();
 		next = curr->get_Left_Neighbor();
 		curr_y = curr_coord.get_Y();
 		curr_x = curr_coord.get_X();
-		if((curr_x < x_coord + window) && (curr_x > x_coord - window)) {
-		//	cout << "passed window check" << endl;
-			if(curr_y > y_coord) {
+		if((curr_x < (x_coord + window)) && (curr_x > (x_coord - window))) {
+			//cout << "passed window check" << endl;
+			if(curr_y >= y_coord) {
 				//cout << "passed y coord check" << endl;
 				curr_dist = (cell_center - curr_coord).length();
 				if(curr_dist < smallest_dist) {
-					//cout << "passed smallest check" << endl;
+				//cout << "passed smallest check" << endl;
 					smallest_dist = curr_dist;
 					//cout << "curr " << curr << endl;
 					closest = curr;
@@ -691,39 +710,6 @@ void Cell::closest_node_top(Wall_Node*& up) {
 	//cout << "closest" << closest << endl;
 	up = closest;
 	//cout << "up in function" << up << endl;
-	return;
-}
-void Cell::closest_node(Wall_Node*& closest) {
-	double y_coord = cell_center.get_Y();
-	double x_coord = cell_center.get_X();
-
-	Wall_Node* curr = left_Corner;
-	Wall_Node* next = NULL;
-	Wall_Node* orig = curr;
-
-	double curr_dist;
-	//double curr_y;
-	//double curr_x;
-	//double window = .8;
-	double smallest_dist = (curr->get_Location() -cell_center).length();
-	Coord curr_coord;
-	//Wall_Node* closest = NULL;
-	do {
-		curr_coord = curr->get_Location();
-		next = curr->get_Left_Neighbor();
-		//curr_y = curr_coord.get_Y();
-		//curr_x = curr_coord.get_X();
-		//if((curr_x < x_coord + window) && (curr_x > x_coord - window)) {
-		//if(curr_y < y_coord) {
-		curr_dist = (cell_center - curr_coord).length();
-			if(curr_dist < smallest_dist) {
-					smallest_dist = curr_dist;
-					closest = curr;
-			}
-		curr = next;
-	} while (next != orig);
-
-	//down = closest;
 	return;
 }
 
@@ -738,17 +724,17 @@ void Cell::closest_node_bottom(Wall_Node*& down) {
 	double curr_dist;
 	double curr_y;
 	double curr_x;
-	double window = .2;
-	double smallest_dist = 100;
+	double smallest_dist = 500;
 	Coord curr_coord;
 	Wall_Node* closest = NULL;
+
 	do {
 		curr_coord = curr->get_Location();
 		next = curr->get_Left_Neighbor();
 		curr_y = curr_coord.get_Y();
 		curr_x = curr_coord.get_X();
-		if((curr_x < x_coord + window) && (curr_x > x_coord - window)) {
-			if(curr_y < y_coord) {
+		if((curr_x < (x_coord + window)) && (curr_x > (x_coord - window))) {
+			if(curr_y <= y_coord) {
 				curr_dist = (cell_center - curr_coord).length();
 				if(curr_dist < smallest_dist) {
 					smallest_dist = curr_dist;
@@ -774,17 +760,17 @@ void Cell::closest_node_left(Wall_Node*& left) {
 	double curr_dist;
 	double curr_y;
 	double curr_x;
-	double window = .2;
-	double smallest_dist = 100;
+	double smallest_dist = 500;
 	Coord curr_coord;
 	Wall_Node* closest = NULL;
+
 	do {
 		curr_coord = curr->get_Location();
 		next = curr->get_Left_Neighbor();
 		curr_y = curr_coord.get_Y();
 		curr_x = curr_coord.get_X();
-		if((curr_y < y_coord + window) && (curr_y > y_coord - window)) {
-			if(curr_x < x_coord) {
+		if((curr_y < (y_coord + window)) && (curr_y > (y_coord - window))) {
+			if(curr_x <= x_coord) {
 				curr_dist = (cell_center - curr_coord).length();
 				if(curr_dist < smallest_dist) {
 					smallest_dist = curr_dist;
@@ -810,8 +796,7 @@ void Cell::closest_node_right(Wall_Node*& right) {
 	double curr_dist;
 	double curr_y;
 	double curr_x;
-	double window = .2;
-	double smallest_dist = 100;
+	double smallest_dist = 500;
 	Coord curr_coord;
 	Wall_Node* closest = NULL;
 	do {
@@ -819,8 +804,8 @@ void Cell::closest_node_right(Wall_Node*& right) {
 		next = curr->get_Left_Neighbor();
 		curr_y = curr_coord.get_Y();
 		curr_x = curr_coord.get_X();
-		if((curr_y < y_coord + window) && (curr_y > y_coord - window)) {
-			if(curr_x > x_coord) {
+		if((curr_y < (y_coord + window)) && (curr_y > (y_coord - window))) {
+			if(curr_x >= x_coord) {
 				curr_dist = (cell_center - curr_coord).length();
 				if(curr_dist < smallest_dist) {
 					smallest_dist = curr_dist;
@@ -832,76 +817,6 @@ void Cell::closest_node_right(Wall_Node*& right) {
 	} while (next != orig);
 
 	right = closest;
-	return;
-}
-void Cell::most_Up_Down(Wall_Node*& up, Wall_Node*& down) {
-	update_Cell_Center();
-	
-	double y_Coord = cell_center.get_Y();
-	Wall_Node* curr = left_Corner;
-	Wall_Node* next = NULL;
-	Wall_Node* orig = curr;
-	double y_max = y_Coord;
-	double y_min = y_Coord;
-	double curr_Coord;
-	
-	do {
-		curr_Coord = curr->get_Location().get_Y();
-		next = curr->get_Left_Neighbor();
-		if(curr_Coord > y_max) {
-			y_max = curr_Coord;
-			up = curr;
-		}
-		else if(curr_Coord < y_min) {
-			y_min = curr_Coord;
-			down = curr;
-		}
-		curr = next;
-	} while (next != orig);
-	
-	return;
-}
-
-double Cell::tensile_Length() {
-	double length = 0;
-	Wall_Node* curr = most_up;
-	Wall_Node* next = NULL;
-	do {
-
-		next = curr->get_Left_Neighbor();
-		length += (next->get_Location()-curr->get_Location()).length();
-		curr = next;
-	} while (next != most_down);
-	
-	return length;
-}
-
-double Cell::total_Force() {
-	Wall_Node* curr = left_Corner;
-	Wall_Node* next = NULL;
-	Wall_Node* orig = curr;
-	Coord force_sum;
-	double force;
-
-	do {
-		force_sum += curr->get_f_EXT();
-		next = curr->get_Left_Neighbor();
-		curr = next;
-	} while (next != curr);
-
-	force = force_sum.length();
-
-	return force;
-}
-
-void Cell::add_strain(double& new_length) {
-	strain_vec.push_back(new_length);
-	return;
-}
-
-void Cell::add_stress(double& new_length, double& new_force) {
-	double curr_stress = new_force/new_length;
-	stress_vec.push_back(curr_stress);
 	return;
 }
 
@@ -920,10 +835,6 @@ double Cell::calc_Area() {
 //	cout << "left " << left << endl;
 //	cout << "up" << up << endl;
 //	cout << "down " << down << endl;
-	if(down == NULL) {
-		cout << "Down is null" << endl;
-		exit(1);
-	}
 	double width = (right->get_Location() - left->get_Location()).length();
 //	cout << "width computed " << width <<  endl;
 	double length = (up->get_Location() - down->get_Location()).length();
