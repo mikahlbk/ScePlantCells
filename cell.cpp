@@ -36,6 +36,7 @@ Cell::Cell(Tissue* tissue) {
 	//left_Corner assigned
 	time_since_division = 500;
 	life_length = 0;
+	num_cyt_nodes = 0;
 }
 
 
@@ -187,11 +188,7 @@ void Cell::get_Stress(vector<double>& stress) {
 }
 
 int Cell::get_Node_Count() {
-	int node_count = 0;
-
-	node_count = num_wall_nodes + num_cyt_nodes;
-
-	return node_count;
+	return num_wall_nodes + num_cyt_nodes;
 }
 
 void Cell::set_Left_Corner(Wall_Node*& new_left_corner) {
