@@ -49,8 +49,7 @@ int main() {
 		//for now only one cell
 		//cout << "Ti = " << Ti << endl;
 		//Print to dataOutput and VTK files
-//	if(Ti > 115000){
-		if (Ti % 100  == 0) {
+		if (Ti % 1  == 0) {
 			
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {
@@ -73,8 +72,7 @@ int main() {
 			ofs.close();	
 			out++;
 		}
-//	}
-
+		
 		if (Ti % 100 == 0) {
 			cout << "Simulation still running. Ti: " << Ti << endl;
 		}
@@ -88,7 +86,7 @@ int main() {
 		//Add cyt node/ wall node 
 		if(Ti > 1500) {
 		//	cout << "update cytoplasm" << endl;
-			growing_Tissue.update_Cytoplasm();
+			//growing_Tissue.update_Cytoplasm();
 		}
 
 		if(Ti > 1500) {
@@ -107,12 +105,13 @@ int main() {
 			}
 		}
 		//Division if necessary
-		if(Ti == 1500) {
+		if(Ti > 1500) {
 		//	if(Ti% 10 == 0) {
-				cout << "Check if cells need to divide" << endl;
+			//	cout << "Check if cells need to divide" << endl;
 				growing_Tissue.cell_Division(Ti);
 			//}
 		}
+		
 		//cout << "division success" << endl;
 		/*if((Ti > 268583)) {
 			growing_Tissue.stretching_Test();
@@ -123,14 +122,14 @@ int main() {
 		}*/
 		// Update Each cell's neighboring cells
 		
-		cout << "do forces" << endl;
+		//cout << "do forces" << endl;
 		//Calculate new forces on cells and nodes
 		growing_Tissue.calc_New_Forces();
-		cout << "calculated forces" << endl;
+		//cout << "calculated forces" << endl;
 		//Update node positions
 		growing_Tissue.update_Cell_Locations();
 		//updates cell centers
-		cout << "updated node positions" << endl;
+		//cout << "updated node positions" << endl;
 		
 	}
 

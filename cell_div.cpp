@@ -21,16 +21,16 @@
 Cell* Cell::divide(int Ti) {
 	Cell* sister = NULL;
 	//calculate area
-	cout << "in division function" << endl;
+//	cout << "in division function" << endl;
 	double area = this->calc_Area();
-	cout << "area calculated " << area << endl;
+//	cout << "area calculated " << area << endl;
 	if(area > AREA_DOUBLED) {
-		if(this->layer == 1) { 
+		if(this->layer == 4) { 
 			cout << "Cell " << this->rank << "  passed area threshold for division" << endl;
 			sister = this->divide_length_wise();
 			cout << "divided" << endl;
 		}
-		if(this->layer == 0) {
+		if(this->rank == 1) {
 			cout << "Cell " << this->rank << " passed area threshold for division" << endl;
 			sister = this->divide_width_wise();
 			cout << "divided" << endl;

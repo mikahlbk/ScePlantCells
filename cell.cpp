@@ -34,6 +34,7 @@ Cell::Cell(Tissue* tissue) {
 	//cell center computed
 	//num_wall nodes computer
 	//left_Corner assigned
+	time_since_division = 500;
 	life_length = 0;
 }
 
@@ -46,7 +47,7 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer)    {
 	this->layer = layer;
 //	int init_radius = radius;
 	this->cell_center = center;
-	double rate = (-0.25*cell_center.length() + 11.7)*100;
+	double rate = (-0.25*cell_center.length() + 11.7)*10;
 	this->set_growth_rate(rate);
 	num_wall_nodes = 0;
 	
@@ -202,6 +203,11 @@ void Cell::set_Wall_Count(int& number_nodes) {
 	this->num_wall_nodes = number_nodes;
 	return;
 }
+
+void Cell::reset_time_since_division() {
+	this->time_since_division = 0;
+	return;
+}
 //=============================================================
 //=========================================
 // Keep Track of neighbor cells and Adhesion springs
@@ -355,6 +361,7 @@ void Cell::update_Cell_Center() {
 
 void Cell::update_Life_Length() {
 	life_length++;
+	time_since_division++;
 //	cout << life_length << endl;
 	return;
 }
@@ -371,10 +378,11 @@ void Cell::wall_Node_Check() {
 void Cell::cytoplasm_Check() {
 
 	//check if cel should add cytoplasm node
-
-	if (life_length % growth_rate == growth_rate-1) {
-		cout << "adding cyt node" << endl;
-		add_Cyt_Node();
+	if(time_since_division > 100) {
+		if (life_length % growth_rate == growth_rate-1) {
+			cout << "adding cyt node" << endl;
+			add_Cyt_Node();
+		}
 	}
 
 	return;

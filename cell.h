@@ -28,6 +28,7 @@ class Cell {
 		int num_cyt_nodes;
 		int layer;
 		int growth_rate;
+		int time_since_division;
 		Coord cell_center;
 		int num_wall_nodes;
 		vector<double> strain_vec;
@@ -62,6 +63,7 @@ class Cell {
 		void set_Rank(const int id);
 		void set_Layer(int layer);
 		void set_growth_rate(double rate);
+		void reset_time_since_division();
 		void get_Neighbor_Cells(vector<Cell*>& cells);
 		void get_Strain(vector<double>& strain);
 		void get_Stress(vector<double>& stress);

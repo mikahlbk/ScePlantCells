@@ -190,14 +190,16 @@ void Tissue::update_Adhesion(int Ti) {
 void Tissue::cell_Division(int Ti) {
 	Cell* new_cell = NULL;
 	int number_cells = cells.size();
-	cout << "number cells in tissue is: " << number_cells<< endl;
+//	cout << "number cells in tissue is: " << number_cells<< endl;
 	for(unsigned int i = 0; i < number_cells;i++) {
-		cout << "current divide cell: " << i << endl;
+		//cout << "current divide cell: " << i << endl;
 		new_cell = cells.at(i)->divide(Ti);
-		cout << "Completed division check" << endl;
+		//cout << "Completed division check" << endl;
 		if (new_cell !=NULL) {
-			cout << "new cell not null setting rank" << endl;
+		//	cout << "new cell not null setting rank" << endl;
 			new_cell->set_Rank(num_cells);
+			cells.at(i)->reset_time_since_division();
+			new_cell->reset_time_since_division();
 			num_cells++;
 			cells.push_back(new_cell);
 			//cout << "updating neighbors on tissue level" << endl;
@@ -205,7 +207,7 @@ void Tissue::cell_Division(int Ti) {
 			this->update_Adhesion(Ti);
 			//cout<< "done with division" << endl;	
 		}
-	cout << "Updating Division" << endl;
+	//cout << "Updating Division" << endl;
 	//cout << "i is what: " << i << endl;
 	}	
 	return;
