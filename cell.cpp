@@ -48,7 +48,9 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer)    {
 	this->layer = layer;
 //	int init_radius = radius;
 	this->cell_center = center;
-	double rate = (-0.25*cell_center.length() + 11.7)*100;
+	this->wuschel = -0.0162*pow(cell_center.length(),2) + 0.3798*cell_center.length() + 7.8680;
+	this->cytokinin = -0.0713*pow(cell_center.length(),2) + 7.0761*cell_center.length() + 12.6624; 
+	double rate = wuschel*100 + cytokinin*10;
 	this->set_growth_rate(rate);
 	num_wall_nodes = 0;
 	
@@ -851,10 +853,32 @@ double Cell::calc_Area() {
 
 	return area;
 }
+///=================================
+///==========================
+//Measurements for Division
+///==========================
+///==================================
 
-
-
+double Cell::compute_pressure() {
+	Wall_Node* curr_wall = left_Corner;
+	Wall_Node* next = NULL;
+	Wall_Node* orig = curr_wall;
+	Coord force;
+	double curr_length = 0;
+	double total_length = 0;
+	double pressure = 0;
+	do {
+		next = curr_wall->get_Left_Neighbor();
+		force += curr_wall->get_CytForce();
+		curr_length = (curr_wall->get_Location() - next->get_Location()).length();
+		total_length += curr_length;
+		curr_wall = next;
+	} while (next != orig);
 	
+	pressure = force.length()/total_length;
+
+	return pressure;
+}
 
 
 

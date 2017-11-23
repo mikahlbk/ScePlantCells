@@ -30,6 +30,8 @@ class Cell {
 		int growth_rate;
 		int time_since_division;
 		Coord cell_center;
+		double cytokinin;
+		double wuschel;
 		int num_wall_nodes;
 		vector<double> strain_vec;
 		vector<double> stress_vec;
@@ -88,6 +90,7 @@ class Cell {
 		void wall_Node_Check();
 		void cytoplasm_Check();
 		void stretch();
+		double compute_pressure();
 		//Output Functions
 		void print_Data_Output(ofstream& ofs);
 	//	int update_VTK_Indices(int& id);

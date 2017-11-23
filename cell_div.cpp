@@ -25,6 +25,7 @@ Cell* Cell::divide(int Ti) {
 	double area = this->calc_Area();
 //	cout << "area calculated " << area << endl;
 	if(area > AREA_DOUBLED) {
+		//add in iff statement for amount of cytokinin and wuschel and logintudinal vs. radial pressure
 		if(this->layer == 1) { 
 			cout << "Cell " << this->rank << "  passed area threshold for division lengthwise" << endl;
 			sister = this->divide_length_wise();
