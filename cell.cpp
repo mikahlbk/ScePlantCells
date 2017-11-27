@@ -45,12 +45,13 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer)    {
 	this->rank = rank;
 	this->my_tissue = tiss;
 	num_cyt_nodes = 0;
+	time_since_division = 500;
 	this->layer = layer;
 //	int init_radius = radius;
 	this->cell_center = center;
 	this->wuschel = -0.0162*pow(cell_center.length(),2) + 0.3798*cell_center.length() + 7.8680;
 	this->cytokinin = -0.0713*pow(cell_center.length(),2) + 7.0761*cell_center.length() + 12.6624; 
-	double rate = wuschel*100 + cytokinin*10;
+	double rate = 100;
 	this->set_growth_rate(rate);
 	num_wall_nodes = 0;
 	

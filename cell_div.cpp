@@ -26,7 +26,7 @@ Cell* Cell::divide(int Ti) {
 //	cout << "area calculated " << area << endl;
 	if(area > AREA_DOUBLED) {
 		//add in iff statement for amount of cytokinin and wuschel and logintudinal vs. radial pressure
-		if(this->layer == 1) { 
+		if(this->rank == 0) { 
 			cout << "Cell " << this->rank << "  passed area threshold for division lengthwise" << endl;
 			sister = this->divide_length_wise();
 			cout << "divided" << endl;
@@ -80,35 +80,47 @@ Cell* Cell::divide_length_wise() {
 	delete up->get_Right_Neighbor()->get_Right_Neighbor();
 	delete up;
 
-	double left_slope = (left_end->get_Location().get_Y() - left_start->get_Location().get_Y())/(left_end->get_Location().get_X() - left_start->get_Location().get_X());
-	double right_slope = (right_end->get_Location().get_Y() - right_start->get_Location().get_Y())/(right_end->get_Location().get_X() - right_start->get_Location().get_X());
+//	double left_slope = (left_end->get_Location().get_Y() - left_start->get_Location().get_Y())/(left_end->get_Location().get_X() - left_start->get_Location().get_X());
+//	double right_slope = (right_end->get_Location().get_Y() - right_start->get_Location().get_Y())/(right_end->get_Location().get_X() - right_start->get_Location().get_X());
 	
-	double b_left = left_end->get_Location().get_Y()-left_slope*left_end->get_Location().get_X();
-	double b_right = right_end->get_Location().get_Y()-right_slope*right_end->get_Location().get_X();
+//	double b_left = left_end->get_Location().get_Y()-left_slope*left_end->get_Location().get_X();
+//	double b_right = right_end->get_Location().get_Y()-right_slope*right_end->get_Location().get_X();
 
 	double left_length = (left_end->get_Location() - left_start->get_Location()).length();
 	double right_length = (right_end->get_Location() - right_start->get_Location()).length();
 
 	int total_num_left = (int) (left_length/(MembrEquLen*2));
 	int total_num_right = (int) (right_length/(MembrEquLen*2));
+	
+	//bool left = false;
+	//bool right = false;
 
-	double x_left = sqrt(pow(left_end->get_Location().get_X() - left_start->get_Location().get_X(),2));
-	double x_right = sqrt(pow(right_end->get_Location().get_X() - right_start->get_Location().get_X(),2));
+	double x_left = left_end->get_Location().get_X() - left_start->get_Location().get_X();
+	double x_right = right_end->get_Location().get_X() - right_start->get_Location().get_X();
 
+	double y_left = left_end->get_Location().get_Y() - left_start->get_Location().get_Y();
+	double y_right = right_end->get_Location().get_Y() - right_start->get_Location().get_Y();
+	 
 	double delta_x_left = x_left/total_num_left;
 	double delta_x_right = x_right/total_num_right;
+	
+	double delta_y_left = y_left/total_num_left;
+	double delta_y_right = y_right/total_num_left;
 
 	double start_x_left = left_start->get_Location().get_X();
 	double start_x_right = right_start->get_Location().get_X();
-	
+	double start_y_left = left_start->get_Location().get_Y();
+	double start_y_right = right_start->get_Location().get_Y();
+
 //	cout << "make left side" << endl;
 	Wall_Node* curr = NULL;
-	Coord curr_coord;
-	Wall_Node* prev = left_start;
 	double curr_x = start_x_left;
+	double curr_y = start_y_left;
+	Coord curr_coord = Coord(curr_x +.04,curr_y);
+	Wall_Node* prev = left_start;
+	
 	for(unsigned int i = 0; i < total_num_left; i++) {
-		curr_x = curr_x + delta_x_left;
-		curr_coord = Coord(curr_x + 0.04, left_slope*curr_x + b_left);
+		curr_coord = curr_coord + Coord(delta_x_left, delta_y_left);
 		curr = new Wall_Node(curr_coord, this);
 		//cout << "Setting neighbors: " << i << endl;
 		prev->set_Left_Neighbor(curr);
@@ -121,11 +133,12 @@ Cell* Cell::divide_length_wise() {
 
 //	cout << "make right side" << endl;;
 	prev = right_start;
+	curr_y = start_y_right;
 	curr_x = start_x_right;
+	curr_coord = Coord(curr_x-.04, curr_y);
 
 	for(int i = 0; i< total_num_right; i++) {
-		curr_x = curr_x + delta_x_right;
-		curr_coord = Coord(curr_x - .04, right_slope*curr_x + b_right);
+		curr_coord = curr_coord + Coord(delta_x_right,delta_y_right);;
 		curr = new Wall_Node(curr_coord, sister);
 		//cout << "Setting neighbors: " << i << endl;
 		prev->set_Right_Neighbor(curr);
