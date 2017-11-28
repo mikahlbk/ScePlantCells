@@ -90,7 +90,9 @@ class Cell {
 		void wall_Node_Check();
 		void cytoplasm_Check();
 		void stretch();
-		double compute_pressure();
+		double compute_pressure(Wall_Node* start, Wall_Node* end);
+		double compute_sigma_trans();
+		double compute_sigma_long();
 		//Output Functions
 		void print_Data_Output(ofstream& ofs);
 	//	int update_VTK_Indices(int& id);

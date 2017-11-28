@@ -51,7 +51,7 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer)    {
 	this->cell_center = center;
 	this->wuschel = -0.0162*pow(cell_center.length(),2) + 0.3798*cell_center.length() + 7.8680;
 	this->cytokinin = -0.0713*pow(cell_center.length(),2) + 7.0761*cell_center.length() + 12.6624; 
-	double rate = 100;
+	double rate = 800;
 	this->set_growth_rate(rate);
 	num_wall_nodes = 0;
 	
@@ -860,10 +860,10 @@ double Cell::calc_Area() {
 ///==========================
 ///==================================
 
-double Cell::compute_pressure() {
-	Wall_Node* curr_wall = left_Corner;
+double Cell::compute_pressure(Wall_Node* start, Wall_Node* end) {
+	Wall_Node* curr_wall = start;
 	Wall_Node* next = NULL;
-	Wall_Node* orig = curr_wall;
+	Wall_Node* orig = end;
 	Coord force;
 	double curr_length = 0;
 	double total_length = 0;
@@ -881,6 +881,141 @@ double Cell::compute_pressure() {
 	return pressure;
 }
 
+double Cell::compute_sigma_long() {
+	Wall_Node* top = NULL;
+	this->closest_node_top(top);
+	double length = ((cell_center - top->get_Location()).length())*(0.5);
+	double y_cut_off = cell_center.get_Y() + length;
+	Wall_Node* left = NULL;
+	Wall_Node* right = NULL;
+	this->closest_node_left(left);
+	this->closest_node_right(right);
+	Wall_Node* curr = left;
+	Wall_Node* start = NULL;
+	Wall_Node* end = NULL;
+	bool possible = true;
+	do {
+		if(curr->get_Location().get_Y() > y_cut_off) {
+			start = curr;
+			possible = false;
+		}  
+		curr = curr->get_Right_Neighbor();
+	} while (possible);
+
+	curr = right;
+	possible = true;
+	do {
+		if(curr->get_Location().get_Y() > y_cut_off) {
+			end = curr;
+			possible = false;
+		}
+		curr = curr->get_Left_Neighbor();
+	} while (possible);
+	double pressure_top = this->compute_pressure(start, end);
+	
+	Wall_Node* bottom = NULL;
+	this->closest_node_bottom(bottom);
+	length = ((cell_center - bottom->get_Location()).length())*(0.5);
+	y_cut_off = cell_center.get_Y() - length;
+//	Wall_Node* left = NULL;
+//	Wall_Node* right = NULL;
+//	this->most_left_node(left);
+//	this->most_right_node(right);
+	curr = left;
+	start = NULL;
+	end = NULL;
+	possible = true;
+	do {
+		if(curr->get_Location().get_Y() < y_cut_off) {
+			start = curr;
+			possible = false;
+		}  
+		curr = curr->get_Left_Neighbor();
+	} while (possible);
+
+	curr = right;
+	possible = true;
+	do {
+		if(curr->get_Location().get_Y() < y_cut_off) {
+			end = curr;
+			possible = false;
+		}
+		curr = curr->get_Right_Neighbor();
+	} while (possible);
+	double pressure_bottom = this->compute_pressure(start, end);
+
+	double sigma_long = pressure_top + pressure_bottom;
+	return sigma_long;
+}
+
+double Cell::compute_sigma_trans() {
+
+	Wall_Node* left = NULL;
+	this->closest_node_left(left);
+	double length = ((cell_center - left->get_Location()).length())*(0.5);
+	double x_cut_off = cell_center.get_X() + length;
+	Wall_Node* top = NULL;
+	Wall_Node* bottom = NULL;
+	this->closest_node_top(top);
+	this->closest_node_bottom(bottom);
+	Wall_Node* curr = top;
+	Wall_Node* start = NULL;
+	Wall_Node* end = NULL;
+	bool possible = true;
+	do {
+		if(curr->get_Location().get_X() < x_cut_off) {
+			start = curr;
+			possible = false;
+		}  
+		curr = curr->get_Left_Neighbor();
+	} while (possible);
+
+	curr = bottom;
+	possible = true;
+	do {
+		if(curr->get_Location().get_X() < x_cut_off) {
+			end = curr;
+			possible = false;
+		}
+		curr = curr->get_Right_Neighbor();
+	} while (possible);
+	double pressure_left = this-> compute_pressure(start, end);
+
+	Wall_Node* right = NULL;
+	this->closest_node_right(right);
+	length = ((cell_center - right->get_Location()).length())*(0.5);
+	x_cut_off = cell_center.get_X() + length;
+	//Wall_Node* top = NULL;
+	//Wall_Node* bottom = NULL;
+	//this->most_top_node(top);
+	//this->most_bottom_node(bottom);
+	curr = bottom;
+	start = NULL;
+	end = NULL;
+	possible = true;
+	do {
+		if(curr->get_Location().get_X() < x_cut_off) {
+			start = curr;
+			possible = false;
+		}  
+		curr = curr->get_Left_Neighbor();
+	} while (possible);
+
+	curr = top;
+	possible = true;
+	do {
+		if(curr->get_Location().get_X() < x_cut_off) {
+			end = curr;
+			possible = false;
+		}
+		curr = curr->get_Right_Neighbor();
+	} while (possible);
+	double pressure_right = this->compute_pressure(start, end);
+
+
+	double sigma_trans = pressure_left + pressure_right;
+	return sigma_trans;
+}
 
 
 
