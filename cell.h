@@ -24,6 +24,8 @@ class Cell {
 	private:
 		int rank;
 		Tissue* my_tissue;
+	//	double wuschel
+	//	double cytokinin
 		int life_length;
 		int num_cyt_nodes;
 		int layer;
@@ -69,6 +71,8 @@ class Cell {
 		void get_Neighbor_Cells(vector<Cell*>& cells);
 		void get_Strain(vector<double>& strain);
 		void get_Stress(vector<double>& stress);
+		double get_WUS_concentration() {return wuschel;}
+		double get_CYT_concentration() {return cytokinin;}
 		Wall_Node* get_Left_Corner() {return left_Corner;}
 		void set_Left_Corner(Wall_Node*& new_left_corner);
 		void set_Wall_Count(int& number_nodes);
@@ -98,7 +102,9 @@ class Cell {
 	//	int update_VTK_Indices(int& id);
 	//	void print_VTK_Adh(ofstream& ofs);
 		void print_VTK_Points(ofstream& ofs, int& count);
-		void print_VTK_Scalars(ofstream& ofs);
+		void print_VTK_Scalars_Force(ofstream& ofs);
+		void print_VTK_Scalars_WUS(ofstream& ofs);
+		void print_VTK_Scalars_CYT(ofstream& ofs);
 		void print_VTK_Vectors(ofstream& ofs);
 		
 		// Growth of cell

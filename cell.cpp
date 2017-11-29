@@ -37,6 +37,8 @@ Cell::Cell(Tissue* tissue) {
 	time_since_division = 500;
 	life_length = 0;
 	num_cyt_nodes = 0;
+	wuschel = 0;
+	cytokinin = 0;
 }
 
 
@@ -259,15 +261,15 @@ void Cell::update_adhesion_springs(int Ti) {
 	Wall_Node* next_Node = NULL;
 	Wall_Node* curr_Closest = NULL;
 	double curr_len = 0;
-	for(int i = 0; i<num_wall_nodes;i++) {
-		curr_Node = left_Corner;
+//	for(int i = 0; i<num_wall_nodes;i++) {
+	curr_Node = left_Corner;
 		do {
 			next_Node = curr_Node->get_Left_Neighbor();
 			curr_Closest = curr_Node->find_Closest_Node(neighbors);
 			curr_Node->make_Connection(curr_Closest);
 			curr_Node = next_Node;
 		} while(next_Node != left_Corner);
-	}
+	//}
 }
 
 //===============================================================
@@ -535,7 +537,7 @@ void Cell::print_VTK_Points(ofstream& ofs, int& count) {
 	return;
 }
 
-void Cell::print_VTK_Scalars(ofstream& ofs) {
+void Cell::print_VTK_Scalars_Force(ofstream& ofs) {
 
 	Wall_Node* curr_wall = left_Corner;
 	do {
@@ -551,6 +553,37 @@ void Cell::print_VTK_Scalars(ofstream& ofs) {
 		ofs << force.length() << endl;
 	}
 
+	return;
+}
+
+void Cell::print_VTK_Scalars_WUS(ofstream& ofs) {
+
+	//double concentration = 0;
+	Wall_Node* curr_wall = left_Corner;
+	do {
+		double concentration = curr_wall->get_My_Cell()->get_WUS_concentration();
+		ofs << concentration << endl;
+
+		curr_wall = curr_wall->get_Left_Neighbor();
+		
+	} while (curr_wall != left_Corner);
+
+
+	for(unsigned int i = 0; i < cyt_nodes.size(); i++) {
+		double concentration = cyt_nodes.at(i)->get_My_Cell()->get_WUS_concentration();
+		ofs << concentration << endl;
+	}
+	return;
+}
+
+void Cell::print_VTK_Scalars_CYT(ofstream& ofs) {
+
+//	double concentration = 0;
+
+	for(unsigned int i = 0; i < cyt_nodes.size(); i++) {
+		double concentration = cyt_nodes.at(i)->get_My_Cell()->get_CYT_concentration();
+		ofs << concentration << endl;
+	}
 	return;
 }
 

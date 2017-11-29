@@ -248,7 +248,7 @@ void Tissue::make_Vectors() {
 	return;
 }
 
-void Tissue::print_Data_Output(ofstream & ofs) {
+void Tissue::print_Data_Output(ofstream& ofs) {
 	return;
 }
 
@@ -329,18 +329,18 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 
 
 	ofs << "POINT_DATA " << num_Points << endl;
-	ofs << "SCALARS magnitude float " << 1 << endl;
+	ofs << "SCALARS magnitude double " << 1 << endl;
 	ofs << "LOOKUP_TABLE default" << endl;
 	for (unsigned int i = 0; i < cells.size(); i++) {
-		cells.at(i)->print_VTK_Scalars(ofs);
+		cells.at(i)->print_VTK_Scalars_WUS(ofs);
 	}
 
 	ofs << endl;
 
-	ofs << "VECTORS force float" << endl;
-	for (unsigned int i = 0; i < cells.size(); i++) {
-		cells.at(i)->print_VTK_Vectors(ofs);
-	}
+//	ofs << "VECTORS force float" << endl;
+//	for (unsigned int i = 0; i < cells.size(); i++) {
+//		cells.at(i)->print_VTK_Vectors(ofs);
+//	}
 
 	
 
