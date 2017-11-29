@@ -21,7 +21,10 @@ using namespace std;
 
 //============================
 
-int main() {
+int main(int argc, char* argv[]) {
+
+	string anim_folder = argv[1];
+
 	int start = clock();
 	
 	string init_tissue = "cell_start.txt";
@@ -38,7 +41,7 @@ int main() {
 	int digits;
 	string format = ".vtk";
 	string Number;
-	string initial = "Animation/Plant_Cell_";
+	string initial = "/Plant_Cell_";
 	string Filename;
 	ofstream ofs;
 	int out = 0; //counter for creating output/vtk files
@@ -65,7 +68,7 @@ int main() {
 				Number = "0" + to_string(out);
 			}
 
-			Filename = initial + Number + format;
+			Filename = anim_folder +  initial + Number + format;
 
 			ofs.open(Filename.c_str());
 			growing_Tissue.print_VTK_File(ofs);
@@ -84,17 +87,17 @@ int main() {
 		growing_Tissue.update_Life_Length();
 		//cout << "life length updated" << endl;	
 		//Add cyt node/ wall node 
-		if(Ti > 1500) {
+		if(Ti > 500) {
 		//	cout << "update cytoplasm" << endl;
 			growing_Tissue.update_Cytoplasm();
 		}
 
-		if(Ti > 1500) {
+		if(Ti > 500) {
 		//	cout << "Updated Wall" << endl;
 			growing_Tissue.update_Wall();
 		}
 		
-		if((Ti > 1000)) {
+		if((Ti > 200)) {
 			if (Ti% 100  == 0 ) {
 			//	cout << "Find Neighbors" << endl;
 				growing_Tissue.update_Neighbor_Cells();
@@ -107,7 +110,7 @@ int main() {
 		//Division if necessary
 		if(Ti > 1500) {
 		//	if(Ti% 10 == 0) {
-			//	cout << "Check if cells need to divide" << endl;
+			cout << "Check if cells need to divide" << endl;
 				growing_Tissue.cell_Division(Ti);
 			//}
 		}

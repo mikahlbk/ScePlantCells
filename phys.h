@@ -24,16 +24,16 @@ const int MAX_NUM_CYT = 60;
 
 const int Init_Num_Cyt_Nodes = 20;
 const int Init_Wall_Nodes = 100;
-const double AREA_DOUBLED = 8;
+const double AREA_DOUBLED = 6;
 // Global Physics Constants
 const double pi = acos(-1.0);
 const double window = .8;
 ///// Cell wall mechanical parameters
 
-const double K_BEND = .001;
+const double K_BEND = .1;
 const Coord K_LINEAR_LONG = Coord(450, 100);
 const Coord K_LINEAR_WIDE = Coord(100, 450);
-const double K_ADH = 20;
+const double K_ADH = 30;
 const double MembrEquLen_ADH = 0.6;
 
 const double EXTERNAL_FORCE = 2;
