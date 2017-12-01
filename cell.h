@@ -56,6 +56,7 @@ class Cell {
 		int get_Rank() {return rank;}
 		int get_Life_Length() {return life_length;}
 		int get_Cytoplasm_Count() {return num_cyt_nodes;}
+		//int get_Wall_Count() {return num_wall_nodes;}
 		int get_Layer() {return layer;}
 		int get_Growth_Rate() {return growth_rate;}
 		Coord get_Cell_Center() {return cell_center;}
@@ -99,8 +100,8 @@ class Cell {
 		double compute_sigma_long();
 		//Output Functions
 		void print_Data_Output(ofstream& ofs);
-	//	int update_VTK_Indices(int& id);
-	//	void print_VTK_Adh(ofstream& ofs);
+		int update_VTK_Indices(int& id);
+		void print_VTK_Adh(ofstream& ofs);
 		void print_VTK_Points(ofstream& ofs, int& count);
 		void print_VTK_Scalars_Force(ofstream& ofs);
 		void print_VTK_Scalars_WUS(ofstream& ofs);

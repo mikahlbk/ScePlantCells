@@ -24,10 +24,10 @@ Coord Node::get_Location() {
 Coord Node::get_Force() {
 	return new_force;
 }
-//void Node::update_VTK_Id(int id) {
-//	vtk_id = id;
-//	return;
-//}
+void Node::update_VTK_Id(int id) {
+	vtk_id = id;
+	return;
+}
 void Node::update_Location() {
 	my_loc += new_force * dt;
     return;
@@ -509,6 +509,7 @@ Coord Wall_Node::linear_Equation_ADH(Wall_Node*& wall) {
 
 //==========================================================
 //Adhesion functions
+
 Wall_Node* Wall_Node::find_Closest_Node(vector<Cell*>& neighbors) {
 	Wall_Node* curr = NULL;
 	Wall_Node* orig = NULL;
@@ -536,7 +537,6 @@ Wall_Node* Wall_Node::find_Closest_Node(vector<Cell*>& neighbors) {
 	}
 	return closest;
 }
-
 Wall_Node* Wall_Node::find_Closest_Node_Beg(vector<Cell*>& neighbors) {
 	Wall_Node* curr = NULL;
 	Wall_Node* orig = NULL;
@@ -588,7 +588,9 @@ void Wall_Node::make_Connection(Wall_Node* curr_Closest) {
 			curr_Closest->set_Closest(this, curr_dist);
 		}
 	}
+	return;
 }
+
 //==========================================================
 // End of node.cpp
 

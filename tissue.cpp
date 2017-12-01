@@ -101,7 +101,10 @@ void Tissue::update_Cytoplasm() {
 void Tissue::update_Wall() {
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->wall_Node_Check();
+		cout<< "Wall Count Cell " << i << ": " << cells.at(i)->get_Wall_Count() << endl;
 	}
+
+
 
 	return;
 }
@@ -252,7 +255,7 @@ void Tissue::print_Data_Output(ofstream& ofs) {
 	return;
 }
 
-/*int Tissue::update_VTK_Indices() {
+int Tissue::update_VTK_Indices() {
 
 	int id = 0;
 	int rel_cnt = 0;
@@ -267,10 +270,10 @@ void Tissue::print_Data_Output(ofstream& ofs) {
 //	cout << "rel_cnt: " << rel_cnt << endl;
 
 	return rel_cnt;
-}*/
+}
 
 void Tissue::print_VTK_File(ofstream& ofs) {
-//	int rel_cnt = update_VTK_Indices();
+	int rel_cnt = update_VTK_Indices();
 
 
 	ofs << "# vtk DataFile Version 3.0" << endl;
@@ -297,7 +300,7 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 	}
 
 	ofs << endl;
-	ofs << "CELLS " << cells.size() << ' ' << num_Points + start_points.size() << endl;
+	ofs << "CELLS " << cells.size()+rel_cnt << ' ' << (num_Points + start_points.size()) + (rel_cnt*3) << endl;
 
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		ofs << cells.at(i)->get_Node_Count();
@@ -309,21 +312,21 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 	}
 	
 //	//output pairs of node indices to draw adh line
-//	for(unsigned int i = 0; i < cells.size(); i++) {
-//		cells.at(i)->print_VTK_Adh(ofs);
-//	}
+	for(unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->print_VTK_Adh(ofs);
+	}
 
 	ofs << endl;
 
-	ofs << "CELL_TYPES " << start_points.size() << endl;
+	ofs << "CELL_TYPES " << start_points.size() + rel_cnt << endl;
 	for (unsigned int i = 0; i < start_points.size(); i++) {
 		ofs << 2 << endl;
 	}
 
-//	for(unsigned int i = 0; i < rel_cnt; i++) {
+	for(unsigned int i = 0; i < rel_cnt; i++) {
 //		//type for adh relationship
-//		ofs << 3 << endl;
-//	}
+		ofs << 3 << endl;
+	}
 
 	ofs << endl;
 
@@ -337,10 +340,10 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 
 	ofs << endl;
 
-//	ofs << "VECTORS force float" << endl;
-//	for (unsigned int i = 0; i < cells.size(); i++) {
-//		cells.at(i)->print_VTK_Vectors(ofs);
-//	}
+	ofs << "VECTORS force float" << endl;
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->print_VTK_Vectors(ofs);
+	}
 
 	
 

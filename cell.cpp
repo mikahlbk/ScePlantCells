@@ -267,13 +267,14 @@ void Cell::update_adhesion_springs(int Ti) {
 	double curr_len = 0;
 //	for(int i = 0; i<num_wall_nodes;i++) {
 	curr_Node = left_Corner;
-		do {
-			next_Node = curr_Node->get_Left_Neighbor();
-			curr_Closest = curr_Node->find_Closest_Node(neighbors);
-			curr_Node->make_Connection(curr_Closest);
-			curr_Node = next_Node;
-		} while(next_Node != left_Corner);
+	do {
+		next_Node = curr_Node->get_Left_Neighbor();
+		curr_Closest = curr_Node->find_Closest_Node(neighbors);
+		curr_Node->make_Connection(curr_Closest);
+		curr_Node = next_Node;
+	} while(next_Node != left_Corner);
 	//}
+	return;
 }
 
 //===============================================================
@@ -376,7 +377,7 @@ void Cell::wall_Node_Check() {
 	//check if cell can add a cyt or wall node
 
 	if (life_length % ADD_WALL_TIMER == ADD_WALL_TIMER-1) {
-		cout << "adding a wall node" << endl;
+		//cout << "adding a wall node" << endl;
 		add_Wall_Node();
 	}
 	return;
@@ -385,7 +386,7 @@ void Cell::cytoplasm_Check() {
 
 	//check if cel should add cytoplasm node
 	if(time_since_division > 100) {
-		if (life_length % growth_rate == growth_rate-1) {
+		if (life_length % ADD_CYT_TIMER == ADD_CYT_TIMER-1) {
 			cout << "adding cyt node" << endl;
 			add_Cyt_Node();
 		}
@@ -479,11 +480,11 @@ void Cell::print_Data_Output(ofstream& ofs) {
 	return;
 }
 
-//int Cell::update_VTK_Indices(int& id) {
+int Cell::update_VTK_Indices(int& id) {
 //	cout << "ID before: " << id << endl;
-//	int rel_cnt = 0;
+	int rel_cnt = 0;
 
-/*	Wall_Node* curr_wall = left_Corner;
+	Wall_Node* curr_wall = left_Corner;
 	do { 
 		curr_wall->update_VTK_Id(id);
 		id++;
@@ -516,7 +517,7 @@ void Cell::print_VTK_Adh(ofstream& ofs) {
 		curr_wall = curr_wall->get_Left_Neighbor();
 	} while(curr_wall != left_Corner);
 	return;
-}*/
+}
 void Cell::print_VTK_Points(ofstream& ofs, int& count) {
 
 	Wall_Node* curr_wall = left_Corner;
