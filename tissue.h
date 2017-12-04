@@ -29,9 +29,10 @@ class Tissue {
 		Tissue(string filename);
 		
 		void get_Cells(vector<Cell*>& cells);
-		void update_Life_Length();
+		void update_Cell_Cycle(int Ti);
 		void update_Wall();
 		void update_Cytoplasm();
+		void update_Num_Cells(Cell*& new_Cell);
 		void calc_New_Forces();
 		void update_Cell_Locations();
 		void update_Neighbor_Cells();

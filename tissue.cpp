@@ -83,31 +83,37 @@ void Tissue::get_Cells(vector<Cell*>& cells) {
 	return;
 }
 
-void Tissue::update_Life_Length() {
+void Tissue::update_Cell_Cycle(int Ti) {
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		//cout << "updating cell i" << endl;
-		cells.at(i)->update_Life_Length();
+		cells.at(i)->update_Cell_Progress(Ti);
 	}
 	return;
 }
 
-void Tissue::update_Cytoplasm() {
+/*void Tissue::update_Cytoplasm() {
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->cytoplasm_Check();
 	}
 	return;
-}
+}*/
 
 void Tissue::update_Wall() {
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->wall_Node_Check();
-		cout<< "Wall Count Cell " << i << ": " << cells.at(i)->get_Wall_Count() << endl;
+		//cout<< "Wall Count Cell " << i << ": " << cells.at(i)->get_Wall_Count() << endl;
 	}
 
 
 
 	return;
 }
+void Tissue::update_Num_Cells(Cell*& new_Cell) {
+	num_cells++;
+	cells.push_back(new_Cell);
+	return;
+}
+
 void Tissue::calc_New_Forces() {
 	Cell* curr = NULL;
 	for (unsigned int i = 0; i < cells.size(); i++) {
@@ -186,34 +192,8 @@ void Tissue::update_Adhesion(int Ti) {
 	
 	for(unsigned int i=0;i<cells.size();i++) {
 		//cout << "Updating adhesion for cell" << endl;
-		cells.at(i)->update_adhesion_springs(time);
+		cells.at(i)->update_adhesion_springs();
 	}
-}
-
-void Tissue::cell_Division(int Ti) {
-	Cell* new_cell = NULL;
-	int number_cells = cells.size();
-//	cout << "number cells in tissue is: " << number_cells<< endl;
-	for(unsigned int i = 0; i < number_cells;i++) {
-		//cout << "current divide cell: " << i << endl;
-		new_cell = cells.at(i)->divide(Ti);
-		//cout << "Completed division check" << endl;
-		if (new_cell !=NULL) {
-		//	cout << "new cell not null setting rank" << endl;
-			new_cell->set_Rank(num_cells);
-			cells.at(i)->reset_time_since_division();
-			new_cell->reset_time_since_division();
-			num_cells++;
-			cells.push_back(new_cell);
-			//cout << "updating neighbors on tissue level" << endl;
-			this->update_Neighbor_Cells();
-			this->update_Adhesion(Ti);
-			//cout<< "done with division" << endl;	
-		}
-	//cout << "Updating Division" << endl;
-	//cout << "i is what: " << i << endl;
-	}	
-	return;
 }
 
 void Tissue::make_Vectors() {

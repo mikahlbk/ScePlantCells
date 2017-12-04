@@ -537,33 +537,7 @@ Wall_Node* Wall_Node::find_Closest_Node(vector<Cell*>& neighbors) {
 	}
 	return closest;
 }
-Wall_Node* Wall_Node::find_Closest_Node_Beg(vector<Cell*>& neighbors) {
-	Wall_Node* curr = NULL;
-	Wall_Node* orig = NULL;
-	Wall_Node* next = NULL;
-	Cell* curr_cell = NULL;
-	Wall_Node* closest = NULL;
-	double curr_dist = 0;
-	double smallest = 100;
-	for(int i = 0; i < neighbors.size(); i++) {
-		curr_cell = neighbors.at(i);
-		//find the closest node on curr_Side
-		curr = curr_cell->get_Left_Corner();
-		orig = curr;
-		do{
-			next = curr->get_Left_Neighbor();
-			curr_dist = (this->my_loc - curr->get_Location()).length();
-			if(curr_dist < ADHThreshBeg) {
-				if(curr_dist < smallest) {
-					closest = curr;
-					smallest = curr_dist;
-				}
-			}
-			curr = next;
-		} while (next != orig);
-	}
-	return closest;
-}
+
 
 void Wall_Node::make_Connection(Wall_Node* curr_Closest) {
 	double curr_dist = 0;

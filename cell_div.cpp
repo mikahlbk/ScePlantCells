@@ -18,13 +18,13 @@
 #include "tissue.h"
 //==========================
 
-Cell* Cell::divide(int Ti) {
+Cell* Cell::divide() {
 	Cell* sister = NULL;
 	//calculate area
 //	cout << "in division function" << endl;
-	double area = this->calc_Area();
+//	double area = this->calc_Area();
 //	cout << "area calculated " << area << endl;
-	if(area > AREA_DOUBLED) {
+//	if(area > AREA_DOUBLED) {
 		//add in iff statement for amount of cytokinin and wuschel and logintudinal vs. radial pressure
 		if(this->layer == 1) {
 			cout << "Cell " << this->rank << "  passed area threshold for division lengthwise" << endl;
@@ -36,7 +36,6 @@ Cell* Cell::divide(int Ti) {
 			sister = this->divide_width_wise();
 			cout << "divided" << endl;
 		}
-	}
 	return sister;
 }
 
@@ -204,8 +203,16 @@ Cell* Cell::divide_length_wise() {
 	//update layer information
 	sister->set_Layer(this->layer);
 	//cout << "update growth rate" << endl;
-	sister->set_growth_rate(this->growth_rate);
-		
+//	sister->set_growth_rate(this->growth_rate);
+	
+	this->area = calc_Area();
+	double new_area = sister->calc_Area();
+	sister->set_Area(new_area);
+	
+	this->reset_Cell_Progress();
+	sister->reset_Cell_Progress();
+	this->Cell_Progress_add_node = area;
+	sister->set_Cell_Progress_add_node(new_area);
 	//cout << "Updated Angles and cell centers"<< endl;
 	
 	//distribute cyt nodes between sister cells
@@ -431,8 +438,16 @@ Cell* Cell::divide_width_wise() {
 	//update layer information
 	sister->set_Layer(this->layer);
 	//cout << "update growth rate" << endl;
-	sister->set_growth_rate(this->growth_rate);
-		
+//	sister->set_growth_rate(this->growth_rate);
+	
+	this->area = calc_Area();
+	double new_area = sister->calc_Area();
+	sister->set_Area(new_area);	
+	
+	this->reset_Cell_Progress();
+	sister->reset_Cell_Progress();
+	this->Cell_Progress_add_node = area;
+	sister->set_Cell_Progress_add_node(new_area);
 	//cout << "Updated Angles and cell centers"<< endl;
 	
 	//distribute cyt nodes between sister cells

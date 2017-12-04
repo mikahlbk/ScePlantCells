@@ -21,13 +21,15 @@ using namespace std;
 
 //============================
 
-int main(int argc, char* argv[]) {
+int main(){
+	
+//int argc, char* argv[]) {
 
-	string anim_folder = argv[1];
+//string anim_folder = argv[1];
 
 	int start = clock();
 	
-	string init_tissue = "cell_start.txt";
+	string init_tissue = "new_cells.txt";
 	
 	//make new cell objects in tissue
 	Tissue growing_Tissue(init_tissue);
@@ -41,7 +43,7 @@ int main(int argc, char* argv[]) {
 	int digits;
 	string format = ".vtk";
 	string Number;
-	string initial = "/Plant_Cell_";
+	string initial = "Animation/Plant_Cell_";
 	string Filename;
 	ofstream ofs;
 	int out = 0; //counter for creating output/vtk files
@@ -68,7 +70,7 @@ int main(int argc, char* argv[]) {
 				Number = "0" + to_string(out);
 			}
 
-			Filename = anim_folder +  initial + Number + format;
+			Filename = initial + Number + format;
 
 			ofs.open(Filename.c_str());
 			growing_Tissue.print_VTK_File(ofs);
@@ -82,39 +84,30 @@ int main(int argc, char* argv[]) {
 		
 	
 		// Tissue Growth
-		//cout << "update life length" << endl;
-
-		growing_Tissue.update_Life_Length();
-		//cout << "life length updated" << endl;	
+		
+		//cout << "update cell cycle of each cell" << endl;
+		//if(Ti > 1500) {
+		growing_Tissue.update_Cell_Cycle(Ti);
+		//}
 		//Add cyt node/ wall node 
-		if(Ti > 500) {
 		//	cout << "update cytoplasm" << endl;
-			growing_Tissue.update_Cytoplasm();
+		//growing_Tissue.update_Cytoplasm();
+		
+		//	cout << "Updated Wall" << endl;
+		growing_Tissue.update_Wall();
+		
+		
+		if (Ti% 100  == 0 ) {
+			//	cout << "Find Neighbors" << endl;
+			growing_Tissue.update_Neighbor_Cells();
 		}
 
-		if(Ti > 500) {
-		//	cout << "Updated Wall" << endl;
-			growing_Tissue.update_Wall();
+		if(Ti% 100 == 0) {
+			//cout << "Finding adhesion points" << endl;
+			growing_Tissue.update_Adhesion(Ti);
 		}
 		
-		if((Ti > 200)) {
-			if (Ti% 100  == 0 ) {
-			//	cout << "Find Neighbors" << endl;
-				growing_Tissue.update_Neighbor_Cells();
-		//	}
-		//	if(Ti%10 == 0) {
-			//	cout << "Make Adhesion" << endl;
-				growing_Tissue.update_Adhesion(Ti);
-			}
-		}
-		//Division if necessary
-		if(Ti > 1500) {
-		//	if(Ti% 10 == 0) {
-			cout << "Check if cells need to divide" << endl;
-				growing_Tissue.cell_Division(Ti);
-			//}
-		}
-		
+	
 		//cout << "division success" << endl;
 		/*if((Ti > 268583)) {
 			growing_Tissue.stretching_Test();
