@@ -28,8 +28,8 @@ void Node::update_VTK_Id(int id) {
 	vtk_id = id;
 	return;
 }
-void Node::update_Location() {
-	my_loc += new_force * dt;
+void Node::update_Location(double& new_damping) {
+	my_loc += new_force*dt*new_damping;
     return;
 }
 
@@ -473,16 +473,17 @@ Coord Wall_Node::linear_Equation(Wall_Node* wall) {
 	
 	//use spring constant variables
 	Coord F_lin;
-	Coord K_LINEAR;
-	if(this->get_My_Cell()->get_Layer() == 1) {
-		K_LINEAR = K_LINEAR_WIDE;
-	}
-	else {
-		K_LINEAR = K_LINEAR_LONG;
-	}
+	Coord k_linear = this->get_My_Cell()->get_K_LINEAR();
+//	Coord K_LINEAR;
+//	if(this->get_My_Cell()->get_Layer() == 1) {
+//		K_LINEAR = K_LINEAR_WIDE;
+//	}
+//	else {
+//		K_LINEAR = K_LINEAR_LONG;
+//	}
 	Coord diff_vect = wall->get_Location() - my_loc;
 	double diff_len = diff_vect.length();
-	Coord scaled_k = K_LINEAR*(diff_len - MembrEquLen);
+	Coord scaled_k = k_linear*(diff_len - MembrEquLen);
 	F_lin = (diff_vect/diff_len).distribute(scaled_k);
 
 	return F_lin;	

@@ -23,13 +23,15 @@ class Cell {
 
 	private:
 		int rank;
+		double damping;
 		Tissue* my_tissue;
 		double Cell_Progress;
 		double Cell_Progress_add_node;
+		Coord K_LINEAR;
 		int num_cyt_nodes;
 		int layer;
 		int life_length;
-		double area;
+		//double area;
 		//int growth_rate;
 		Coord cell_center;
 		double cytokinin;
@@ -60,6 +62,7 @@ class Cell {
 		void get_Cyt_Nodes(vector<Cyt_Node*>& cyts);
 		Tissue* get_Tissue() {return my_tissue;}
 		Wall_Node* get_Wall_Nodes() {return left_Corner;}
+		void set_Damping(double& new_damping);
 		void set_Rank(const int id);
 		void set_Layer(int layer);
 		void set_Area(double& new_area);
@@ -67,9 +70,11 @@ class Cell {
 		void set_Cell_Progress_add_node(double& new_area);
 		void update_Life_Length();
 		void set_growth_rate(double rate);
+		double get_Damping(){return damping;}
 		void get_Neighbor_Cells(vector<Cell*>& cells);
 		void get_Strain(vector<double>& strain);
 		void get_Stress(vector<double>& stress);
+		Coord get_K_LINEAR() {return K_LINEAR;}
 		double get_WUS_concentration() {return wuschel;}
 		double get_CYT_concentration() {return cytokinin;}
 		Wall_Node* get_Left_Corner() {return left_Corner;}
@@ -119,6 +124,8 @@ class Cell {
 		void add_stress(double& new_length, double& new_force);
 		void add_strain(double& new_length);
 		double calc_Area();
+		void calc_WUS();
+		void calc_CYT();
 		//Division 
 		Cell* divide();
 		Cell* divide_length_wise();

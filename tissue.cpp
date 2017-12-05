@@ -315,7 +315,7 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 	ofs << "SCALARS magnitude double " << 1 << endl;
 	ofs << "LOOKUP_TABLE default" << endl;
 	for (unsigned int i = 0; i < cells.size(); i++) {
-		cells.at(i)->print_VTK_Scalars_CYT(ofs);
+		cells.at(i)->print_VTK_Scalars_WUS(ofs);
 	}
 
 	ofs << endl;

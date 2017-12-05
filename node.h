@@ -30,7 +30,7 @@ class Node {
         //    all nodes will use the exact same function
         virtual Coord get_Location();
 		virtual Coord get_Force();
-		virtual void update_Location();
+		virtual void update_Location(double& new_damping);
        	virtual void update_VTK_Id(int id);
 		virtual int get_VTK_Id() {return vtk_id;}
 		//other functions might be executed differently based on

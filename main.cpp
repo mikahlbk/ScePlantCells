@@ -29,7 +29,7 @@ int main(){
 
 	int start = clock();
 	
-	string init_tissue = "new_cells.txt";
+	string init_tissue = "cell_start.txt";
 	
 	//make new cell objects in tissue
 	Tissue growing_Tissue(init_tissue);

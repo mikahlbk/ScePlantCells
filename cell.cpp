@@ -10,6 +10,7 @@
 #include <vector>
 #include <cstdlib>
 #include <ctime>
+#include <random>
 
 #include "phys.h"
 #include "coord.h"
@@ -34,11 +35,14 @@ Cell::Cell(Tissue* tissue) {
 	//at time of division
 	//cell center computed at time of division
 	//num_wall nodes computed at time of division
+	num_wall_nodes = 0;
 	//left_Corner assigned at time of division
 	//WUS computed based on new cell center
 	wuschel = 0;
 	//cytokinin computed based on new cell center
 	cytokinin = 0;
+	Cell_Progress = 0;
+	Cell_Progress_add_node = 0;
 }
 
 
@@ -52,14 +56,15 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer)    {
 //	int init_radius = radius;
 	this->cell_center = center;
 //	cout << "length: " << cell_center.get_Y() << endl;
-	this->wuschel = 0.0246*pow(cell_center.length(),2) + -1.5659*cell_center.length() + 23.5785;
-	//cout << "wuschel: " << wuschel << endl;
-	this->cytokinin = -.0713*pow(cell_center.length()*.1,2) + .10761*cell_center.length()*.1 + 12.6624; 
-//	cout << "cytokinin: " << cytokinin << endl;
-	double rate = 0.5;
-//	this->set_growth_rate(rate);
 	num_wall_nodes = 0;
 	life_length = 0;
+	Cell_Progress = 0;
+	Cell_Progress_add_node = 0;
+	this->calc_WUS();
+	this->calc_CYT();
+	double K_LINEAR_Y = .1540*pow(wuschel,3) + -4.8350*pow(wuschel,2) + 54.2901*wuschel + -50.7651;
+	double K_LINEAR_X = -13.2177*wuschel + 473.7440;
+	this->K_LINEAR = Coord(K_LINEAR_X, K_LINEAR_Y);
 	//rough estimates for cell sizing
 	int num_Init_Wall_Nodes = Init_Wall_Nodes;
 	double angle_increment = (2*pi)/num_Init_Wall_Nodes;
@@ -124,9 +129,13 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer)    {
 	update_Wall_Equi_Angles();
 	//update wall angles
 	update_Wall_Angles();
-	area = this->calc_Area();
-	Cell_Progress = 0;
-	Cell_Progress_add_node = calc_Area();
+	//set damping for cells that act as anchor points
+	if(layer == 6) {
+		this->damping = .0001;
+	}
+	else {
+		this->damping = 1;
+	}
 }
 
 
@@ -170,19 +179,18 @@ void Cell::set_Rank(const int id) {
 	return;
 }
 
-void Cell::set_Layer(int layer) {
-	this->layer = layer;
+void Cell::set_Damping(double& new_damping) {
+	this->damping = new_damping;
 	return;
 }
-void Cell::set_growth_rate(double growth_rate) {
-//	this->growth_rate = growth_rate;
+void Cell::set_Layer(int layer) {
+	this->layer = layer;
 	return;
 }
 void Cell::get_Neighbor_Cells(vector<Cell*>& cells) {
 	cells = neigh_cells;
 	return;
 }
-
 void Cell::get_Strain(vector<double>& strain) {
 	strain = this->strain_vec;
 	return;
@@ -206,10 +214,10 @@ void Cell::set_Wall_Count(int& number_nodes) {
 	this->num_wall_nodes = number_nodes;
 	return;
 }
-void Cell::set_Area(double& new_area){
+/*void Cell::set_Area(double& new_area){
 	area = new_area;
 	return;
-}
+}*/
 void Cell::reset_Cell_Progress(){
 	this->Cell_Progress = 0;
 
@@ -219,6 +227,17 @@ void Cell::set_Cell_Progress_add_node(double& new_area) {
 	this->Cell_Progress_add_node = new_area;
 	return;
 }
+void Cell::calc_WUS() {
+	this->wuschel = 0.0246*pow(cell_center.length(),2) + -1.8659*cell_center.length() + 28.5785;
+	//cout << "wuschel: " << wuschel << endl;
+	return;
+}
+void Cell::calc_CYT() {
+	this->cytokinin = -.0713*pow(cell_center.length()*.1,2) + .10761*cell_center.length()*.1 + 10.6624; 
+	//	cout << "cytokinin: " << cytokinin << endl;
+	return;
+}
+
 //=============================================================
 //=========================================
 // Keep Track of neighbor cells and Adhesion springs
@@ -309,8 +328,11 @@ void Cell::calc_New_Forces() {
 
 void Cell::update_Node_Locations() {
 	//update cyt nodes
+	double new_damping = 0;
 	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
-		cyt_nodes.at(i)->update_Location();
+		new_damping = cyt_nodes.at(i)->get_My_Cell()->get_Damping();
+		cyt_nodes.at(i)->update_Location(new_damping);
+
 	}
 
 	//update wall nodes
@@ -318,7 +340,8 @@ void Cell::update_Node_Locations() {
 	Wall_Node* orig = curr;
 
 	do {
-		curr->update_Location();
+		new_damping = curr->get_My_Cell()->get_Damping();
+		curr->update_Location(new_damping);
 		curr = curr->get_Left_Neighbor();
 	
 	} while(curr != orig);
@@ -865,18 +888,17 @@ void Cell::closest_node_right(Wall_Node*& right) {
 void Cell::update_Cell_Progress(int Ti) {
 	Cell* new_Cell= NULL;
 	vector<Cell*> cells;
+	this->update_Life_Length();
 	this->my_tissue->get_Cells(cells);
 	int number_cells = cells.size();
-	double sigma = (((double) rand())/RAND_MAX) -1;
+	double sigma = (((double) rand()/(double) RAND_MAX))*.004 - .002;
 //	cout << "Sigma: " << sigma << endl;
-	this->area = calc_Area();
-//	cout << "Area: " << area << endl;
-//  double rate = .018;
-	Cell_Progress = Cell_Progress + GROWTH*(1+sigma)*area*dt;
+	double rate = (.002+sigma)*exp(.018*dt*life_length);
+	Cell_Progress = Cell_Progress + rate*dt;
 	//cout << "growth rate: " << rate << endl;
 	//cout<< "new: " << Cell_Progress << endl;
 	//cout << "Old: " << Cell_Progress_add_node << endl;
-	if(area > AREA_DOUBLED) {
+	if(Cell_Progress >= 1) {
 		new_Cell = this->divide();
 		new_Cell->set_Rank(number_cells);
 		my_tissue->update_Num_Cells(new_Cell);

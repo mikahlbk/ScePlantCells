@@ -198,21 +198,29 @@ Cell* Cell::divide_length_wise() {
 	//update cell center
 	this->update_Cell_Center();
 	sister->update_Cell_Center();
-
+	this->calc_WUS();
+	sister->calc_WUS();
+	this->calc_CYT();
+	sister->calc_CYT();
+	double K_LINEAR_Y = .1540*pow(wuschel,3) + -4.8350*pow(wuschel,2) + 54.2901*wuschel + -50.7651;
+	double K_LINEAR_X = -13.2177*wuschel + 473.7440;
+	this->K_LINEAR = Coord(K_LINEAR_X, K_LINEAR_Y);
 	//cout << "update layer" << endl;
 	//update layer information
 	sister->set_Layer(this->layer);
 	//cout << "update growth rate" << endl;
 //	sister->set_growth_rate(this->growth_rate);
 	
-	this->area = calc_Area();
-	double new_area = sister->calc_Area();
-	sister->set_Area(new_area);
+//	this->area = calc_Area();
+//	double new_area = sister->calc_Area();
+//	sister->set_Area(new_area);
 	
-	this->reset_Cell_Progress();
-	sister->reset_Cell_Progress();
-	this->Cell_Progress_add_node = area;
-	sister->set_Cell_Progress_add_node(new_area);
+//	this->reset_Cell_Progress();
+//	sister->reset_Cell_Progress();
+//	this->Cell_Progress_add_node = area;
+//	sister->set_Cell_Progress_add_node(new_area);
+	double new_damping = this->get_Damping();
+	sister->set_Damping(new_damping);
 	//cout << "Updated Angles and cell centers"<< endl;
 	
 	//distribute cyt nodes between sister cells
@@ -433,23 +441,31 @@ Cell* Cell::divide_width_wise() {
 	//update cell center
 	this->update_Cell_Center();
 	sister->update_Cell_Center();
-
+	this->calc_WUS();
+	sister->calc_WUS();
+	this->calc_CYT();
+	sister->calc_CYT();
+	double K_LINEAR_Y = .1540*pow(wuschel,3) + -4.8350*pow(wuschel,2) + 54.2901*wuschel + -50.7651;
+	double K_LINEAR_X = -13.2177*wuschel + 473.7440;
+	this->K_LINEAR = Coord(K_LINEAR_X, K_LINEAR_Y);
 	//cout << "update layer" << endl;
 	//update layer information
 	sister->set_Layer(this->layer);
 	//cout << "update growth rate" << endl;
 //	sister->set_growth_rate(this->growth_rate);
 	
-	this->area = calc_Area();
-	double new_area = sister->calc_Area();
-	sister->set_Area(new_area);	
+//	this->area = calc_Area();
+//	double new_area = sister->calc_Area();
+//	sister->set_Area(new_area);	
 	
-	this->reset_Cell_Progress();
-	sister->reset_Cell_Progress();
-	this->Cell_Progress_add_node = area;
-	sister->set_Cell_Progress_add_node(new_area);
+//	this->reset_Cell_Progress();
+//	sister->reset_Cell_Progress();
+//	this->Cell_Progress_add_node = area;
+//	sister->set_Cell_Progress_add_node(new_area);
 	//cout << "Updated Angles and cell centers"<< endl;
 	
+	double new_damping = this->get_Damping();
+	sister->set_Damping(new_damping);
 	//distribute cyt nodes between sister cells
 	//cout << "deleting cyt nodes" << endl;
 	

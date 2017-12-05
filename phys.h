@@ -45,7 +45,7 @@ const double MembrEquLen = .0625;
 const double MEMBR_THRESH_LENGTH = 0.1; 
 
 //damping parameter
-const double damping = 1;
+//const double damping = 1;
 
 ///// Subcellular element parameters for membrane - membrane interactions
 const double U_MM =  3.90625;
