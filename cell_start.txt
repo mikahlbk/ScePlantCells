@@ -1,19 +1,19 @@
 CellRank:0
 Center:-2.9,0
 Radius:1.25
-Layer:3
+Layer:6
 End_Cell
 
 CellRank:1
 Center:0, 0
 Radius:1.25
-Layer:3
+Layer:6
 End_Cell
 
 CellRank:2
 Center:2.9,0
 Radius:1.25
-Layer:1
+Layer:6
 End_Cell
 
 CellRank:3
@@ -31,7 +31,7 @@ End_Cell
 CellRank:5
 Center:2.9,2.9
 Radius:1.25
-Layer:1
+Layer:3
 End_Cell
 
 CellRank:6

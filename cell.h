@@ -108,7 +108,7 @@ class Cell {
 		void print_VTK_Vectors(ofstream& ofs);
 		
 		// Growth of cell
-		Wall_Node* find_Largest_Length();
+		void find_Largest_Length(Wall_Node* first, Wall_Node* second);
 		void add_Wall_Node();
 		void add_Cyt_Node();
 		double total_Force();

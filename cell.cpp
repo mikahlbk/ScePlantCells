@@ -64,6 +64,12 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer)    {
 	this->calc_CYT();
 	double K_LINEAR_Y = .1540*pow(wuschel,3) + -4.8350*pow(wuschel,2) + 54.2901*wuschel + -50.7651;
 	double K_LINEAR_X = -13.2177*wuschel + 473.7440;
+	if(K_LINEAR_Y > 1000) {
+		K_LINEAR_Y = 1000;
+	}
+	if(K_LINEAR_X > 1000) {
+		K_LINEAR_X = 1000;
+	}
 	this->K_LINEAR = Coord(K_LINEAR_X, K_LINEAR_Y);
 	//rough estimates for cell sizing
 	int num_Init_Wall_Nodes = Init_Wall_Nodes;
@@ -642,7 +648,7 @@ void Cell::print_VTK_Vectors(ofstream& ofs) {
 // Growth of Cell
 //==========================================
 //=====================================================================
-Wall_Node* Cell::find_Largest_Length() {
+void Cell::find_Largest_Length(Wall_Node* first, Wall_Node* second) {
 	
 	Wall_Node* curr = left_Corner;
 	Wall_Node* biggest = NULL;
@@ -651,6 +657,7 @@ Wall_Node* Cell::find_Largest_Length() {
 	Coord curr_Loc;
 	Coord diff_vect;
 	double max_len = 0;
+	double second_max = 0;
 	double len;
 	int big_gaps = 0;
 	//loop through all possible Cell Wall 'links' to find biggest
@@ -662,9 +669,13 @@ Wall_Node* Cell::find_Largest_Length() {
 		len = diff_vect.length();
 		if (len > MEMBR_THRESH_LENGTH) {
 			big_gaps++;
-			if(len > max_len) {
-				max_len = len;
-				biggest = curr;
+			if(len > second_max) {
+				second_max = len;
+				second = curr;
+				if(len > max_len) {
+					max_len = len;
+					first = curr;
+				}
 			}
 		}
 		curr = curr->get_Left_Neighbor();
@@ -673,13 +684,15 @@ Wall_Node* Cell::find_Largest_Length() {
 
 //	cout << "Cell " << rank << " -- big gaps: " << big_gaps << endl;
 
-	return biggest;
+	return;
 }
 
 
 void Cell::add_Wall_Node() {
 	//find node to the right of largest spring
-	Wall_Node* right = find_Largest_Length();
+	Wall_Node* right = NULL;
+	Wall_Node* second = NULL;
+	find_Largest_Length(right, second);
 	Wall_Node* left = NULL;
 	Coord location;
 	Wall_Node* added_node = NULL;

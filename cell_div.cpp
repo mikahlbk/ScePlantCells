@@ -26,16 +26,16 @@ Cell* Cell::divide() {
 //	cout << "area calculated " << area << endl;
 //	if(area > AREA_DOUBLED) {
 		//add in iff statement for amount of cytokinin and wuschel and logintudinal vs. radial pressure
-		if(this->layer == 1) {
+		//if(this->layer == 1) {
 			cout << "Cell " << this->rank << "  passed area threshold for division lengthwise" << endl;
 			sister = this->divide_length_wise();
 			cout << "divided" << endl;
-		}
-		else if(layer == 3) {
-			cout << "Cell " << this->rank << " passed area threshold for division widthwise" << endl;
-			sister = this->divide_width_wise();
-			cout << "divided" << endl;
-		}
+	//	}
+	//	else if(layer == 3) {
+	//		cout << "Cell " << this->rank << " passed area threshold for division widthwise" << endl;
+	//		sister = this->divide_width_wise();
+	//		cout << "divided" << endl;
+	//	}
 	return sister;
 }
 
@@ -52,7 +52,8 @@ Cell* Cell::divide_length_wise() {
 	Wall_Node* down = NULL;
 	Wall_Node* left = NULL;
 	Wall_Node* right = NULL;
-	this->closest_node_top(up);
+	this->find_Largest_Length(up, down);
+	/*this->closest_node_top(up);
 	if(up == NULL) {
 		cout << "Top NULL" << endl;
 		exit(1);
@@ -61,7 +62,7 @@ Cell* Cell::divide_length_wise() {
 	if(down == NULL) {
 		cout << "Bottom NULL" << endl;
 		exit(1);
-	}
+	}*/
 
 	Wall_Node* left_start = down->get_Right_Neighbor()->get_Right_Neighbor()->get_Right_Neighbor();
 	Wall_Node* right_start = down->get_Left_Neighbor()->get_Left_Neighbor()->get_Left_Neighbor();
@@ -204,6 +205,12 @@ Cell* Cell::divide_length_wise() {
 	sister->calc_CYT();
 	double K_LINEAR_Y = .1540*pow(wuschel,3) + -4.8350*pow(wuschel,2) + 54.2901*wuschel + -50.7651;
 	double K_LINEAR_X = -13.2177*wuschel + 473.7440;
+	if(K_LINEAR_Y > 1000) {
+		K_LINEAR_Y = 1000;
+	}
+	if(K_LINEAR_X > 1000) {
+		K_LINEAR_X = 1000;
+	}
 	this->K_LINEAR = Coord(K_LINEAR_X, K_LINEAR_Y);
 	//cout << "update layer" << endl;
 	//update layer information
