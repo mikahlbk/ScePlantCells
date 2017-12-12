@@ -137,7 +137,7 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer)    {
 	update_Wall_Angles();
 	//set damping for cells that act as anchor points
 	if(layer == 6) {
-		this->damping = .0001;
+		this->damping = .01;
 	}
 	else {
 		this->damping = 1;
@@ -906,12 +906,12 @@ void Cell::update_Cell_Progress(int Ti) {
 	int number_cells = cells.size();
 	double sigma = (((double) rand()/(double) RAND_MAX))*.004 - .002;
 //	cout << "Sigma: " << sigma << endl;
-	double rate = (.002+sigma)*exp(.018*dt*life_length);
+	double rate = (.002+sigma)*exp(.08*dt*life_length);
 	Cell_Progress = Cell_Progress + rate*dt;
 	//cout << "growth rate: " << rate << endl;
 	//cout<< "new: " << Cell_Progress << endl;
 	//cout << "Old: " << Cell_Progress_add_node << endl;
-	if(Cell_Progress >= 1) {
+	if(this->calc_Area() >= 8) {
 		new_Cell = this->divide();
 		new_Cell->set_Rank(number_cells);
 		my_tissue->update_Num_Cells(new_Cell);
