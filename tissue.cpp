@@ -77,63 +77,61 @@ Tissue::~Tissue() {
 		cells.pop_back();
 	}
 }
-
+//*********functions for tissue to return information i.e.************//
+//*********updating or returning the number of cells in the tissue*******//
 void Tissue::get_Cells(vector<Cell*>& cells) {
 	cells = this->cells;
 	return;
 }
 
-void Tissue::update_Cell_Cycle(int Ti) {
-	for (unsigned int i = 0; i < cells.size(); i++) {
-		//cout << "updating cell i" << endl;
-		cells.at(i)->update_Cell_Progress(Ti);
-	}
-	return;
-}
-
-/*void Tissue::update_Cytoplasm() {
-	for (unsigned int i = 0; i < cells.size(); i++) {
-		cells.at(i)->cytoplasm_Check();
-	}
-	return;
-}*/
-
-void Tissue::update_Wall() {
-	for (unsigned int i = 0; i < cells.size(); i++) {
-		cells.at(i)->wall_Node_Check();
-		//cout<< "Wall Count Cell " << i << ": " << cells.at(i)->get_Wall_Count() << endl;
-	}
-
-
-
-	return;
-}
 void Tissue::update_Num_Cells(Cell*& new_Cell) {
 	num_cells++;
 	cells.push_back(new_Cell);
 	return;
 }
-
-void Tissue::calc_New_Forces() {
-	Cell* curr = NULL;
+//**********function for tissue to perform on cells********//
+//**********updates cell cycle of each cell************//
+void Tissue::update_Cell_Cycle(int Ti) {
+	//cout << "Current number of cells: " << cells.size() << endl; 
 	for (unsigned int i = 0; i < cells.size(); i++) {
-		curr = cells.at(i);
-	//	cout << "calc forces for cell: " << i << endl;
-		curr->calc_New_Forces();
+		//cout << "updating cell" << i << endl;
+		cells.at(i)->update_Cell_Progress(Ti);
+	}
+//	cout << "Number cells is: " << cells.size() << endl;
+	return;
+}
+//adds node to cell wall if needed for each cell
+void Tissue::update_Wall() {
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		cells.at(i)->wall_Node_Check();
+		//cout<< "Wall Count Cell " << i << ": " << cells.at(i)->get_Wall_Count() << endl;
 	}
 	return;
-
-
 }
-
+//calculates the forces for nodes of  each cell 
+void Tissue::calc_New_Forces() {
+	for (unsigned int i = 0; i < cells.size(); i++) {
+		//cout << "Calc forces for cell: " << i << endl;
+		cells.at(i)->calc_New_Forces();
+		//cout << "success for cell: " << i << endl;
+	}
+	return;
+}
+void Tissue::pressure() {
+	for(unsigned int i = 0; i < cells.size(); i++) {
+		cout << "Curr Pressure: " << cells.at(i)->compute_pressure() << endl;
+	}
+	return;
+}
+	
+//updates the location of all the nodes of each cell
 void Tissue::update_Cell_Locations() {
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->update_Node_Locations();
-		//updates cell centers
 	}
 	return;
 }
-
+//updates current neighbors of each cell
 void Tissue::update_Neighbor_Cells() {
 	//update vectors of neighboring cells
 	for (unsigned int i = 0; i < cells.size(); i++) {
@@ -141,8 +139,15 @@ void Tissue::update_Neighbor_Cells() {
 	}
 	return;
 }
-
-void Tissue::stretching_Test() {
+//updates adhesion springs for each cell
+void Tissue::update_Adhesion(int Ti) {
+	for(unsigned int i=0;i<cells.size();i++) {
+		//cout << "Updating adhesion for cell" << endl;
+		cells.at(i)->update_adhesion_springs();
+	}
+}
+//functions for calibrating elastic modulus
+/*void Tissue::stretching_Test() {
 	//stretch the cell
 	for(unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->stretch();
@@ -173,29 +178,6 @@ void Tissue::cell_stress() {
 	}
 	return;
 }
-
-void Tissue::update_Adhesion(int Ti) {
-	int time = Ti;
-	Wall_Node* curr = NULL;
-	Wall_Node* orig = NULL;
-	Wall_Node* next = NULL;
-	for (unsigned int i = 0;i<cells.size();i++) {
-		//cout<< "clearing current closest info" << endl;
-		curr = cells.at(i)->get_Wall_Nodes();
-		orig = curr;
-		do {
-			next = curr->get_Left_Neighbor();
-			curr->set_Closest(NULL, 100);
-			curr = next;
-		} while(next != orig);
-	}
-	
-	for(unsigned int i=0;i<cells.size();i++) {
-		//cout << "Updating adhesion for cell" << endl;
-		cells.at(i)->update_adhesion_springs();
-	}
-}
-
 void Tissue::make_Vectors() {
 	Cell* curr = NULL;
 	vector<double> strain;
@@ -229,7 +211,7 @@ void Tissue::make_Vectors() {
 		cout << "unable to open file" << endl;
 	}
 	return;
-}
+}*/
 
 void Tissue::print_Data_Output(ofstream& ofs) {
 	return;
@@ -315,7 +297,7 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 	ofs << "SCALARS magnitude double " << 1 << endl;
 	ofs << "LOOKUP_TABLE default" << endl;
 	for (unsigned int i = 0; i < cells.size(); i++) {
-		cells.at(i)->print_VTK_Scalars_WUS(ofs);
+		cells.at(i)->print_VTK_Scalars_Total(ofs);
 	}
 
 	ofs << endl;
@@ -324,9 +306,6 @@ void Tissue::print_VTK_File(ofstream& ofs) {
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->print_VTK_Vectors(ofs);
 	}
-
-	
-
 	return;
 }
 

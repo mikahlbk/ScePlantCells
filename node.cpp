@@ -234,11 +234,11 @@ void Wall_Node::calc_Forces() {
 	sum += calc_Bending();
 //	cout << "bending" << endl;
 	
-	if(pull == true) {
+//	if(pull == true) {
 //		cout << "External Force is" << calc_External() << endl;
-		sum+= calc_External();
-		pull = false;
-	}
+//		sum+= calc_External();
+//		pull = false;
+//	}
 	// Update new_force variable for location updating
 	new_force = sum;
 
@@ -265,28 +265,28 @@ Coord Wall_Node::calc_Morse_DC() {
 	Coord Fdc;
 	vector<Cell*> cells;
 	my_cell->get_Neighbor_Cells(cells);	
-//	cout << "getting neighbors" << endl;
+	//cout << "getting neighbors" << endl;
 	Wall_Node* curr = NULL;
 	Wall_Node* orig = NULL;
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		curr = cells.at(i)->get_Wall_Nodes();
-	//	cout << "getting wall nodes" << endl;
+		//cout << "getting wall nodes" << endl;
 		orig = curr;
 		do {
 			Fdc += morse_Equation(curr);
-		//	cout << "morse" << endl;
+			//cout << "morse" << endl;
 			curr = curr->get_Left_Neighbor();
-		//	cout << "left neighbor" << endl;
+			//cout << "left neighbor" << endl;
 		} while (curr != orig);
 	}
 	//cout << "made it out of loop" << endl;
-//	cout << closest << endl;
+	//cout << closest << endl;
 	if(this->closest != NULL){
-		//cout << "closest not null" << endl;
+	//	cout << "closest not null" << endl;
 		closest->get_Location();
-		//cout << "got location" << endl;
+	//	cout << "got location" << endl;
 		Fdc += linear_Equation_ADH(this->closest);
-		//cout << "computer adh successfully" << endl;
+	//	cout << "computed adh successfully" << endl;
 	}
 	//cout << " morse_DC: " << Fdc << endl;
 	return Fdc;
@@ -495,7 +495,7 @@ Coord Wall_Node::linear_Equation_ADH(Wall_Node*& wall) {
 		cout << "Problems for days" << endl;
 	}
 	Coord F_lin;
-	//cout << "compute diff vec" << endl;
+//	cout << "compute diff vec" << endl;
 	Coord wall_loc = wall->get_Location();
 //	cout << "wall loc"  << endl;
 	Coord loc = my_loc;

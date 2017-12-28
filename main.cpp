@@ -9,6 +9,9 @@
 #include <vector>
 #include <fstream>
 #include <ctime>
+#include <gsl/gsl_math.h>
+#include <stdio.h>
+#include<gsl/gsl_sf_bessel.h>
 
 #include "phys.h"
 #include "coord.h"
@@ -29,8 +32,8 @@ int main(){
 
 	int start = clock();
 	
-	string init_tissue = "cell_start.txt";
-	
+	string init_tissue = "new_cells.txt";
+
 	//make new cell objects in tissue
 	Tissue growing_Tissue(init_tissue);
 
@@ -54,7 +57,7 @@ int main(){
 		//for now only one cell
 		//cout << "Ti = " << Ti << endl;
 		//Print to dataOutput and VTK files
-		if (Ti % 100  == 0) {
+		if (Ti % 100 == 0) {
 			
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {
@@ -85,20 +88,17 @@ int main(){
 	
 		// Tissue Growth
 		
-		//cout << "update cell cycle of each cell" << endl;
-		//if(Ti > 1500) {
+	//	cout << "update cell cycle of each cell" << endl;
+		//this includes a check for division and addition
+		//of new internal nodes
 		growing_Tissue.update_Cell_Cycle(Ti);
-		//}
-		//Add cyt node/ wall node 
-		//	cout << "update cytoplasm" << endl;
-		//growing_Tissue.update_Cytoplasm();
-		
-		//	cout << "Updated Wall" << endl;
+	
+	//	cout << "add new cell wall nodes if needed" << endl;
 		growing_Tissue.update_Wall();
-		
+	//	cout << "wall node success" << endl;	
 		
 		if (Ti% 100  == 0 ) {
-			//	cout << "Find Neighbors" << endl;
+			//cout << "Find Neighbors" << endl;
 			growing_Tissue.update_Neighbor_Cells();
 		}
 
@@ -107,29 +107,20 @@ int main(){
 			growing_Tissue.update_Adhesion(Ti);
 		}
 		
-	
-		//cout << "division success" << endl;
-		/*if((Ti > 268583)) {
-			growing_Tissue.stretching_Test();
-			growing_Tissue.cell_stress();
-		}
-		if((Ti > 268582)) {
-			growing_Tissue.cell_strain();
-		}*/
-		// Update Each cell's neighboring cells
-		
-		//cout << "do forces" << endl;
+	//	if(Ti%500 == 0) {
+	//		growing_Tissue.pressure();
+	//	}
 		//Calculate new forces on cells and nodes
+		//cout << "forces" << endl;
 		growing_Tissue.calc_New_Forces();
 		//cout << "calculated forces" << endl;
 		//Update node positions
 		growing_Tissue.update_Cell_Locations();
-		//updates cell centers
 		//cout << "updated node positions" << endl;
 		
 	}
 
-	//for calibration of elastic modulus
+	//for output during  calibration of elastic modulus
 	//growing_Tissue.make_Vectors();
 	
 	int stop = clock();

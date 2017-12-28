@@ -31,14 +31,13 @@ class Cell {
 		int num_cyt_nodes;
 		int layer;
 		int life_length;
-		//double area;
-		//int growth_rate;
 		Coord cell_center;
 		double cytokinin;
 		double wuschel;
+		double total_signal;
 		int num_wall_nodes;
-		vector<double> strain_vec;
-		vector<double> stress_vec;
+		//vector<double> strain_vec;
+		//vector<double> stress_vec;
 		vector<Cyt_Node*> cyt_nodes;
 		vector<Cell*> neigh_cells;
 		Wall_Node* left_Corner;	
@@ -52,34 +51,40 @@ class Cell {
 
 		// Getters and Setters
 		int get_Rank() {return rank;}
-		int get_Cell_Progress() {return Cell_Progress;}
+		double get_Damping() {return damping;}
+		Tissue* get_Tissue() {return my_tissue;}
+		double get_Cell_Progress() {return Cell_Progress;}
+		double get_Cell_Progress_Add_Node() {return Cell_Progress_add_node;}
+		Coord get_K_LINEAR() {return K_LINEAR;}
 		int get_Cytoplasm_Count() {return num_cyt_nodes;}
 		int get_Layer() {return layer;}
-	//	int get_Growth_Rate() {return growth_rate;}
+		int get_life_length() {return life_length;}
 		Coord get_Cell_Center() {return cell_center;}
+		double get_WUS_concentration() {return wuschel;}
+		double get_CYT_concentration() {return cytokinin;}
+		double get_total_concentration() {return total_signal;}
 		int get_Wall_Count() {return num_wall_nodes;}
+		Wall_Node* get_Wall_Nodes() {return left_Corner;}
+		Wall_Node* get_Left_Corner() {return left_Corner;}		
 		int get_Node_Count();
 		void get_Cyt_Nodes(vector<Cyt_Node*>& cyts);
-		Tissue* get_Tissue() {return my_tissue;}
-		Wall_Node* get_Wall_Nodes() {return left_Corner;}
+		void get_Neighbor_Cells(vector<Cell*>& cells);
+	
+		//*****calibration******//
+		void get_Strain(vector<double>& strain);
+		void get_Stress(vector<double>& stress);
+
+		void set_K_LINEAR(double& x, double& y);
 		void set_Damping(double& new_damping);
 		void set_Rank(const int id);
 		void set_Layer(int layer);
-		void set_Area(double& new_area);
 		void reset_Cell_Progress();
-		void set_Cell_Progress_add_node(double& new_area);
-		void update_Life_Length();
-		void set_growth_rate(double rate);
-		double get_Damping(){return damping;}
-		void get_Neighbor_Cells(vector<Cell*>& cells);
-		void get_Strain(vector<double>& strain);
-		void get_Stress(vector<double>& stress);
-		Coord get_K_LINEAR() {return K_LINEAR;}
-		double get_WUS_concentration() {return wuschel;}
-		double get_CYT_concentration() {return cytokinin;}
-		Wall_Node* get_Left_Corner() {return left_Corner;}
 		void set_Left_Corner(Wall_Node*& new_left_corner);
 		void set_Wall_Count(int& number_nodes);
+		
+		void update_Cell_Progress_add_node(int& time);
+		void update_Life_Length();
+	
 		// Keep track of neighbor cells
 		void update_Neighbor_Cells();
 		void update_adhesion_springs();
@@ -90,13 +95,30 @@ class Cell {
 		void update_Wall_Angles();
 		void update_Wall_Equi_Angles();
 		void update_Cell_Center();
+	
+		//Growth of a cell
 		void update_Cell_Progress(int Ti);
+		double calc_Area();
 		void wall_Node_Check();
-		void cytoplasm_Check();
-		void stretch();
-		double compute_pressure(Wall_Node* start, Wall_Node* end);
-		double compute_sigma_trans();
-		double compute_sigma_long();
+		void add_Wall_Node();
+		void find_Largest_Length(Wall_Node*& right);
+		void add_Cyt_Node();
+		
+		//Functions for Division
+		double find_radius();
+		void add_Cyt_Node_Div(double radius);
+		void stress_Tensor_Eigenvalues(double& a, double& b, double& c, double& d, vector<double>& eigen_Max);
+		double compute_Stress_Tensor_XY();
+		double compute_Stress_Tensor_Y();
+		double compute_Stress_Tensor_X();
+		//Functions for calibration		
+	//	void stretch();
+	//	double tensile_Length();
+	//	double extensional_Length();
+	//	void add_stress(double& new_length, double& new_force);
+	//	void add_strain(double& new_length);
+	//  double total_Force();
+	
 		//Output Functions
 		void print_Data_Output(ofstream& ofs);
 		int update_VTK_Indices(int& id);
@@ -105,33 +127,28 @@ class Cell {
 		void print_VTK_Scalars_Force(ofstream& ofs);
 		void print_VTK_Scalars_WUS(ofstream& ofs);
 		void print_VTK_Scalars_CYT(ofstream& ofs);
+		void print_VTK_Scalars_Total(ofstream& ofs);
 		void print_VTK_Vectors(ofstream& ofs);
 		
-		// Growth of cell
-		void find_Largest_Length(Wall_Node* first, Wall_Node* second);
-		void add_Wall_Node();
-		void add_Cyt_Node();
-		double total_Force();
-		void most_Left_Right(Wall_Node*& left, Wall_Node*& right);
-		double tensile_Length();
-		double extensional_Length();
-		void closest_node_top(Wall_Node*& up);
-		void closest_node_bottom(Wall_Node*& down);
-		void closest_node_left(Wall_Node*& left);
-		void closest_node_right(Wall_Node*& right);
-		void closest_node(Wall_Node*& closest);
-		
-		void add_stress(double& new_length, double& new_force);
-		void add_strain(double& new_length);
-		double calc_Area();
+		//Not in use
+	//	void most_Left_Right(Wall_Node*& left, Wall_Node*& right);
+	//	void closest_node_top(Wall_Node*& up);
+	//	void closest_node_bottom(Wall_Node*& down);
+	//	void closest_node_left(Wall_Node*& left);
+	//	void closest_node_right(Wall_Node*& right);
+	//	void closest_node(Wall_Node*& closest);
+	
+		double compute_pressure();
+	//	double compute_sigma_trans();
+	//	double compute_sigma_long();	
 		void calc_WUS();
 		void calc_CYT();
+		void calc_Total_Signal();
+	
 		//Division 
 		Cell* divide();
 		Cell* divide_length_wise();
 		Cell* divide_width_wise();
-		//Cell* divide_width_wise(const int Ti);
-		void add_Cyt_Node_Div(double& radius_x, double& radius_y, bool islength);
 	};
 
 

@@ -27,27 +27,23 @@ class Tissue {
 		int num_cells;
 	public:
 		Tissue(string filename);
-		
 		void get_Cells(vector<Cell*>& cells);
+		void update_Num_Cells(Cell*& new_Cell);
 		void update_Cell_Cycle(int Ti);
 		void update_Wall();
-		void update_Cytoplasm();
-		void update_Num_Cells(Cell*& new_Cell);
 		void calc_New_Forces();
 		void update_Cell_Locations();
 		void update_Neighbor_Cells();
-		void stretching_Test();
-		void cell_Division(int Ti);
+		void update_Adhesion(int Ti);
+		void pressure();
+		//void stretching_Test();
+		//void cell_stress();
+		//void cell_strain();
+		//void make_Vectors();
 		void print_Data_Output(ofstream& ofs);
 		int update_VTK_Indices();
 		void print_VTK_File(ofstream& ofs);
-		//void make_Vectors();
-		void cell_stress();
-		void cell_strain();
-		void make_Vectors();
-		void update_Adhesion(int Ti);
 		int get_Num_Cells() {return num_cells;}
-		//void grow_Cells(const int Ti);
 		//Destructor
 		~Tissue();
 };
