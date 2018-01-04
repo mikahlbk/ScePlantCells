@@ -18,10 +18,10 @@ const double dt = .00075;
 const int ADD_WALL_TIMER = 2;
 //const int ADD_CYT_TIMER = needs to be written to follow exponential growth;
 
-const int Init_Num_Cyt_Nodes = 40;
-const int Init_Wall_Nodes = 315;
-const double AREA_DOUBLED = 88;
-const double growth_rate = .001;
+const int Init_Num_Cyt_Nodes = 20;
+const int Init_Wall_Nodes = 250;
+const double AREA_THRESH = 48;
+const double growth_rate = .0001;
 // Global Physics Constants
 const double pi = acos(-1.0);
 
@@ -29,9 +29,9 @@ const double pi = acos(-1.0);
 const double K_BEND = .0001;
 
 //Adhesion spring mechanical params
-const double K_ADH = 20;
+const double K_ADH = 45;
 const double MembrEquLen_ADH = 0.6;
-const double ADHThresh = .75125;
+const double ADHThresh = .78525;
 
 //Calibration parameters
 const double EXTERNAL_FORCE = 2;
@@ -50,16 +50,16 @@ const double xsi_MM = 0.125;
 const double gamma_MM = 1.5625;	
 
 ///// Subcellular element parameters for membrane  - internal interactions
-const double U_MI = 5;
+const double U_MI = 8;
 const double W_MI = 0;
-const double xsi_MI = 0.125;
-const double gamma_MI = 0.625;
+const double xsi_MI = 0.27;
+const double gamma_MI = .625;
 
 ///// Subcellular element parameters for internal - internal interactions
-const double U_II = 2.5;
-const double W_II = 0.146484;
-const double xsi_II = 0.312500;
-const double gamma_II = 1.25;
+const double U_II = 21;
+const double W_II = 6;
+const double xsi_II = 0.58;
+const double gamma_II = 1.34;
 
 
 //=====================

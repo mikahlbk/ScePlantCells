@@ -92,7 +92,7 @@ Cell* Cell::divide_length_wise() {
 	//find closest node to line
 	do {
 		next = curr->get_Left_Neighbor();
-		distance = abs(a_line*curr->get_Location().get_X() + b_line*curr->get_Location().get_Y() + c_line)/(pow(a_line,2) + pow(b_line,2));
+		distance = fabs(a_line*curr->get_Location().get_X() + b_line*curr->get_Location().get_Y() + c_line)/(pow(a_line,2) + pow(b_line,2));
 		if(distance < min_distance) {
 			min_distance = distance;
 			closest = curr;
@@ -109,7 +109,7 @@ Cell* Cell::divide_length_wise() {
 	//find next closest node to line
 	do {
 		next = curr->get_Left_Neighbor();
-		distance = abs(a_line*curr->get_Location().get_X() + b_line*curr->get_Location().get_Y() + c_line)/(pow(a_line,2) + pow(b_line,2));
+		distance = fabs(a_line*curr->get_Location().get_X() + b_line*curr->get_Location().get_Y() + c_line)/(pow(a_line,2) + pow(b_line,2));
 		if((curr->get_Location() - closest->get_Location()).length() > 2) {
 			if(distance < min_distance) {
 				min_distance = distance;
@@ -283,19 +283,28 @@ Cell* Cell::divide_length_wise() {
 	sister->calc_WUS();
 	this->calc_CYT();
 	sister->calc_CYT();
-	double K_LINEAR_Y = 250; // .1540*pow(wuschel,3) + -4.8350*pow(wuschel,2) + 54.2901*wuschel + -50.7651;
-	double K_LINEAR_X = 250; //13.2177*wuschel + 473.7440;
-	if(K_LINEAR_Y > 1000) {
-		K_LINEAR_Y = 1000;
-	}
-	if(K_LINEAR_X > 1000) {
-		K_LINEAR_X = 1000;
-	}
+	this->calc_Total_Signal();
+	sister->calc_Total_Signal();
+	sister->set_Layer(this->layer);
+
+	double K_LINEAR = -3.3673*(this->cytokinin) + 5.7335*(this->wuschel) + 269.4673;
+	double K_LINEAR_X;
+	double K_LINEAR_Y;
+		
+	if(this->layer == 1) {
+		K_LINEAR_Y = K_LINEAR;
+		K_LINEAR_X = 0.2*K_LINEAR_Y;
+	}	
+	else {
+		K_LINEAR_X = K_LINEAR;
+		K_LINEAR_Y = 0.8*K_LINEAR_X;
+	}	
+
 	this->K_LINEAR = Coord(K_LINEAR_X, K_LINEAR_Y);
+	
 	sister->set_K_LINEAR(K_LINEAR_X,K_LINEAR_Y);
 	//	cout << "update layer" << endl;
 	//update layer information
-	sister->set_Layer(this->layer);
 //	cout << "update growth rate" << endl;
 //	sister->set_growth_rate(this->growth_rate);
 	

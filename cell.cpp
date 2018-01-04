@@ -67,16 +67,20 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer)    {
 	this->calc_CYT();
 	this->calc_Total_Signal();
 //  make functions for these*****
-//	double K_LINEAR_Y = .1540*pow(wuschel,3) + -4.8350*pow(wuschel,2) + 54.2901*wuschel + -50.7651;
-//	double K_LINEAR_X = -13.2177*wuschel + 473.7440;
-//	if(K_LINEAR_Y > 1000) {
-//		K_LINEAR_Y = 1000;
-//	}
-//	if(K_LINEAR_X > 1000) {
-//		K_LINEAR_X = 1000;
-//	}
-	double K_LINEAR_Y = 250;
-	double K_LINEAR_X = 250;
+	
+	double K_LINEAR = -3.3673*(this->cytokinin)*0 + 5.7335*(this->wuschel) + 269.4673;
+	double K_LINEAR_X;
+	double K_LINEAR_Y;
+	
+	if(this->layer == 1) {
+		K_LINEAR_Y = K_LINEAR + 100;
+		K_LINEAR_X = 0.2*K_LINEAR_Y;
+	}	
+	else {
+		K_LINEAR_X = K_LINEAR + 100;
+		K_LINEAR_Y = .2*K_LINEAR_X;
+	}	
+
 	this->K_LINEAR = Coord(K_LINEAR_X, K_LINEAR_Y);
 	
 	//assemble the membrane
@@ -145,7 +149,7 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer)    {
 	update_Wall_Angles();
 	//set damping for cells that act as anchor points
 	if(layer == 6) {
-		this->damping = .01;
+		this->damping = .3;
 	}
 	else {
 		this->damping = 1;
@@ -284,7 +288,7 @@ void Cell::update_Neighbor_Cells() {
 	Coord curr_Cent;
 	Coord distance;
 	
-	double prelim_threshold = 10;
+	double prelim_threshold = 18;
 	//double sec_threshold = 1;
 
 	// iterate through all cells
@@ -446,16 +450,17 @@ void Cell::update_Cell_Progress(int Ti) {
 	this->my_tissue->get_Cells(cells);
 	int number_cells = cells.size();
 	//variables for determining growth rate
-	double sigma = (((double) rand()/(double) RAND_MAX));
-	//double rate = (.002+sigma)*exp(.08*dt*life_length);
+	double sigma = (((double) rand()/(double) RAND_MAX))+.004;
+	double rate = (.004 + sigma)*exp(.003*life_length);
+	
 	double curr_area = this->calc_Area();
 	//update cell progress
-	Cell_Progress = Cell_Progress + curr_area*(1-sigma)*growth_rate;
-//	cout << "Area " << curr_area << endl;
+	Cell_Progress = Cell_Progress + rate*dt;
+	cout << "Rank: " << this->rank << "and Progress: " << Cell_Progress << endl;
 	//division check
 //	cout << "Sigma"<< sigma << endl;
 //	cout << Cell_Progress << " is cell prog" << endl;
-	if((this->calc_Area() >= AREA_DOUBLED)) {
+	if((this->Cell_Progress >= 1) && (curr_area >= AREA_THRESH)) {
 		new_Cell = this->divide();
 	//	cout << "division success" << endl;
 		new_Cell->set_Rank(number_cells);
@@ -483,7 +488,7 @@ void Cell::update_Cell_Progress(int Ti) {
 	}
 	//if no division check if internal node should be added
 	else {
-		if(Cell_Progress - Cell_Progress_add_node > 25) { 
+		if(Cell_Progress - Cell_Progress_add_node > .05) { 
 			this->add_Cyt_Node();
 			cout << "added cyt node" << Cell_Progress << endl;
 			Cell_Progress_add_node = Cell_Progress;
