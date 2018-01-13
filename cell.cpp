@@ -16,6 +16,7 @@
 #include "coord.h"
 #include "node.h"
 #include "cell.h"
+#include "rand.h"
 #include "tissue.h"
 //===================
 
@@ -42,6 +43,8 @@ Cell::Cell(Tissue* tissue) {
 	//WUS computed based on new cell center
 	wuschel = 0;
 	//cytokinin computed based on new cell center
+//	counter = 0;
+	curr_area = this->calc_Area();
 	cytokinin = 0;
 	total_signal = 0;
 	Cell_Progress = 0;
@@ -68,17 +71,17 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer)    {
 	this->calc_Total_Signal();
 //  make functions for these*****
 	
-	double K_LINEAR = -3.3673*(this->cytokinin)*0 + 5.7335*(this->wuschel) + 269.4673;
+	double K_LINEAR = -3.3673*(this->cytokinin) + 5.7335*(this->wuschel) + 269.4673;
 	double K_LINEAR_X;
 	double K_LINEAR_Y;
 	
 	if(this->layer == 1) {
-		K_LINEAR_Y = K_LINEAR + 100;
-		K_LINEAR_X = 0.2*K_LINEAR_Y;
+		K_LINEAR_Y = 100;
+		K_LINEAR_X = 600;
 	}	
 	else {
-		K_LINEAR_X = K_LINEAR + 100;
-		K_LINEAR_Y = .2*K_LINEAR_X;
+		K_LINEAR_X = 600;
+		K_LINEAR_Y = 100;
 	}	
 
 	this->K_LINEAR = Coord(K_LINEAR_X, K_LINEAR_Y);
@@ -142,7 +145,7 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer)    {
 		cyt_nodes.push_back(cyt);
 		num_cyt_nodes++;
 	}
-	
+	counter = 0;
 	//update equilibrium angle
 	update_Wall_Equi_Angles();
 	//update wall angles
@@ -198,7 +201,7 @@ void Cell::get_Neighbor_Cells(vector<Cell*>& cells) {
 	cells = neigh_cells;
 	return;
 }
-/*void Cell::get_Strain(vector<double>& strain) {
+void Cell::get_Strain(vector<double>& strain) {
 	strain = this->strain_vec;
 	return;
 }
@@ -206,7 +209,7 @@ void Cell::get_Neighbor_Cells(vector<Cell*>& cells) {
 void Cell::get_Stress(vector<double>& stress) {
 	stress = this->stress_vec;
 	return;
-}*/
+}
 void Cell::set_K_LINEAR(double& x, double& y) {
 	K_LINEAR = Coord(x,y);
 	return;
@@ -451,16 +454,16 @@ void Cell::update_Cell_Progress(int Ti) {
 	int number_cells = cells.size();
 	//variables for determining growth rate
 	double sigma = (((double) rand()/(double) RAND_MAX))+.004;
-	double rate = (.004 + sigma)*exp(.003*life_length);
-	
-	double curr_area = this->calc_Area();
+//	double rate = (.004 + sigma)*exp(GROWTH_RATE*life_length);
+	double rate = 1;	
+	this->curr_area = this->calc_Area();
 	//update cell progress
 	Cell_Progress = Cell_Progress + rate*dt;
-	cout << "Rank: " << this->rank << "and Progress: " << Cell_Progress << endl;
+//	cout << "Rank: " << this->rank << "and Progress: " << Cell_Progress << " and life length: " << life_length << endl;
 	//division check
 //	cout << "Sigma"<< sigma << endl;
-//	cout << Cell_Progress << " is cell prog" << endl;
-	if((this->Cell_Progress >= 1) && (curr_area >= AREA_THRESH)) {
+/*	if((this->Cell_Progress >= 1) && (curr_area >= AREA_THRESH)) {
+		//cout << "Cell Prog" << Cell_Progress << endl;
 		new_Cell = this->divide();
 	//	cout << "division success" << endl;
 		new_Cell->set_Rank(number_cells);
@@ -472,6 +475,10 @@ void Cell::update_Cell_Progress(int Ti) {
 		this->update_Neighbor_Cells();
 		this->update_adhesion_springs();
 	//	cout << "updated neighbor" << endl;
+		this->life_length = 0;
+		this->Cell_Progress = 0;
+		this->Cell_Progress_add_node = 0;
+		this-> counter = 0;
 		this->get_Neighbor_Cells(neighbor_cells);
 		for(unsigned int i=0; i < neighbor_cells.size(); i++) {
 			neighbor_cells.at(i)->update_adhesion_springs();
@@ -487,13 +494,17 @@ void Cell::update_Cell_Progress(int Ti) {
 		}
 	}
 	//if no division check if internal node should be added
-	else {
-		if(Cell_Progress - Cell_Progress_add_node > .05) { 
-			this->add_Cyt_Node();
-			cout << "added cyt node" << Cell_Progress << endl;
+	else {*/
+		if(Cell_Progress - Cell_Progress_add_node > 2.5) { 
+    	//	this->add_Cyt_Node();
+		
+		//	this->counter = counter +1;
+			//cout << "added cyt node" << this->counter << endl;
+		//	cout << curr_area << " is area" << endl;
+		//	cout << "time: " << Ti << endl;
 			Cell_Progress_add_node = Cell_Progress;
 		}
-	}
+	
 	//cout << "Cell Prog: " << Cell_Progress_add_node << endl;
 	return;
 }
@@ -514,12 +525,14 @@ double Cell::calc_Area() {
 		area += curr_area;
 		curr = next;
 	} while(next != orig);
-
+	//cout << "Area: " << area << endl;
 	return area;
 }
-void Cell::wall_Node_Check() {
+void Cell::wall_Node_Check(int Ti) {
 	//cout << "adding a wall node" << endl;
-	add_Wall_Node();
+	if(Ti < 10000) {
+		add_Wall_Node();
+	}
 	return;
 }
 void Cell::add_Wall_Node() {
@@ -530,7 +543,7 @@ void Cell::add_Wall_Node() {
 	Coord location;
 	Wall_Node* added_node = NULL;
 	if(right != NULL) {
-		//cout << "wasnt null" << endl;
+		cout << "wasnt null" << endl;
 		left = right->get_Left_Neighbor();
 		location  = (right->get_Location() + left->get_Location())*0.5;
 		added_node = new Wall_Node(location, this, left, right);
@@ -617,8 +630,8 @@ void Cell::add_Cyt_Node_Div(double radius) {
 	Cyt_Node* cyt;
 	double x;
 	double y;
-	double rand_radius = (static_cast<double>(rand()) / RAND_MAX)*offset*radius; 
-	double rand_angle = (static_cast<double>(rand()) / RAND_MAX)*2*pi;
+	double rand_radius = unifRand()*offset*radius; 
+	double rand_angle = unifRand()*2*pi;
 	x = cell_center.get_X()+ rand_radius*cos(rand_angle);
 	y = cell_center.get_Y()+ rand_radius*sin(rand_angle);
 	location = Coord(x,y);
@@ -768,15 +781,18 @@ void Cell::stress_Tensor_Eigenvalues(double& a, double& b, double & c, double& d
 //Functions for calibration
 //==================================
 //======================================================
-/*void Cell::stretch() {
+//void Cell::get_stretch_nodes() {
+	//something goes here
+	
+//	return;
+//}
+void Cell::stretch(){
 	//stretch the cell
-	Wall_Node* curr = left_Corner;
+	Wall_Node* curr = this->left_Corner;
 	Wall_Node* next = NULL;
 	Wall_Node* orig = curr;
-	double y_coord = cell_center.get_Y();
-	double curr_coord;
+
 	do {
-		curr_coord = curr->get_Location().get_Y();
 		next = curr->get_Left_Neighbor();
 		curr->pull_node();
 	//	cout << "pulling" << endl;
@@ -786,62 +802,36 @@ void Cell::stress_Tensor_Eigenvalues(double& a, double& b, double & c, double& d
 	return;
 }
 
-double Cell::extensional_Length() {
- 	Wall_Node* right = NULL;
-	Wall_Node* left = NULL;
-	closest_node_right(right);
-	closest_node_left(left);
-	double length = (right->get_Location() - left->get_Location()).length();
-
-	return length;
+void Cell::extensional_strain() {
+    double new_area = this->calc_Area();
+	double delta_L = new_area -this-> curr_area;
+	double strain = delta_L/curr_area;
+	this->curr_area = new_area;
+	strain_vec.push_back(strain);
+	return;
 }
 
-double Cell::tensile_Length() {
-	double length = 0;
-	Wall_Node* up = NULL;
-	Wall_Node* bottom = NULL;
-	closest_node_bottom(bottom);
-	closest_node_top(up);
-	Wall_Node* curr = up;
-	Wall_Node* next = NULL;
-	do {
-
-		next = curr->get_Left_Neighbor();
-		length += (next->get_Location()-curr->get_Location()).length();
-		curr = next;
-	} while (next != bottom);
-	
-	return length;
-}
-
-double Cell::total_Force() {
-	Wall_Node* curr = left_Corner;
+void Cell::tensile_Stress(){
+	Wall_Node* curr = this->left_Corner;
 	Wall_Node* next = NULL;
 	Wall_Node* orig = curr;
-	Coord force_sum;
+	Coord force_sum = Coord(0,0);
 	double force;
+	double curr_length = 0;
+	double total_length = 0;
 
 	do {
 		force_sum += curr->get_f_EXT();
 		next = curr->get_Left_Neighbor();
+		curr_length = (curr->get_Location() - next->get_Location()).length();
+		total_length += curr_length;
 		curr = next;
-	} while (next != curr);
+	} while (next != orig);
 
 	force = force_sum.length();
-
-	return force;
-}
-
-void Cell::add_strain(double& new_length) {
-	strain_vec.push_back(new_length);
+	stress_vec.push_back(force/total_length);
 	return;
 }
-
-void Cell::add_stress(double& new_length, double& new_force) {
-	double curr_stress = new_force/new_length;
-	stress_vec.push_back(curr_stress);
-	return;
-}*/
 
 //===========================================================
 //==================================
@@ -1178,6 +1168,8 @@ double Cell::compute_pressure(){
 	double curr_length = 0;
 	double total_length = 0;
 	double pressure = 0;
+//	if(this->rank == 0) {
+
 	do {
 		next = curr->get_Left_Neighbor();
 		force += curr->get_CytForce();
@@ -1187,9 +1179,17 @@ double Cell::compute_pressure(){
 	} while (next != orig);
 	
 	pressure = force.length()/total_length;
+//	double area = this->calc_Area();
+//	double radius = sqrt(area/pi);
+//	pressure = pressure/radius;
+	//else {
+	//	pressure = 0;
+	//}
+	return total_length;
+	
 
-	return pressure;
 }
+
 
 /*double Cell::compute_sigma_long() {
 	Wall_Node* top = NULL;

@@ -101,9 +101,9 @@ void Tissue::update_Cell_Cycle(int Ti) {
 	return;
 }
 //adds node to cell wall if needed for each cell
-void Tissue::update_Wall() {
+void Tissue::update_Wall(int Ti) {
 	for (unsigned int i = 0; i < cells.size(); i++) {
-		cells.at(i)->wall_Node_Check();
+		cells.at(i)->wall_Node_Check(Ti);
 		//cout<< "Wall Count Cell " << i << ": " << cells.at(i)->get_Wall_Count() << endl;
 	}
 	return;
@@ -147,7 +147,20 @@ void Tissue::update_Adhesion(int Ti) {
 	}
 }
 //functions for calibrating elastic modulus
-/*void Tissue::stretching_Test() {
+
+/*void Tissue::nodes_for_stretch_test() {
+	for(unsigned int i=0; i < cells.size(); i++) {
+		cells.at(i)->get_stretch_nodes();
+	}
+	return;
+}*/
+void Tissue::add_cyt_node(){
+	for(unsigned int i =0; i < cells.size(); i++) {
+		cells.at(i)->add_Cyt_Node();
+	}
+	return;
+}
+void Tissue::stretching_Test() {
 	//stretch the cell
 	for(unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->stretch();
@@ -155,29 +168,15 @@ void Tissue::update_Adhesion(int Ti) {
 	return;
 }
 
-void Tissue::cell_strain() {
-	double curr_length;
-	Cell* curr_cell;
+void Tissue::elastic_mod_measurements() {
 	for(unsigned int i = 0; i < cells.size(); i++) {
-		curr_cell = cells.at(i);
-		curr_length = curr_cell->extensional_Length();
-		curr_cell->add_strain(curr_length);
+		cells.at(i)->extensional_strain();
+		cells.at(i)->tensile_Stress();
 	}
+
 	return;
 }
 
-void Tissue::cell_stress() {
-	double curr_length;
-	double curr_force;
-	Cell* curr_cell;
-	for(unsigned int i = 0; i < cells.size(); i ++) {
-		curr_cell = cells.at(i);
-		curr_length = curr_cell->tensile_Length();
-		curr_force = curr_cell->total_Force();
-		curr_cell->add_stress(curr_length, curr_force);
-	}
-	return;
-}
 void Tissue::make_Vectors() {
 	Cell* curr = NULL;
 	vector<double> strain;
@@ -211,7 +210,7 @@ void Tissue::make_Vectors() {
 		cout << "unable to open file" << endl;
 	}
 	return;
-}*/
+}
 
 void Tissue::print_Data_Output(ofstream& ofs) {
 	return;

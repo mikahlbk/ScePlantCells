@@ -33,14 +33,13 @@ int main(){
 	int start = clock();
 	
 	string init_tissue = "new_cells.txt";
-
+	
 	//make new cell objects in tissue
 	Tissue growing_Tissue(init_tissue);
-
+	seed();
 	cout << "Finished creating Cells" << endl;
-	
 	//parameters for time step
-    double numSteps = 500;
+    double numSteps = 1000;
 
 	// Variable for dataoutput
 	int digits;
@@ -94,7 +93,7 @@ int main(){
 		growing_Tissue.update_Cell_Cycle(Ti);
 	
 	//	cout << "add new cell wall nodes if needed" << endl;
-		growing_Tissue.update_Wall();
+		growing_Tissue.update_Wall(Ti);
 	//	cout << "wall node success" << endl;	
 		
 		if (Ti% 100  == 0 ) {
@@ -107,9 +106,23 @@ int main(){
 			growing_Tissue.update_Adhesion(Ti);
 		}
 		
-	//	if(Ti%500 == 0) {
-	//		growing_Tissue.pressure();
-	//	}
+//		if(Ti ==  10000) {
+//			growing_Tissue.pressure();
+//		}
+//		if(Ti ==  10000) {
+//			growing_Tissue.pressure();
+			//growing_Tissue.add_cyt_node();
+//		}
+		if(Ti% 500 == 0) {
+			growing_Tissue.add_cyt_node();
+		}
+
+//		if(Ti == 20000) {
+//			growing_Tissue.pressure();
+//		}
+//		if((Ti > 10000) && (Ti < 12000)){
+//			growing_Tissue.stretching_Test();
+//		}
 		//Calculate new forces on cells and nodes
 		//cout << "forces" << endl;
 		growing_Tissue.calc_New_Forces();
@@ -117,11 +130,14 @@ int main(){
 		//Update node positions
 		growing_Tissue.update_Cell_Locations();
 		//cout << "updated node positions" << endl;
+//		if((Ti > 10000) && (Ti < 12000)) {
+//			growing_Tissue.elastic_mod_measurements();
+//		}
 		
 	}
 
 	//for output during  calibration of elastic modulus
-	//growing_Tissue.make_Vectors();
+//	growing_Tissue.make_Vectors();
 	
 	int stop = clock();
 

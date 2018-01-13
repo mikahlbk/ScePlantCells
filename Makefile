@@ -4,8 +4,8 @@ CFLAGS=-c -Wall
 
 all: program
 
-program: folder main.o coord.o node.o cell.o cell_div.o tissue.o
-		$(CC) main.o coord.o node.o cell.o cell_div.o tissue.o -o program
+program: folder main.o coord.o node.o cell.o cell_div.o tissue.o rand.o
+		$(CC) main.o coord.o node.o cell.o cell_div.o tissue.o rand.o -o program
 
 folder: 
 		mkdir -p ./DataOutput ./Animation
@@ -27,6 +27,9 @@ cell_div.o: cell_div.cpp
 
 tissue.o: tissue.cpp
 		$(CC) $(CFLAGS) tissue.cpp
+
+rand.o: rand.cpp
+		$(CC) $(CFLAGS) rand.cpp
 
 clean: wipe
 		rm -rf strain_vec.txt stress_vec.txt *o program

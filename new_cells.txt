@@ -4,34 +4,34 @@ Radius:3.75
 Layer:1
 End_Cell
 
-ellRank:1
-enter:0, 0
-adius:3.75
-ayer:1
-nd_Cell
+CellRank:1
+Center:0,0
+Radius:3.75
+Layer:1
+End_Cell
 
-ellRank:2
-enter:0,7.9
-adius:3.75
-ayer:1
-nd_Cell
+CellRank:2
+Center:0,7.9
+Radius:3.75
+Layer:1
+End_Cell
 
-ellRank:3
-enter:-7.9,0
-adius:3.75
-ayer:2
-nd_Cell
+CellRank:3
+Center:-7.9,0
+Radius:3.75
+Layer:1
+End_Cell
 
 ellRank:4
 enter:7.9,0
 adius:3.75
-ayer:2
+ayer:1
 nd_Cell
 
 ellRank:5
-enter:2.9,2.9
-adius:1.25
-ayer:1
+enter:4,-7.9
+adius:3.75
+ayer:2
 nd_Cell
 
 

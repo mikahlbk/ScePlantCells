@@ -28,6 +28,7 @@ class Cell {
 		double Cell_Progress;
 		double Cell_Progress_add_node;
 		Coord K_LINEAR;
+		int counter;
 		int num_cyt_nodes;
 		int layer;
 		int life_length;
@@ -36,8 +37,13 @@ class Cell {
 		double wuschel;
 		double total_signal;
 		int num_wall_nodes;
-		//vector<double> strain_vec;
-		//vector<double> stress_vec;
+		vector<double> strain_vec;
+		vector<double> stress_vec;
+		double curr_area;
+	//	Wall_Node* = left_start;
+	//	Wall_Node* = left_end;
+	//	Wall_Node* = right_start;
+	//	Wall_Node* = right_end;
 		vector<Cyt_Node*> cyt_nodes;
 		vector<Cell*> neigh_cells;
 		Wall_Node* left_Corner;	
@@ -99,7 +105,7 @@ class Cell {
 		//Growth of a cell
 		void update_Cell_Progress(int Ti);
 		double calc_Area();
-		void wall_Node_Check();
+		void wall_Node_Check(int Ti);
 		void add_Wall_Node();
 		void find_Largest_Length(Wall_Node*& right);
 		void add_Cyt_Node();
@@ -111,14 +117,11 @@ class Cell {
 		double compute_Stress_Tensor_XY();
 		double compute_Stress_Tensor_Y();
 		double compute_Stress_Tensor_X();
-		//Functions for calibration		
-	//	void stretch();
-	//	double tensile_Length();
-	//	double extensional_Length();
-	//	void add_stress(double& new_length, double& new_force);
-	//	void add_strain(double& new_length);
-	//  double total_Force();
-	
+		//Functions for calibration
+		void get_stretch_nodes();
+		void stretch();
+		void extensional_strain();
+		void tensile_Stress();	
 		//Output Functions
 		void print_Data_Output(ofstream& ofs);
 		int update_VTK_Indices(int& id);

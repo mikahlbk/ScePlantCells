@@ -106,7 +106,8 @@ Coord Cyt_Node::morse_Equation(Cyt_Node* cyt) {
     double attract = (U_II/xsi_II)*exp(diff_len*(-1)/xsi_II);
     double repel = (W_II/gamma_II)*exp(diff_len*(-1)/gamma_II);
     
-	Fii = diff_vect*((-attract + repel)/diff_len);
+	Fii = diff_vect * (1*ALPHA*DELTA*(1-exp(-ALPHA*(diff_len -MORSE_EQ)))*(exp(-ALPHA*(diff_len-MORSE_EQ)))*(1.0/diff_len));
+	//Fii = diff_vect*((-attract + repel)/diff_len);
 	return Fii;
 }
 
@@ -123,8 +124,8 @@ Coord Cyt_Node::morse_Equation(Wall_Node* wall) {
 	double diff_len = diff_vect.length();
 	double attract = (U_MI/xsi_MI)*exp(diff_len*(-1)/xsi_MI);
     double repel = (W_MI/gamma_MI)*exp(diff_len*(-1)/gamma_MI);
-    
-    Fmi = diff_vect*((-attract + repel)/diff_len);
+    Fmi = diff_vect * (1*ALPHA_MI*DELTA_MI*(1-exp(-ALPHA_MI*(diff_len -MORSE_EQ_MI)))*(exp(-ALPHA_MI*(diff_len-MORSE_EQ_MI)))*(1.0/diff_len));
+  //  Fmi = diff_vect*((-attract + repel)/diff_len);
 	return Fmi;
 }
 
@@ -234,11 +235,11 @@ void Wall_Node::calc_Forces() {
 	sum += calc_Bending();
 //	cout << "bending" << endl;
 	
-//	if(pull == true) {
+	if(pull == true) {
 //		cout << "External Force is" << calc_External() << endl;
-//		sum+= calc_External();
-//		pull = false;
-//	}
+		sum+= calc_External();
+		pull = false;
+	}
 	// Update new_force variable for location updating
 	new_force = sum;
 
@@ -330,9 +331,11 @@ Coord Wall_Node::calc_External() {
 	//	return F_ext;
 	//}
 	if(this->get_Location().get_X() < my_cell->get_Cell_Center().get_X()) {
-		F_ext =  F_ext*(-1);
+		return F_ext*(-1);
 	}
-	return F_ext;
+	else {
+		return F_ext;
+	}
 }
 
 void Wall_Node::pull_node() {
@@ -357,8 +360,8 @@ Coord Wall_Node::morse_Equation(Cyt_Node* cyt) {
 	double attract = (U_MI/xsi_MI)*exp(diff_len*(-1)/xsi_MI);
 	double repel = (W_MI/gamma_MI)*exp(diff_len*(-1)/gamma_MI);
 
-	Fmi = diff_vect * ((-attract + repel) / diff_len);
-
+	Fmi = diff_vect * (1*ALPHA_MI*DELTA_MI*(1-exp(-ALPHA_MI*(diff_len -MORSE_EQ_MI)))*(exp(-ALPHA_MI*(diff_len-MORSE_EQ_MI)))*(1.0/diff_len));
+//   	cout << Fmi << endl;
 	return Fmi;
 }
 
@@ -374,7 +377,8 @@ Coord Wall_Node::morse_Equation(Wall_Node* wall) {
     double attract = (U_MM/xsi_MM)*exp(diff_len*(-1)/xsi_MM);
     double repel = (W_MM/gamma_MM)*exp(diff_len*(-1)/gamma_MM);
     
-    Fmmd = diff_vect * ((-attract + repel) / diff_len);
+    Fmmd =  diff_vect*(0);//(-attract + repel)/diff_len);
+	//	cout << Fmmd << endl;
 	return Fmmd;
 }
 
