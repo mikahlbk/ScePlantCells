@@ -56,7 +56,7 @@ int main(){
 		//for now only one cell
 		//cout << "Ti = " << Ti << endl;
 		//Print to dataOutput and VTK files
-		if (Ti % 100 == 0) {
+		if (Ti % 500 == 0) {
 			
 			digits = ceil(log10(out + 1));
 			if (digits == 1 || digits == 0) {
@@ -109,15 +109,15 @@ int main(){
 //		if(Ti ==  10000) {
 //			growing_Tissue.pressure();
 //		}
-//		if(Ti ==  10000) {
-//			growing_Tissue.pressure();
-			//growing_Tissue.add_cyt_node();
-//		}
-		if(Ti% 500 == 0) {
-			growing_Tissue.add_cyt_node();
-		}
+	//	if(Ti%1000==0) {
+		//	growing_Tissue.pressure();
+		//	growing_Tissue.add_cyt_node();
+	//	}
+	//	if(Ti==20000) {
+	//		growing_Tissue.add_cyt_node();
+	//	}
 
-//		if(Ti == 20000) {
+//		if(Ti == 12000) {
 //			growing_Tissue.pressure();
 //		}
 //		if((Ti > 10000) && (Ti < 12000)){

@@ -76,8 +76,8 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer)    {
 	double K_LINEAR_Y;
 	
 	if(this->layer == 1) {
-		K_LINEAR_Y = 100;
-		K_LINEAR_X = 600;
+		K_LINEAR_Y = 600;
+		K_LINEAR_X = 100;
 	}	
 	else {
 		K_LINEAR_X = 600;
@@ -495,15 +495,15 @@ void Cell::update_Cell_Progress(int Ti) {
 	}
 	//if no division check if internal node should be added
 	else {*/
-		if(Cell_Progress - Cell_Progress_add_node > 2.5) { 
+//		if(Cell_Progress - Cell_Progress_add_node > 2.5) { 
     	//	this->add_Cyt_Node();
 		
 		//	this->counter = counter +1;
 			//cout << "added cyt node" << this->counter << endl;
 		//	cout << curr_area << " is area" << endl;
 		//	cout << "time: " << Ti << endl;
-			Cell_Progress_add_node = Cell_Progress;
-		}
+//			Cell_Progress_add_node = Cell_Progress;
+//		}
 	
 	//cout << "Cell Prog: " << Cell_Progress_add_node << endl;
 	return;
@@ -530,9 +530,7 @@ double Cell::calc_Area() {
 }
 void Cell::wall_Node_Check(int Ti) {
 	//cout << "adding a wall node" << endl;
-	if(Ti < 10000) {
 		add_Wall_Node();
-	}
 	return;
 }
 void Cell::add_Wall_Node() {
@@ -1178,6 +1176,7 @@ double Cell::compute_pressure(){
 		curr = next;
 	} while (next != orig);
 	
+	cout << "Area: " << this->calc_Area() << endl;
 	pressure = force.length()/total_length;
 //	double area = this->calc_Area();
 //	double radius = sqrt(area/pi);
