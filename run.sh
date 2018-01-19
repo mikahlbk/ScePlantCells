@@ -3,7 +3,7 @@
 #$ -M mbkuhn@math.ucr.edu
 #$ -m abe
 #$ -q  long 				# Specify queue
-#$ -N  run_DEC11_Animate5   		 	# Specify job name
+#$ -N  run_JAN18_Animate16   		 	# Specify job name
 
-mkdir Animate5
-./program Animate5
+mkdir Animate16
+./program Animate16

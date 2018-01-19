@@ -9,10 +9,7 @@
 #include <vector>
 #include <fstream>
 #include <ctime>
-#include <gsl/gsl_math.h>
 #include <stdio.h>
-#include<gsl/gsl_sf_bessel.h>
-
 #include "phys.h"
 #include "coord.h"
 #include "node.h"
@@ -24,11 +21,9 @@ using namespace std;
 
 //============================
 
-int main(){
-	
-//int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 
-//string anim_folder = argv[1];
+	string anim_folder = argv[1];
 
 	int start = clock();
 	
@@ -45,7 +40,7 @@ int main(){
 	int digits;
 	string format = ".vtk";
 	string Number;
-	string initial = "Animation/Plant_Cell_";
+	string initial = "/Plant_Cell_";
 	string Filename;
 	ofstream ofs;
 	int out = 0; //counter for creating output/vtk files
@@ -72,7 +67,7 @@ int main(){
 				Number = "0" + to_string(out);
 			}
 
-			Filename = initial + Number + format;
+			Filename = anim_folder + initial + Number + format;
 
 			ofs.open(Filename.c_str());
 			growing_Tissue.print_VTK_File(ofs);
@@ -93,7 +88,9 @@ int main(){
 		growing_Tissue.update_Cell_Cycle(Ti);
 	
 	//	cout << "add new cell wall nodes if needed" << endl;
-		growing_Tissue.update_Wall(Ti);
+		if(Ti%250 == 0) {
+			growing_Tissue.update_Wall(Ti);
+		}
 	//	cout << "wall node success" << endl;	
 		
 		if (Ti% 100  == 0 ) {
@@ -113,9 +110,9 @@ int main(){
 		//	growing_Tissue.pressure();
 		//	growing_Tissue.add_cyt_node();
 	//	}
-	//	if(Ti==20000) {
-	//		growing_Tissue.add_cyt_node();
-	//	}
+		if(Ti%500==0) {
+			growing_Tissue.add_cyt_node();
+		}
 
 //		if(Ti == 12000) {
 //			growing_Tissue.pressure();

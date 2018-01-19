@@ -25,7 +25,7 @@ const double GROWTH_RATE = .000001;
 const double pi = acos(-1.0);
 
 ///// Cell wall mechanical parameters
-const double K_BEND = 2;
+const double K_BEND = 3;
 
 //Adhesion spring mechanical params
 const double K_ADH = 20;
