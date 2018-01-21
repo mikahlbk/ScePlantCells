@@ -28,7 +28,7 @@ Cell* Cell::divide() {
 		//add in iff statement for amount of cytokinin and wuschel and logintudinal vs. radial pressure
 	//	if(this->rank != 1) {
 			cout << "Cell " << this->rank << "  passed area threshold for division lengthwise" << endl;
-			sister = this->divide_length_wise();
+//			sister = this->divide_length_wise();
 			cout << "divided" << endl;
 	//	}
 	//	else if(layer == 3) {
@@ -271,8 +271,8 @@ Cell* Cell::divide_length_wise() {
 	cout << "Sister: " << number_nodes_B << endl;
 //	cout << "updating angles" << endl;
 	//update wall angles
-	this->update_Wall_Angles();
-	sister->update_Wall_Angles();
+	//this->update_Wall_Angles();
+	//sister->update_Wall_Angles();
 	this->update_Wall_Equi_Angles();
 	sister->update_Wall_Equi_Angles();
 //	cout << "updating center" << endl;

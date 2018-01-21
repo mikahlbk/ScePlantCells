@@ -40,10 +40,10 @@ class Cell {
 		vector<double> strain_vec;
 		vector<double> stress_vec;
 		double curr_area;
-	//	Wall_Node* = left_start;
-	//	Wall_Node* = left_end;
-	//	Wall_Node* = right_start;
-	//	Wall_Node* = right_end;
+		Wall_Node* top;
+		Wall_Node* bottom;
+		int counter_left;
+		int counter_right;
 		vector<Cyt_Node*> cyt_nodes;
 		vector<Cell*> neigh_cells;
 		Wall_Node* left_Corner;	
@@ -76,10 +76,6 @@ class Cell {
 		void get_Cyt_Nodes(vector<Cyt_Node*>& cyts);
 		void get_Neighbor_Cells(vector<Cell*>& cells);
 	
-		//*****calibration******//
-		void get_Strain(vector<double>& strain);
-		void get_Stress(vector<double>& stress);
-
 		void set_K_LINEAR(double& x, double& y);
 		void set_Damping(double& new_damping);
 		void set_Rank(const int id);
@@ -96,7 +92,7 @@ class Cell {
 		void update_adhesion_springs();
 	
 		// Forces and Positionsing
-		void calc_New_Forces();
+		void calc_New_Forces(int Ti);
 		void update_Node_Locations();
 		void update_Wall_Angles();
 		void update_Wall_Equi_Angles();
@@ -105,7 +101,7 @@ class Cell {
 		//Growth of a cell
 		void update_Cell_Progress(int Ti);
 		double calc_Area();
-		void wall_Node_Check(int Ti);
+		void wall_Node_Check();
 		void add_Wall_Node();
 		void find_Largest_Length(Wall_Node*& right);
 		void add_Cyt_Node();
@@ -118,10 +114,13 @@ class Cell {
 		double compute_Stress_Tensor_Y();
 		double compute_Stress_Tensor_X();
 		//Functions for calibration
+		void get_Strain(vector<double>& strain);
+		void get_Stress(vector<double>& stress);
+		void set_isStationary();
 		void get_stretch_nodes();
-		void stretch();
-		void extensional_strain();
-		void tensile_Stress();	
+		void compress();
+	//	void extensional_strain();
+	//	void tensile_Stress();	
 		//Output Functions
 		void print_Data_Output(ofstream& ofs);
 		int update_VTK_Indices(int& id);
@@ -135,15 +134,14 @@ class Cell {
 		
 		//Not in use
 	//	void most_Left_Right(Wall_Node*& left, Wall_Node*& right);
-	//	void closest_node_top(Wall_Node*& up);
-	//	void closest_node_bottom(Wall_Node*& down);
+		Wall_Node* closest_node_top();
+		Wall_Node* closest_node_bottom();
 	//	void closest_node_left(Wall_Node*& left);
 	//	void closest_node_right(Wall_Node*& right);
 	//	void closest_node(Wall_Node*& closest);
 	
-		double compute_pressure();
-	//	double compute_sigma_trans();
-	//	double compute_sigma_long();	
+		void set_Stationary_Points(int Ti);
+		double compute_pressure();	
 		void calc_WUS();
 		void calc_CYT();
 		void calc_Total_Signal();

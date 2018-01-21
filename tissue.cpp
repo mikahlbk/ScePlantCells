@@ -101,29 +101,31 @@ void Tissue::update_Cell_Cycle(int Ti) {
 	return;
 }
 //adds node to cell wall if needed for each cell
-void Tissue::update_Wall(int Ti) {
+void Tissue::update_Wall() {
 	for (unsigned int i = 0; i < cells.size(); i++) {
-		cells.at(i)->wall_Node_Check(Ti);
+		cells.at(i)->wall_Node_Check();
 		//cout<< "Wall Count Cell " << i << ": " << cells.at(i)->get_Wall_Count() << endl;
 	}
 	return;
 }
+void Tissue::cell_area(){
+	double area;
+	for(unsigned int i = 0; i < cells.size(); i++) {
+		area = cells.at(i)->calc_Area();
+		cout << "Area: " << area << endl;
+	}
+	return;
+}
 //calculates the forces for nodes of  each cell 
-void Tissue::calc_New_Forces() {
+void Tissue::calc_New_Forces(int Ti) {
 	for (unsigned int i = 0; i < cells.size(); i++) {
 		//cout << "Calc forces for cell: " << i << endl;
-		cells.at(i)->calc_New_Forces();
+		cells.at(i)->calc_New_Forces(Ti);
 		//cout << "success for cell: " << i << endl;
 	}
 	return;
 }
-void Tissue::pressure() {
-	for(unsigned int i = 0; i < cells.size(); i++) {
-		cout << "Curr Pressure: " << cells.at(i)->compute_pressure() << endl;
-	}
-	return;
-}
-	
+
 //updates the location of all the nodes of each cell
 void Tissue::update_Cell_Locations() {
 	for (unsigned int i = 0; i < cells.size(); i++) {
@@ -140,14 +142,19 @@ void Tissue::update_Neighbor_Cells() {
 	return;
 }
 //updates adhesion springs for each cell
-void Tissue::update_Adhesion(int Ti) {
+void Tissue::update_Adhesion() {
 	for(unsigned int i=0;i<cells.size();i++) {
 		//cout << "Updating adhesion for cell" << endl;
 		cells.at(i)->update_adhesion_springs();
 	}
 }
-//functions for calibrating elastic modulus
-
+//functions for calibration
+void Tissue::pressure() {
+	for(unsigned int i = 0; i < cells.size(); i++) {
+		cout << "Curr Pressure: " << cells.at(i)->compute_pressure() << endl;
+	}
+	return;
+}
 /*void Tissue::nodes_for_stretch_test() {
 	for(unsigned int i=0; i < cells.size(); i++) {
 		cells.at(i)->get_stretch_nodes();
@@ -160,15 +167,22 @@ void Tissue::add_cyt_node(){
 	}
 	return;
 }
-void Tissue::stretching_Test() {
+void Tissue::set_Stationary_Points(int Ti){
+	for(unsigned int i=0; i < cells.size(); i++) {
+		cells.at(i)->set_Stationary_Points(Ti);
+	}	
+	return;
+}
+
+void Tissue::compression_Test() {
 	//stretch the cell
 	for(unsigned int i = 0; i < cells.size(); i++) {
-		cells.at(i)->stretch();
+		cells.at(i)->compress();
 	}
 	return;
 }
 
-void Tissue::elastic_mod_measurements() {
+/*void Tissue::elastic_mod_measurements() {
 	for(unsigned int i = 0; i < cells.size(); i++) {
 		cells.at(i)->extensional_strain();
 		cells.at(i)->tensile_Stress();
@@ -176,7 +190,7 @@ void Tissue::elastic_mod_measurements() {
 
 	return;
 }
-
+*/
 void Tissue::make_Vectors() {
 	Cell* curr = NULL;
 	vector<double> strain;
@@ -211,7 +225,7 @@ void Tissue::make_Vectors() {
 	}
 	return;
 }
-
+//***Functions for VTK output****//
 void Tissue::print_Data_Output(ofstream& ofs) {
 	return;
 }

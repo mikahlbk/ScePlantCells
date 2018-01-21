@@ -49,6 +49,10 @@ Cell::Cell(Tissue* tissue) {
 	total_signal = 0;
 	Cell_Progress = 0;
 	Cell_Progress_add_node = 0;
+	top = closest_node_top();
+	bottom = closest_node_bottom();
+	counter_left = 0;
+	counter_right = 0;
 }
 
 
@@ -76,12 +80,12 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer)    {
 	double K_LINEAR_Y;
 	
 	if(this->layer == 1) {
-		K_LINEAR_Y = 600;
-		K_LINEAR_X = 100;
+		K_LINEAR_Y = 200;
+		K_LINEAR_X = 200;
 	}	
 	else {
-		K_LINEAR_X = 600;
-		K_LINEAR_Y = 100;
+		K_LINEAR_X = 200;
+		K_LINEAR_Y = 200;
 	}	
 
 	this->K_LINEAR = Coord(K_LINEAR_X, K_LINEAR_Y);
@@ -157,6 +161,10 @@ Cell::Cell(int rank, Coord center, double radius, Tissue* tiss, int layer)    {
 	else {
 		this->damping = 1;
 	}
+	top = closest_node_top();
+	bottom = closest_node_bottom();
+	counter_left = 0;
+	counter_right = 0;
 }
 
 
@@ -199,15 +207,6 @@ void Cell::get_Cyt_Nodes(vector<Cyt_Node*>& cyts) {
 }
 void Cell::get_Neighbor_Cells(vector<Cell*>& cells) {
 	cells = neigh_cells;
-	return;
-}
-void Cell::get_Strain(vector<double>& strain) {
-	strain = this->strain_vec;
-	return;
-}
-
-void Cell::get_Stress(vector<double>& stress) {
-	stress = this->stress_vec;
 	return;
 }
 void Cell::set_K_LINEAR(double& x, double& y) {
@@ -349,7 +348,7 @@ void Cell::update_adhesion_springs() {
 //  Forces and Positioning
 //============================
 //===============================================================
-void Cell::calc_New_Forces() {
+void Cell::calc_New_Forces(int Ti) {
 	for (unsigned int i = 0; i < cyt_nodes.size(); i++) {
 		cyt_nodes.at(i)->calc_Forces();
 	}
@@ -360,8 +359,8 @@ void Cell::calc_New_Forces() {
 	int counter = 0;
 	do {
 		counter++;
-	//	cout << "Wall node number: " << counter << endl;
-		curr->calc_Forces();
+//		cout << "Wall node number: " << counter << endl;
+		curr->calc_Forces(Ti);
 	//	cout << "Forces calculated" << endl;
 		curr = curr->get_Left_Neighbor();
 	
@@ -381,10 +380,35 @@ void Cell::update_Node_Locations() {
 
 	//update wall nodes
 	Wall_Node* curr = left_Corner;
-	Wall_Node* orig = curr;
-
+	Wall_Node* orig = left_Corner;
+	
+//	if(this->top == NULL) {
+//		cout << "NULL top" << endl;
+//	}
+//	double x_coord = this->top->get_Location().get_X();
+//	double direction;
+//	Wall_Node* neighbor = NULL;
 	do {
 		new_damping = curr->get_My_Cell()->get_Damping();
+	//	cout << "check if needs stationary" << endl;
+	//	direction = curr->get_Location().get_X() - x_coord;
+	//	if(direction > 0) {
+	//		neighbor = curr->get_Left_Neighbor();
+	//	}
+	//	else if(direction < 0) {
+	//		neighbor = curr->get_Right_Neighbor();
+	//	}
+
+	//	if((curr->get_Location().get_Y() > neighbor->get_Location().get_Y() - .02) && (curr->get_Location().get_Y() < neighbor->get_Location().get_Y() + .02)){
+//		if(curr->get_isStationary()) {
+//			//do nothing
+//		}
+	//	else {
+//		if((curr->get_Angle() - pi < .00001) && (curr->get_Angle() -pi > -.00001)) {
+//			curr->set_isStationary();
+//		}
+	//	}
+	//	cout << "update locaation" << endl;
 		curr->update_Location(new_damping);
 		curr = curr->get_Left_Neighbor();
 	
@@ -394,7 +418,7 @@ void Cell::update_Node_Locations() {
 	update_Cell_Center();
 	//update wall_angles
 	update_Wall_Angles();
-	
+//	cout << "done" << endl;
 	return;
 }
 
@@ -528,7 +552,7 @@ double Cell::calc_Area() {
 	//cout << "Area: " << area << endl;
 	return area;
 }
-void Cell::wall_Node_Check(int Ti) {
+void Cell::wall_Node_Check() {
 	//cout << "adding a wall node" << endl;
 		add_Wall_Node();
 	return;
@@ -773,64 +797,6 @@ void Cell::stress_Tensor_Eigenvalues(double& a, double& b, double & c, double& d
 	//cout << "Eigen values: 1 " << eigen_Max.at(0) << " 2 " << eigen_Max.at(1) << endl; 
 	return;
 }
-
-//======================================================
-//==================================
-//Functions for calibration
-//==================================
-//======================================================
-//void Cell::get_stretch_nodes() {
-	//something goes here
-	
-//	return;
-//}
-void Cell::stretch(){
-	//stretch the cell
-	Wall_Node* curr = this->left_Corner;
-	Wall_Node* next = NULL;
-	Wall_Node* orig = curr;
-
-	do {
-		next = curr->get_Left_Neighbor();
-		curr->pull_node();
-	//	cout << "pulling" << endl;
-		curr = next;
-			
-	} while (next != orig);
-	return;
-}
-
-void Cell::extensional_strain() {
-    double new_area = this->calc_Area();
-	double delta_L = new_area -this-> curr_area;
-	double strain = delta_L/curr_area;
-	this->curr_area = new_area;
-	strain_vec.push_back(strain);
-	return;
-}
-
-void Cell::tensile_Stress(){
-	Wall_Node* curr = this->left_Corner;
-	Wall_Node* next = NULL;
-	Wall_Node* orig = curr;
-	Coord force_sum = Coord(0,0);
-	double force;
-	double curr_length = 0;
-	double total_length = 0;
-
-	do {
-		force_sum += curr->get_f_EXT();
-		next = curr->get_Left_Neighbor();
-		curr_length = (curr->get_Location() - next->get_Location()).length();
-		total_length += curr_length;
-		curr = next;
-	} while (next != orig);
-
-	force = force_sum.length();
-	stress_vec.push_back(force/total_length);
-	return;
-}
-
 //===========================================================
 //==================================
 // Output Functions
@@ -1005,7 +971,13 @@ void Cell::print_VTK_Vectors(ofstream& ofs) {
 
 	return;
 }
-/*void Cell::closest_node_top(Wall_Node*& up) {
+
+//===========================================================
+//=======================================================
+//Functions for finding top/right/left/bottom-most nodes
+//=======================================================
+//===========================================================
+Wall_Node* Cell::closest_node_top() {
 	//finds node with highest y value that is
 	//in a certain window around x value of center
 	double y_coord = cell_center.get_Y();
@@ -1042,12 +1014,12 @@ void Cell::print_VTK_Vectors(ofstream& ofs) {
 		curr = next;
 	} while (next != orig);
 	//cout << "closest" << closest << endl;
-	up = closest;
+	//up = closest;
 	//cout << "up in function" << up << endl;
-	return;
+	return closest;
 }
 
-void Cell::closest_node_bottom(Wall_Node*& down) {
+Wall_Node* Cell::closest_node_bottom() {
 	double y_coord = cell_center.get_Y();
 	double x_coord = cell_center.get_X();
 
@@ -1077,11 +1049,11 @@ void Cell::closest_node_bottom(Wall_Node*& down) {
 		curr = next;
 	} while (next != orig);
 //	cout << "bottom" << endl;
-	down = closest;
-	return;
+	//down = closest;
+	return closest;
 }
 
-void Cell::closest_node_left(Wall_Node*& left) {
+/*void Cell::closest_node_left(Wall_Node*& left) {
 	double y_coord = cell_center.get_Y();
 	double x_coord = cell_center.get_X();
 
@@ -1151,180 +1123,6 @@ void Cell::closest_node_right(Wall_Node*& right) {
 
 
 
-
-///=================================================
-///=========================================
-//Functions for forces that might be wanted
-///=========================================
-///==================================================
-
-double Cell::compute_pressure(){
-	Wall_Node* curr = left_Corner;
-	Wall_Node* next = NULL;
-	Wall_Node* orig = curr;
-	Coord force = Coord(0,0);
-	double curr_length = 0;
-	double total_length = 0;
-	double pressure = 0;
-//	if(this->rank == 0) {
-
-	do {
-		next = curr->get_Left_Neighbor();
-		force += curr->get_CytForce();
-		curr_length = (curr->get_Location() - next->get_Location()).length();
-		total_length += curr_length;
-		curr = next;
-	} while (next != orig);
-	
-	cout << "Area: " << this->calc_Area() << endl;
-	pressure = force.length()/total_length;
-//	double area = this->calc_Area();
-//	double radius = sqrt(area/pi);
-//	pressure = pressure/radius;
-	//else {
-	//	pressure = 0;
-	//}
-	return total_length;
-	
-
-}
-
-
-/*double Cell::compute_sigma_long() {
-	Wall_Node* top = NULL;
-	this->closest_node_top(top);
-	double length = ((cell_center - top->get_Location()).length())*(0.5);
-	double y_cut_off = cell_center.get_Y() + length;
-	Wall_Node* left = NULL;
-	Wall_Node* right = NULL;
-	this->closest_node_left(left);
-	this->closest_node_right(right);
-	Wall_Node* curr = left;
-	Wall_Node* start = NULL;
-	Wall_Node* end = NULL;
-	bool possible = true;
-	do {
-		if(curr->get_Location().get_Y() > y_cut_off) {
-			start = curr;
-			possible = false;
-		}  
-		curr = curr->get_Right_Neighbor();
-	} while (possible);
-
-	curr = right;
-	possible = true;
-	do {
-		if(curr->get_Location().get_Y() > y_cut_off) {
-			end = curr;
-			possible = false;
-		}
-		curr = curr->get_Left_Neighbor();
-	} while (possible);
-	double pressure_top = this->compute_pressure(start, end);
-	
-	Wall_Node* bottom = NULL;
-	this->closest_node_bottom(bottom);
-	length = ((cell_center - bottom->get_Location()).length())*(0.5);
-	y_cut_off = cell_center.get_Y() - length;
-//	Wall_Node* left = NULL;
-//	Wall_Node* right = NULL;
-//	this->most_left_node(left);
-//	this->most_right_node(right);
-	curr = left;
-	start = NULL;
-	end = NULL;
-	possible = true;
-	do {
-		if(curr->get_Location().get_Y() < y_cut_off) {
-			start = curr;
-			possible = false;
-		}  
-		curr = curr->get_Left_Neighbor();
-	} while (possible);
-
-	curr = right;
-	possible = true;
-	do {
-		if(curr->get_Location().get_Y() < y_cut_off) {
-			end = curr;
-			possible = false;
-		}
-		curr = curr->get_Right_Neighbor();
-	} while (possible);
-	double pressure_bottom = this->compute_pressure(start, end);
-
-	double sigma_long = pressure_top + pressure_bottom;
-	return sigma_long;
-}
-
-double Cell::compute_sigma_trans() {
-
-	Wall_Node* left = NULL;
-	this->closest_node_left(left);
-	double length = ((cell_center - left->get_Location()).length())*(0.5);
-	double x_cut_off = cell_center.get_X() + length;
-	Wall_Node* top = NULL;
-	Wall_Node* bottom = NULL;
-	this->closest_node_top(top);
-	this->closest_node_bottom(bottom);
-	Wall_Node* curr = top;
-	Wall_Node* start = NULL;
-	Wall_Node* end = NULL;
-	bool possible = true;
-	do {
-		if(curr->get_Location().get_X() < x_cut_off) {
-			start = curr;
-			possible = false;
-		}  
-		curr = curr->get_Left_Neighbor();
-	} while (possible);
-
-	curr = bottom;
-	possible = true;
-	do {
-		if(curr->get_Location().get_X() < x_cut_off) {
-			end = curr;
-			possible = false;
-		}
-		curr = curr->get_Right_Neighbor();
-	} while (possible);
-	double pressure_left = this-> compute_pressure(start, end);
-
-	Wall_Node* right = NULL;
-	this->closest_node_right(right);
-	length = ((cell_center - right->get_Location()).length())*(0.5);
-	x_cut_off = cell_center.get_X() + length;
-	//Wall_Node* top = NULL;
-	//Wall_Node* bottom = NULL;
-	//this->most_top_node(top);
-	//this->most_bottom_node(bottom);
-	curr = bottom;
-	start = NULL;
-	end = NULL;
-	possible = true;
-	do {
-		if(curr->get_Location().get_X() < x_cut_off) {
-			start = curr;
-			possible = false;
-		}  
-		curr = curr->get_Left_Neighbor();
-	} while (possible);
-
-	curr = top;
-	possible = true;
-	do {
-		if(curr->get_Location().get_X() < x_cut_off) {
-			end = curr;
-			possible = false;
-		}
-		curr = curr->get_Right_Neighbor();
-	} while (possible);
-	double pressure_right = this->compute_pressure(start, end);
-
-
-	double sigma_trans = pressure_left + pressure_right;
-	return sigma_trans;
-}*/
 
 
 

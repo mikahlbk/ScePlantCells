@@ -22,6 +22,7 @@ class Node {
 		Coord my_loc;
 		Coord new_force;
 		int vtk_id;
+//		bool isStationary;
     public:
     //functions that you will want performed on all nodes
         //Constructor
@@ -36,7 +37,7 @@ class Node {
 		//other functions might be executed differently based on
         //    which node you are. Thus define as "pure virtual" and 
         //    properly define them in a derived class
-        virtual void calc_Forces() = 0;
+        //virtual void calc_Forces();
 		
 		virtual ~Node();
 };
@@ -47,7 +48,7 @@ class Cyt_Node: public Node {
 		Cell* my_cell;
     public:
         Cyt_Node(Coord loc, Cell* my_cell);
-		virtual void calc_Forces();
+		void calc_Forces();
 		Cell* get_My_Cell(){return my_cell;}
 		Coord calc_Morse_II();
 		Coord calc_Morse_MI(Wall_Node* orig);
@@ -67,6 +68,7 @@ class Wall_Node: public Node {
 		double cross_Prod;
 		Coord cyt_force;
 		bool pull;
+		bool isStationary;
 		Coord F_ext;
 		Wall_Node* closest;
     	double closest_len;
@@ -84,6 +86,8 @@ class Wall_Node: public Node {
 		void set_Left_Neighbor(Wall_Node* new_Left);
 		void set_Right_Neighbor(Wall_Node* new_Right);
 		Cell* get_My_Cell() {return my_cell;}
+		bool get_isStationary(){return isStationary;}
+		void set_isStationary();
 		void update_Angle();
 		void update_Equi_Angle(double new_theta);
 		void update_Cell(Cell* new_cell);
@@ -96,13 +100,13 @@ class Wall_Node: public Node {
 		Coord get_CytForce() {return cyt_force;}
       	Coord get_f_EXT() {return F_ext;}	
 		//Force Calculations
-		virtual void calc_Forces();
+		void calc_Forces(int Ti);
 		Coord calc_Morse_SC();
 		Coord calc_Morse_DC();
 		Coord calc_Bending();
 		Coord calc_Linear();
 		void pull_node();
-		Coord calc_External();
+		Coord calc_External(int Ti);
 		
 		// Mathematical Force Equations
 		Coord morse_Equation(Cyt_Node* cyt);

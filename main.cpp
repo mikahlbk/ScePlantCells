@@ -9,9 +9,7 @@
 #include <vector>
 #include <fstream>
 #include <ctime>
-#include <gsl/gsl_math.h>
 #include <stdio.h>
-#include<gsl/gsl_sf_bessel.h>
 
 #include "phys.h"
 #include "coord.h"
@@ -36,10 +34,9 @@ int main(){
 	
 	//make new cell objects in tissue
 	Tissue growing_Tissue(init_tissue);
-	seed();
 	cout << "Finished creating Cells" << endl;
 	//parameters for time step
-    double numSteps = 1000;
+    double numSteps = 500;
 
 	// Variable for dataoutput
 	int digits;
@@ -87,15 +84,16 @@ int main(){
 	
 		// Tissue Growth
 		
-	//	cout << "update cell cycle of each cell" << endl;
+		//cout << "update cell cycle of each cell" << endl;
 		//this includes a check for division and addition
-		//of new internal nodes
+		//of new internal nodes according to growth rate
 		growing_Tissue.update_Cell_Cycle(Ti);
 	
-	//	cout << "add new cell wall nodes if needed" << endl;
-		growing_Tissue.update_Wall(Ti);
-	//	cout << "wall node success" << endl;	
-		
+		//cout << "add new cell wall nodes if needed" << endl;
+		//adds one new cell wall node in the biggest gap
+//		if(Ti <= calibStart) {
+			growing_Tissue.update_Wall();
+//		}
 		if (Ti% 100  == 0 ) {
 			//cout << "Find Neighbors" << endl;
 			growing_Tissue.update_Neighbor_Cells();
@@ -103,41 +101,32 @@ int main(){
 
 		if(Ti% 100 == 0) {
 			//cout << "Finding adhesion points" << endl;
-			growing_Tissue.update_Adhesion(Ti);
+			growing_Tissue.update_Adhesion();
 		}
-		
-//		if(Ti ==  10000) {
-//			growing_Tissue.pressure();
+	//	cout << "stationary" << endl;
+//		if(Ti >= calibStart){
+//			growing_Tissue.set_Stationary_Points(Ti);
 //		}
-	//	if(Ti%1000==0) {
-		//	growing_Tissue.pressure();
-		//	growing_Tissue.add_cyt_node();
-	//	}
-	//	if(Ti==20000) {
-	//		growing_Tissue.add_cyt_node();
-	//	}
-
-//		if(Ti == 12000) {
-//			growing_Tissue.pressure();
+	//	cout << "compression" << endl;
+//		if(Ti >= calibStart) {
+//			growing_Tissue.compression_Test();	
 //		}
-//		if((Ti > 10000) && (Ti < 12000)){
-//			growing_Tissue.stretching_Test();
-//		}
+		if(Ti%40000 == 39999) {
+			growing_Tissue.add_cyt_node();
+		}
 		//Calculate new forces on cells and nodes
-		//cout << "forces" << endl;
-		growing_Tissue.calc_New_Forces();
-		//cout << "calculated forces" << endl;
+//		cout << "forces" << endl;
+		growing_Tissue.calc_New_Forces(Ti);
+	
+//		cout << "locations" << endl;
 		//Update node positions
 		growing_Tissue.update_Cell_Locations();
-		//cout << "updated node positions" << endl;
-//		if((Ti > 10000) && (Ti < 12000)) {
-//			growing_Tissue.elastic_mod_measurements();
-//		}
-		
-	}
-
+//		cout << "Finished" << endl;
+//		growing_Tissue.cell_area();
+}
+//	growing_Tissue.pressure();
 	//for output during  calibration of elastic modulus
-//	growing_Tissue.make_Vectors();
+	//growing_Tissue.make_Vectors();
 	
 	int stop = clock();
 

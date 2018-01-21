@@ -29,8 +29,10 @@ void Node::update_VTK_Id(int id) {
 	return;
 }
 void Node::update_Location(double& new_damping) {
+	
 	my_loc += new_force*dt*new_damping;
-    return;
+	
+	return;
 }
 
 Node::~Node() {}
@@ -38,6 +40,7 @@ Node::~Node() {}
 /**class Cyt Node Functions**/
 Cyt_Node::Cyt_Node(Coord loc, Cell* my_cell) : Node(loc) {
 	this->my_cell = my_cell;
+//	isStationary = false;
 
 }
 
@@ -106,8 +109,8 @@ Coord Cyt_Node::morse_Equation(Cyt_Node* cyt) {
     double attract = (U_II/xsi_II)*exp(diff_len*(-1)/xsi_II);
     double repel = (W_II/gamma_II)*exp(diff_len*(-1)/gamma_II);
     
-	Fii = diff_vect * (1*ALPHA*DELTA*(1-exp(-ALPHA*(diff_len -MORSE_EQ)))*(exp(-ALPHA*(diff_len-MORSE_EQ)))*(1.0/diff_len));
-	//Fii = diff_vect*((-attract + repel)/diff_len);
+//	Fii = diff_vect * (1*ALPHA*DELTA*(1-exp(-ALPHA*(diff_len -MORSE_EQ)))*(exp(-ALPHA*(diff_len-MORSE_EQ)))*(1.0/diff_len));
+	Fii = diff_vect*((-attract + repel)/diff_len);
 	return Fii;
 }
 
@@ -124,8 +127,8 @@ Coord Cyt_Node::morse_Equation(Wall_Node* wall) {
 	double diff_len = diff_vect.length();
 	double attract = (U_MI/xsi_MI)*exp(diff_len*(-1)/xsi_MI);
     double repel = (W_MI/gamma_MI)*exp(diff_len*(-1)/gamma_MI);
-    Fmi = diff_vect * (1*ALPHA_MI*DELTA_MI*(1-exp(-ALPHA_MI*(diff_len -MORSE_EQ_MI)))*(exp(-ALPHA_MI*(diff_len-MORSE_EQ_MI)))*(1.0/diff_len));
-  //  Fmi = diff_vect*((-attract + repel)/diff_len);
+    //Fmi = diff_vect * (1*ALPHA_MI*DELTA_MI*(1-exp(-ALPHA_MI*(diff_len -MORSE_EQ_MI)))*(exp(-ALPHA_MI*(diff_len-MORSE_EQ_MI)))*(1.0/diff_len));
+  	 Fmi = diff_vect*((-attract + repel)/diff_len);
 	return Fmi;
 }
 
@@ -141,10 +144,11 @@ Cyt_Node::~Cyt_Node() {
 Wall_Node::Wall_Node(Coord loc, Cell* my_cell) : Node(loc) {
 	this->my_cell = my_cell;
 	this-> pull = false;
-	this->F_ext = Coord(0,0);
+//	this->F_ext = Coord(0,0);
 	this->closest = NULL;
 	this->closest_len = 100;
-	
+	this->isStationary = false;
+	F_ext = Coord(0,0);
 }
 
 Wall_Node::Wall_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right) : Node(loc)   {
@@ -152,10 +156,12 @@ Wall_Node::Wall_Node(Coord loc, Cell* my_cell, Wall_Node* left, Wall_Node* right
     this->right = right;
 	this-> my_cell = my_cell;
 	this-> pull = false;
-	this->F_ext = Coord(0,0);
+//	this->F_ext = Coord(0,0);
 	this->closest = NULL;
 	this->closest_len = 100;
 	update_Angle();
+	this->isStationary = false;
+	F_ext = Coord(0,0);
 }
 
 Wall_Node::~Wall_Node() {
@@ -180,7 +186,10 @@ void Wall_Node::set_Right_Neighbor(Wall_Node* new_Right) {
 	this->right = new_Right;
 	return;
 }
-
+void Wall_Node::set_isStationary() {
+	this->isStationary = true;
+	return;
+}
 void Wall_Node::update_Angle() {
 	Coord left_vect = get_Left_Neighbor()->get_Location() - get_Location();
 	Coord right_vect = get_Right_Neighbor()->get_Location() - get_Location();
@@ -200,8 +209,14 @@ void Wall_Node::update_Angle() {
 	
 	//update protected member variables
 	my_angle = theta;
+//	cout << "Angle: " << my_angle << endl;	
+//	if(Ti > 8000) {
+//	if((my_angle > pi-.75) && (my_angle < pi-.75)){
+//		isStationary = true;
+//	}
+//	}
 	cross_Prod = crossProd;
-
+	
 	return;
 }
 void Wall_Node::update_Cell(Cell* new_cell) {
@@ -220,10 +235,13 @@ void Wall_Node::set_Closest(Wall_Node*  closest, double closest_len) {
 }
 
 // Calc Force Functions -----------------------
-void Wall_Node::calc_Forces() {
+void Wall_Node::calc_Forces(int Ti) {
 	// Initialize force sum to zero by default constructor
 	Coord sum;
-	
+	if(isStationary) {
+		//do nothing
+	}
+	else {
 	sum += calc_Morse_SC();
 //	cout << "SC success" << endl;	
 	cyt_force = sum;
@@ -234,10 +252,12 @@ void Wall_Node::calc_Forces() {
 //	cout << "linear" << endl;
 	sum += calc_Bending();
 //	cout << "bending" << endl;
-	
+	}
+//	int i = 0;
 	if(pull == true) {
-//		cout << "External Force is" << calc_External() << endl;
-		sum+= calc_External();
+//		cout << "External Force is" << calc_External(Ti) << endl;
+		this->F_ext = calc_External(Ti);
+		sum+= calc_External(Ti);
 		pull = false;
 	}
 	// Update new_force variable for location updating
@@ -323,19 +343,18 @@ Coord Wall_Node::calc_Linear() {
 	return F_lin;
 }
 
-Coord Wall_Node::calc_External() {
+Coord Wall_Node::calc_External(int Ti) {
+	Coord F_ext = Coord(0,(-1)*EXTERNAL_FORCE*dt*Ti);
 
-	F_ext += Coord(EXTERNAL_FORCE*dt,0);
-	
 	//if(this->get_Location().get_X() > my_cell->get_Cell_Center().get_X()) {
 	//	return F_ext;
 	//}
-	if(this->get_Location().get_X() < my_cell->get_Cell_Center().get_X()) {
-		return F_ext*(-1);
-	}
-	else {
+//	if(this->get_Location().get_X() < my_cell->get_Cell_Center().get_X()) {
+//		return F_ext*(-1);
+//	}
+//	else {
 		return F_ext;
-	}
+//	}
 }
 
 void Wall_Node::pull_node() {
@@ -360,8 +379,10 @@ Coord Wall_Node::morse_Equation(Cyt_Node* cyt) {
 	double attract = (U_MI/xsi_MI)*exp(diff_len*(-1)/xsi_MI);
 	double repel = (W_MI/gamma_MI)*exp(diff_len*(-1)/gamma_MI);
 
-	Fmi = diff_vect * (1*ALPHA_MI*DELTA_MI*(1-exp(-ALPHA_MI*(diff_len -MORSE_EQ_MI)))*(exp(-ALPHA_MI*(diff_len-MORSE_EQ_MI)))*(1.0/diff_len));
-//   	cout << Fmi << endl;
+	//Fmi = diff_vect * (1*ALPHA_MI*DELTA_MI*(1-exp(-ALPHA_MI*(diff_len -MORSE_EQ_MI)))*(exp(-ALPHA_MI*(diff_len-MORSE_EQ_MI)))*(1.0/diff_len));
+  	 Fmi = diff_vect*((-attract + repel)/diff_len);
+	
+	//cout << Fmi << endl;
 	return Fmi;
 }
 
@@ -377,7 +398,9 @@ Coord Wall_Node::morse_Equation(Wall_Node* wall) {
     double attract = (U_MM/xsi_MM)*exp(diff_len*(-1)/xsi_MM);
     double repel = (W_MM/gamma_MM)*exp(diff_len*(-1)/gamma_MM);
     
-    Fmmd =  diff_vect*(0);//(-attract + repel)/diff_len);
+    //Fmmd =  diff_vect*(0);//(-attract + repel)/diff_len);
+	 Fmmd = diff_vect*((-attract + repel)/diff_len);
+	
 	//	cout << Fmmd << endl;
 	return Fmmd;
 }
